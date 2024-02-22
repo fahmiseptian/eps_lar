@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\AdminController;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\ShopController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 /*
@@ -20,6 +21,6 @@ Route::get('/', [AdminController::class, 'index'] , function () {
 
 
 // Admin Shop
-Route::get('/shop', [AdminController::class, 'shop'] , function () {
+Route::get('/shop', [ShopController::class, 'shop'] , function () {
     return view('admin.shop.index', ['data' => $data]);
 });
