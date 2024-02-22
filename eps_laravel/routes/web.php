@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ShopController;
+use App\Http\Controllers\Admin\InvoiceController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 /*
@@ -23,4 +24,9 @@ Route::get('/', [AdminController::class, 'index'] , function () {
 // Admin Shop
 Route::get('/shop', [ShopController::class, 'shop'] , function () {
     return view('admin.shop.index', ['data' => $data]);
+});
+
+// Admin list Invoice
+Route::get('/list-inv', [InvoiceController::class, 'list_inv'] , function () {
+    return view('admin.invoice.index', ['data' => $data]);
 });
