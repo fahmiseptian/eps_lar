@@ -13,8 +13,6 @@
 
                             @include('admin.home.card')
 
-                            @include('admin.home.data_table')
-
                         </div>
                     </div>
                 </main>

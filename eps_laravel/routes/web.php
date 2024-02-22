@@ -1,7 +1,8 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Http\Request;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,6 +14,12 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/', [AdminController::class, 'index'] , function () {
+    return view('admin.home.index', ['data' => $data]);
+});
+
+
+// Admin Shop
+Route::get('/shop', [AdminController::class, 'shop'] , function () {
+    return view('admin.shop.index', ['data' => $data]);
 });

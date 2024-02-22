@@ -10,9 +10,7 @@
                         </ol>
                         <div class="row">
 
-                            @include('admin.home.card')
-
-                            @include('admin.home.data_table')
+                            @include('admin.shop.data_table')
 
                         </div>
                     </div>
