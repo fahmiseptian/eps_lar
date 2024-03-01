@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
     @include('admin.asset.header')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <body class="skin-blue">
             <div class="wrapper">
       
@@ -193,3 +192,38 @@
                 }
             </script>
 </html>
+
+
+
+function updateTypeUp(id) {
+    Swal.fire({
+        title: 'Memuat...',
+        html: '<div class="spinner-border" role="status"><span class="sr-only">Memuat...</span></div>',
+        showConfirmButton: false,
+        allowOutsideClick: false
+    });
+
+    console.log('Shop ID:', id);
+    
+    $.ajax({
+        url: '/admin/shop/' + id + '/update-type-up',
+        type: 'GET', 
+        success: function(response) {
+            if (response.message === 'Teratas') {
+                Swal.fire({
+                    title: 'Peringatan',
+                    text: 'Tipe toko sudah trusted seller, tidak dapat ditingkatkan lagi.',
+                    icon: 'warning',
+                    confirmButtonText: 'Tutup',
+                });
+            } else {
+                console.log('Tipe toko berhasil ditingkatkan');
+                location.reload();
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Terjadi kesalahan saat mengubah tipe toko:', error);
+            alert('Terjadi kesalahan saat mengubah tipe Toko.');  
+        }
+    });
+}

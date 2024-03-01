@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Admin\Invoice;
-use App\Models\Admin\member;
-use App\Models\Admin\User;
+use App\Models\Invoice;
+use App\Models\member;
+use App\Models\User;
 
 class MemberController extends Controller
 {
@@ -38,8 +38,6 @@ class MemberController extends Controller
             return response()->json(['error' => 'Terjadi kesalahan saat mengubah status anggota.'], 500);
         }
     }
-
-
 
     public function delete($id)
     {

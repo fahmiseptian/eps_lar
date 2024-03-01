@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <html>
+
+
     @include('admin.asset.header')
         <body class="skin-blue">
             <div class="wrapper">
@@ -27,10 +29,12 @@
                   <h3 class="box-title">List Invoice</h3>
                 </div><!-- /.box-header -->
                 <div class="box-body">
+                  
                   <table id="example2" class="table table-bordered table-hover">
                     <thead>
                         <tr>
                             <th>No</th>
+                            <th>Tanggal Bayar</th>
                             <th>No Invoice</th>
                             <th>Total</th>
                             <th>Status</th>
@@ -42,9 +46,17 @@
                     </thead>
                     <tbody>
                         @php $i = 1 @endphp
-                        @foreach ($data as $item)
+                        @foreach ($datainv as $item)
                         <tr>
                             <td>{{ $i++ }}</td>
+                            <td>
+                              @if ($item->tanggal_bayar)
+                                  {{ date('Y-m-d', strtotime($item->tanggal_bayar)) }}
+                              @else
+                                  {{ '-' }}
+                              @endif
+                          </td>
+                          
                             <td>{{ $item->invoice }}</td>
                             <td>Rp. {{ number_format($item->total, 0, ',', '.') }}</td>
         
@@ -100,11 +112,14 @@
                             ?>
                             </td>
                             <td>{{ $item->pelapor_pajak }}</td>
-                            <td><button></button></td>
-                            
+                            <td>
+                              <button class="btn btn-primary btn-xs" onclick="#">Lapor</button>
+                              <button class="btn btn-success btn-xs" onclick="#">Update Status</button>
+                          </td>                          
                         </tr>
                     @endforeach
                     </tbody>
+                    <div id="datepicker" style="display: none;"></div>
                     <tfoot>
                         <tr>
                             <th>No</th>
@@ -118,6 +133,7 @@
                         </tr>
                     </tfoot>
                   </table>
+                  
                 </div><!-- /.box-body -->
               </div><!-- /.box -->
             </div><!-- /.col -->
@@ -130,19 +146,18 @@
     </body>
     {{-- footer --}}
         @include('admin.asset.footer')
-            
             <!-- page script -->
-            <script type="text/javascript">
-              $(function () {
-                $("#example1").dataTable();
-                $('#example2').dataTable({
-                  "bPaginate": true,
-                  "bLengthChange": false,
-                  "bFilter": false,
-                  "bSort": true,
-                  "bInfo": true,
-                  "bAutoWidth": false
-                });
-              });
-            </script>
+  <script type="text/javascript">
+    $(function () {
+    $("#example1").dataTable();
+    $('#example2').dataTable({
+    "bPaginate": true,
+    "bLengthChange": false,
+    "bFilter": false,
+    "bSort": true,
+    "bInfo": true,
+    "bAutoWidth": false
+      });
+    });         
+  </script>
 </html>
