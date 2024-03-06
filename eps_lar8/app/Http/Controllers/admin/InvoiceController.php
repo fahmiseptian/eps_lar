@@ -17,26 +17,6 @@ class InvoiceController extends Controller
         return view('admin.invoice.index', ['datainv' => $datainv]);
     }
 
-    public function updateStatusAndDate($itemId, Request $request)
-    {
-        // Validasi data
-        $request->validate([
-            'date' => 'required|date_format:Y-m-d',
-        ]);
-
-        // Lakukan pembaruan status dan tanggal pembayaran
-        $invoice = Invoice::find($itemId);
-        if (!$invoice) {
-            return response()->json(['message' => 'Invoice not found'], 404);
-        }
-
-        $invoice->tanggal_bayar = $request->date;
-        $invoice->status = 'complete_payment';
-        $invoice->save();
-
-        return response()->json(['message' => 'Invoice status and date updated successfully'], 200);
-    }
-
     public function inv_cancelled()
     {
         // Ambil data invoice yang dibatalkan dari database
@@ -52,7 +32,14 @@ class InvoiceController extends Controller
         $member = Member::where('id', $invoice->id_user)->firstOrFail();
         $cartshop = CompleteCartShop::where('id_cart', $invoice->id)->firstOrFail();
         $shop = Shop::where('id', $cartshop->id_shop)->firstOrFail();
-        return response()->json(['invoice' => $invoice, 'member' => $member, 'cartshop' => $cartshop, 'shop' => $shop]);
+
+        // mengambil data yang diperlukan saja
+        $invoiceData = $invoice->only('invoice');
+        $memberData = $member->only('nama');
+        $shopData = $shop->only('name');
+
+
+        return response()->json(['invoice' => $invoiceData, 'member' => $memberData,'shop' => $shopData]);
     }
 
 }

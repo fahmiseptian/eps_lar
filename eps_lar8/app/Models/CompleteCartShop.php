@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CompleteCartShop extends Model
 {
+    protected $visible = ['status'];
     protected $table = 'complete_cart_shop';
     protected $primaryKey = 'id'; 
 }

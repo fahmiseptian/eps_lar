@@ -61,17 +61,17 @@
                                                             </td>
                                                             <td>
                                                                 <button onclick="updateTypeUp('{{ $item->id }}')"
-                                                                  class="glyphicon glyphicon-upload {{ $item->type === 'trusted_seller' ? 'btn-secondary disabled' : 'btn-success' }}"
-                                                                  {{ $item->type === 'trusted_seller' ? 'disabled' : '' }}>
+                                                                    class="glyphicon glyphicon-upload {{ $item->type === 'trusted_seller' ? 'btn-secondary disabled' : 'btn-success' }}"
+                                                                    {{ $item->type === 'trusted_seller' ? 'disabled' : '' }}>
                                                                 </button>
                                                             </td>
                                                         </tr>
                                                         <tr>
                                                             <td>
-                                                              <button onclick="updateTypeDown('{{ $item->id }}')"
-                                                                class="glyphicon glyphicon-download {{ $item->type === 'silver' ? 'btn-secondary disabled' : 'btn-warning' }}"
-                                                                {{ $item->type === 'silver' ? 'disabled' : '' }}>
-                                                            </button>
+                                                                <button onclick="updateTypeDown('{{ $item->id }}')"
+                                                                    class="glyphicon glyphicon-download {{ $item->type === 'silver' ? 'btn-secondary disabled' : 'btn-warning' }}"
+                                                                    {{ $item->type === 'silver' ? 'disabled' : '' }}>
+                                                                </button>
                                                             </td>
                                                         </tr>
                                                     </table>
@@ -112,177 +112,6 @@
 @include('admin.asset.footer')
 
 <!-- page script -->
-<script type="text/javascript">
-    $(function() {
-        $("#example1").dataTable();
-        $('#example2').dataTable({
-            "bPaginate": true,
-            "bLengthChange": false,
-            "bFilter": false,
-            "bSort": true,
-            "bInfo": true,
-            "bAutoWidth": false
-        });
-    });
-
-    function detail(id) {
-        // Menampilkan loading spinner
-        Swal.fire({
-            title: 'Memuat...',
-            html: '<div class="spinner-border" role="status"><span class="sr-only">Memuat...</span></div>',
-            showConfirmButton: false,
-            allowOutsideClick: false
-        });
-
-        // Mengambil data anggota menggunakan AJAX
-        $.ajax({
-            url: '/admin/shop/' + id,
-            method: 'GET',
-            success: function(response) {
-                var shop = response.shop;
-                var member = response.member;
-                if (shop) {
-                    // Menampilkan informasi anggota dengan SweetAlert
-                    Swal.fire({
-                        title: 'Detail Toko',
-                        html: `
-                                    <div style="text-align: justify;">
-                                        <p><strong>Nama Toko:</strong> ${shop.name || ''}</p>
-                                        <p><strong>Email :</strong> ${member.email || ''}</p>
-                                        <p><strong>No Telepon:</strong> ${shop.phone || ''}</p>
-                                        <p><strong>No NIK:</strong> ${shop.nik_pemilik || ''}</p>
-                                        <p><strong>NPWP :</strong> ${shop.npwp || ''}</p>
-                                    </div>
-                                `,
-                        confirmButtonText: 'Tutup',
-                    });
-                } else {
-                    // Menampilkan pesan jika data anggota tidak ditemukan
-                    Swal.fire({
-                        title: 'Detail Toko',
-                        text: 'Data Toko tidak ditemukan.',
-                        icon: 'error',
-                        confirmButtonText: 'Tutup',
-                    });
-                }
-            },
-            error: function(xhr, status, error) {
-                // Menampilkan pesan kesalahan
-                Swal.fire({
-                    title: 'Terjadi Kesalahan',
-                    text: 'Terjadi kesalahan saat memuat detail anggota.',
-                    icon: 'error',
-                    confirmButtonText: 'Tutup',
-                });
-            }
-        });
-    }
-
-    // Upadte Status
-    function updateStatus(id) {
-        Swal.fire({
-            title: 'Memuat...',
-            html: '<div class="spinner-border" role="status"><span class="sr-only">Memuat...</span></div>',
-            showConfirmButton: false,
-            allowOutsideClick: false
-        });
-        console.log('Shop ID:', id);
-        $.ajax({
-            url: '/admin/shop/' + id + '/update-status',
-            type: 'GET',
-            success: function(response) {
-                console.log('Status anggota berhasil diubah');
-                location.reload();
-            },
-            error: function(xhr, status, error) {
-                console.error('Terjadi kesalahan saat mengubah status toko:', error);
-                alert('Terjadi kesalahan saat mengubah status Toko.');
-            }
-        });
-    }
-
-    function deleteShop(id) {
-        if (confirm('Apakah Anda yakin ingin menghapus Toko ini?')) {
-            $.ajax({
-                url: '/admin/shop/' + id + '/delete',
-                method: 'GET',
-                success: function(response) {
-                    alert('Toko berhasil dihapus.');
-                    // Refresh halaman untuk memperbarui tampilan
-                    location.reload();
-                },
-                error: function(xhr, status, error) {
-                    alert('Terjadi kesalahan saat menghapus Toko.');
-                }
-            });
-        }
-    }
-
-    function updateTypeUp(id) {
-        Swal.fire({
-            title: 'Memuat...',
-            html: '<div class="spinner-border" role="status"><span class="sr-only">Memuat...</span></div>',
-            showConfirmButton: false,
-            allowOutsideClick: false
-        });
-
-        console.log('Shop ID:', id);
-
-        $.ajax({
-            url: '/admin/shop/' + id + '/update-type-up',
-            type: 'GET',
-            success: function(response) {
-                if (response.message === 'Teratas') {
-                    Swal.fire({
-                        title: 'Peringatan',
-                        text: 'Tipe toko sudah trusted seller, tidak dapat ditingkatkan lagi.',
-                        icon: 'warning',
-                        confirmButtonText: 'Tutup',
-                    });
-                } else {
-                    console.log('Tipe toko berhasil ditingkatkan');
-                    location.reload();
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Terjadi kesalahan saat mengubah tipe toko:', error);
-                alert('Terjadi kesalahan saat mengubah tipe Toko.');
-            }
-        });
-    }
-
-    function updateTypeDown(id) {
-        Swal.fire({
-            title: 'Memuat...',
-            html: '<div class="spinner-border" role="status"><span class="sr-only">Memuat...</span></div>',
-            showConfirmButton: false,
-            allowOutsideClick: false
-        });
-
-        console.log('Shop ID:', id);
-
-        $.ajax({
-            url: '/admin/shop/' + id + '/update-type-down',
-            type: 'GET',
-            success: function(response) {
-                if (response.message === 'Terbawah') {
-                    Swal.fire({
-                        title: 'Peringatan',
-                        text: 'Tipe toko sudah silver, tidak dapat diturunkan lagi.',
-                        icon: 'warning',
-                        confirmButtonText: 'Tutup',
-                    });
-                } else {
-                    console.log('Tipe toko berhasil diturunkan');
-                    location.reload();
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('Terjadi kesalahan saat mengubah tipe toko:', error);
-                alert('Terjadi kesalahan saat mengubah tipe Toko.');
-            }
-        });
-    }
-</script>
+<script src="{{ asset('/js/function/admin/shop.js') }}" type="text/javascript"></script>
 
 </html>

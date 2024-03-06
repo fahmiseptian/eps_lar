@@ -11,7 +11,8 @@ class Shop extends Model
     protected $table = 'shop';
     public $timestamps = false;
 
+    protected $visible = ['nama_pt','name','nik_pemilik','npwp','phone'];
     protected $fillable = [
-        'status','type'
+        'status','type','is_top',
     ];
 }
