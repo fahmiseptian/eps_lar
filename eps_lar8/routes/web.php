@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\ShopController;
 use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\AuthController;
 
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -18,25 +20,24 @@ use App\Http\Controllers\Admin\AuthController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('welcome');});
 
 Route::get('/admin', function () {
-    return view('admin/home/index');
-});
+    return view('admin/home/index');});
 
 // Admin list Invoice
-Route::get('/admin/list-inv', [InvoiceController::class, 'list_inv'] , function () {
-});
-Route::get('/admin/list-cancelled-inv', [InvoiceController::class, 'inv_cancelled'] , function () {
-});
+Route::get('/admin/list-inv', [InvoiceController::class, 'list_inv'] , function () {});
+Route::get('/admin/list-cancelled-inv', [InvoiceController::class, 'inv_cancelled'] , function () {});
 Route::get('/admin/invoice/{id}', [InvoiceController::class, 'detail'])->name('admin.invoice.detail');
 
 
 // Admin Shop
-Route::get('/admin/shop', [ShopController::class, 'shop'] , function () {
-});
+Route::get('/admin/shop', [ShopController::class, 'shop'] , function () {});
+Route::get('/admin/shop/lpse-config', [ShopController::class, 'lpse_config'] , function () {});
+Route::post('/admin/update-is-top/{id}', [ShopController::class, 'updateIsTop']);
 Route::get('/admin/shop/{id}', [ShopController::class, 'detail'])->name('admin.shop.detail');
+Route::post('/admin/update-formula', [ShopController::class, 'updateFormula']);
+Route::get('/admin/formula-lpse', [ShopController::class, 'formulaLpse'])->name('admin.formula-lpse');
 Route::get('/admin/shop/{id}/update-status', [ShopController::class, 'updateStatus'])->name('admin.shop.update-status');
 Route::get('/admin/shop/{id}/delete', [ShopController::class, 'delete'])->name('admin.shop.delete');
 Route::get('/admin/shop/{id}/update-type-up', [ShopController::class, 'updateTypeUp'])->name('admin.shop.update-type-up');

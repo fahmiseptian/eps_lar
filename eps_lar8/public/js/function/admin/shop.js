@@ -1,0 +1,483 @@
+$(function () {
+    $("#example1").dataTable();
+    $("#example2").dataTable({
+        bPaginate: true,
+        bLengthChange: false,
+        bFilter: false,
+        bSort: true,
+        bInfo: true,
+        bAutoWidth: false,
+    });
+});
+
+function detail(id) {
+    // Menampilkan loading spinner
+    Swal.fire({
+        title: "Memuat...",
+        html: '<div class="spinner-border" role="status"><span class="sr-only">Memuat...</span></div>',
+        showConfirmButton: false,
+        allowOutsideClick: false,
+    });
+
+    // Mengambil data anggota menggunakan AJAX
+    $.ajax({
+        url: "/admin/shop/" + id,
+        method: "GET",
+        success: function (response) {
+            var shop = response.shop;
+            var member = response.member;
+            if (shop) {
+                // Menampilkan informasi anggota dengan SweetAlert
+                Swal.fire({
+                    title: "Detail Toko",
+                    html: `
+                                <div style="text-align: justify;">
+                                    <p><strong>Nama Toko:</strong> ${
+                                        shop.name || ""
+                                    }</p>
+                                    <p><strong>Email :</strong> ${
+                                        member.email || ""
+                                    }</p>
+                                    <p><strong>No Telepon:</strong> ${
+                                        shop.phone || ""
+                                    }</p>
+                                    <p><strong>No NIK:</strong> ${
+                                        shop.nik_pemilik || ""
+                                    }</p>
+                                    <p><strong>NPWP :</strong> ${
+                                        shop.npwp || ""
+                                    }</p>
+                                </div>
+                            `,
+                    confirmButtonText: "Tutup",
+                });
+            } else {
+                // Menampilkan pesan jika data anggota tidak ditemukan
+                Swal.fire({
+                    title: "Detail Toko",
+                    text: "Data Toko tidak ditemukan.",
+                    icon: "error",
+                    confirmButtonText: "Tutup",
+                });
+            }
+        },
+        error: function (xhr, status, error) {
+            // Menampilkan pesan kesalahan
+            Swal.fire({
+                title: "Terjadi Kesalahan",
+                text: "Terjadi kesalahan saat memuat detail anggota.",
+                icon: "error",
+                confirmButtonText: "Tutup",
+            });
+        },
+    });
+}
+
+// Upadte Status
+function updateStatus(id) {
+    Swal.fire({
+        title: "Memuat...",
+        html: '<div class="spinner-border" role="status"><span class="sr-only">Memuat...</span></div>',
+        showConfirmButton: false,
+        allowOutsideClick: false,
+    });
+    console.log("Shop ID:", id);
+    $.ajax({
+        url: "/admin/shop/" + id + "/update-status",
+        type: "GET",
+        success: function (response) {
+            console.log("Status anggota berhasil diubah");
+            location.reload();
+        },
+        error: function (xhr, status, error) {
+            console.error(
+                "Terjadi kesalahan saat mengubah status toko:",
+                error
+            );
+            alert("Terjadi kesalahan saat mengubah status Toko.");
+        },
+    });
+}
+
+function deleteShop(id) {
+    if (confirm("Apakah Anda yakin ingin menghapus Toko ini?")) {
+        $.ajax({
+            url: "/admin/shop/" + id + "/delete",
+            method: "GET",
+            success: function (response) {
+                alert("Toko berhasil dihapus.");
+                // Refresh halaman untuk memperbarui tampilan
+                location.reload();
+            },
+            error: function (xhr, status, error) {
+                alert("Terjadi kesalahan saat menghapus Toko.");
+            },
+        });
+    }
+}
+
+function updateTypeUp(id) {
+    Swal.fire({
+        title: "Memuat...",
+        html: '<div class="spinner-border" role="status"><span class="sr-only">Memuat...</span></div>',
+        showConfirmButton: false,
+        allowOutsideClick: false,
+    });
+
+    console.log("Shop ID:", id);
+
+    $.ajax({
+        url: "/admin/shop/" + id + "/update-type-up",
+        type: "GET",
+        success: function (response) {
+            if (response.message === "Teratas") {
+                Swal.fire({
+                    title: "Peringatan",
+                    text: "Tipe toko sudah trusted seller, tidak dapat ditingkatkan lagi.",
+                    icon: "warning",
+                    confirmButtonText: "Tutup",
+                });
+            } else {
+                console.log("Tipe toko berhasil ditingkatkan");
+                location.reload();
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Terjadi kesalahan saat mengubah tipe toko:", error);
+            alert("Terjadi kesalahan saat mengubah tipe Toko.");
+        },
+    });
+}
+
+function updateTypeDown(id) {
+    Swal.fire({
+        title: "Memuat...",
+        html: '<div class="spinner-border" role="status"><span class="sr-only">Memuat...</span></div>',
+        showConfirmButton: false,
+        allowOutsideClick: false,
+    });
+
+    console.log("Shop ID:", id);
+
+    $.ajax({
+        url: "/admin/shop/" + id + "/update-type-down",
+        type: "GET",
+        success: function (response) {
+            if (response.message === "Terbawah") {
+                Swal.fire({
+                    title: "Peringatan",
+                    text: "Tipe toko sudah silver, tidak dapat diturunkan lagi.",
+                    icon: "warning",
+                    confirmButtonText: "Tutup",
+                });
+            } else {
+                console.log("Tipe toko berhasil diturunkan");
+                location.reload();
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error("Terjadi kesalahan saat mengubah tipe toko:", error);
+            alert("Terjadi kesalahan saat mengubah tipe Toko.");
+        },
+    });
+}
+
+var toggleIcons = document.querySelectorAll(".is_top");
+toggleIcons.forEach(function (icon) {
+    icon.addEventListener("click", function () {
+        var shopId = this.getAttribute("data-shop-id");
+        var isTop = this.getAttribute("data-is-top");
+        console.log(shopId);
+        // Kirim permintaan AJAX untuk memperbarui nilai is_top
+        fetch("/admin/update-is-top/" + shopId, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}",
+            },
+            body: JSON.stringify({
+                is_top: isTop,
+            }),
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.json();
+            })
+            .then((data) => {
+                // Mengubah ikon dan data is_top berdasarkan respons
+                if (data.is_top == 1) {
+                    icon.classList.remove("glyphicon-remove-sign");
+                    icon.classList.add("glyphicon-ok-sign");
+                    icon.setAttribute("data-is-top", 1);
+                } else {
+                    icon.classList.remove("glyphicon-ok-sign");
+                    icon.classList.add("glyphicon-remove-sign");
+                    icon.setAttribute("data-is-top", 0);
+                }
+            })
+            .catch((error) => console.error("Error:", error));
+    });
+});
+
+document.getElementById("formula-price").addEventListener("click", function () {
+    // Menampilkan SweetAlert
+    Swal.fire({
+        title: "Memuat...",
+        html: '<div class="spinner-border" role="status"><span class="sr-only">Memuat...</span></div>',
+        showConfirmButton: false,
+        allowOutsideClick: false,
+    });
+
+    $.ajax({
+        url: "/admin/formula-lpse",
+        method: "GET",
+        success: function (response) {
+            var formula = response.formula;
+            if (formula) {
+                Swal.fire({
+                    title: "Detail Formula",
+                    html: `
+        <div style="text-align: justify;">
+            <table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd;">
+                <thead>
+                    <tr>
+                        <th style="padding: 8px; border-bottom: 1px solid #ddd;">PPH (%)</th>
+                        <th style="padding: 8px; border-bottom: 1px solid #ddd;">PPN (%)</th>
+                        <th style="padding: 8px; border-bottom: 1px solid #ddd;">Fee Marketplace (%)</th>
+                        <th style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">
+                            <input type="text" class="form-control" id="inputPPHPercent" value="${formula.pph}" required>   
+                        </td>
+                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">
+                            <input type="text" class="form-control" id="inputPPNPercent" value="${formula.ppn}" required>
+                        </td>
+                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">
+                            <input type="text" class="form-control" id="inputFeeMPPercent" value="${formula.fee_mp_percent}" required>
+                        </td>
+                        <th style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">
+                            <a class="glyphicon glyphicon-saved" id="formula-saved">Simpan </a>
+                        </th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <hr>
+        <div style="margin-top: 20px;">
+            <h4>Formulir Perhitungan</h4>
+            <form id="calculation-form">
+                <div class="form-group">
+                    <label for="inputValue">Harga Seller:</label>
+                    <input type="text" class="form-control" id="inputValue" placeholder="Rp Masukkan Nominal" required inputmode="numeric" pattern="[0-9]*">
+                </div>
+                <button type="button" class="btn btn-primary" id="calculate-button">Hitung</button>
+            </form>
+        </div>
+        <div style="margin-top: 20px;" id="calculation-results"></div>
+    `,
+                    confirmButtonText: "Tutup",
+                    width: "50%",
+                    // Logika perhitungan saat tombol "Hitung" ditekan
+                    didOpen: function () {
+                        var originalValue = "";
+                        var inputElement =
+                            document.getElementById("inputValue");
+
+                        inputElement.addEventListener(
+                            "input",
+                            function (event) {
+                                var value = event.target.value.replace(
+                                    /\D/g,
+                                    ""
+                                );
+                                var formattedValue = value.replace(
+                                    /\B(?=(\d{3})+(?!\d))/g,
+                                    ","
+                                );
+                                event.target.value = formattedValue;
+                                originalValue = value;
+                            }
+                        );
+
+                        // Tambahkan event listener untuk tombol Simpan
+                        $(document).on("click", "#formula-saved", function () {
+                            var $row = $(this).closest("tr");
+                            var newData = {};
+                            $row.find("td:not(:last-child)").each(function (
+                                index
+                            ) {
+                                var key = ["pph", "ppn", "fee_mp_percent"][
+                                    index
+                                ];
+                                newData[key] = $(this)
+                                    .find("input")
+                                    .val()
+                                    .trim();
+                            });
+                            var csrfToken = document
+                                .querySelector('meta[name="csrf-token"]')
+                                .getAttribute("content");
+
+                            // Kirim perubahan ke server menggunakan AJAX
+                            $.ajax({
+                                url: "/admin/update-formula",
+                                method: "POST",
+                                data: { ...newData, _token: csrfToken },
+                                success: function (response) {
+                                    // Tampilkan pesan sukses atau gagal
+                                    alert(response.message);
+
+                                    // Tampilkan kembali input fields dengan nilai yang baru disimpan
+                                    $row.find("td:not(:last-child)").each(
+                                        function (index) {
+                                            var key = [
+                                                "pph",
+                                                "ppn",
+                                                "fee_mp_percent",
+                                            ][index];
+                                            $(this).html(
+                                                '<input type="text" class="form-control" value="' +
+                                                    newData[key] +
+                                                    '">'
+                                            );
+                                        }
+                                    );
+                                },
+                                error: function (xhr, status, error) {
+                                    // Tampilkan pesan kesalahan jika terjadi kesalahan saat mengirim permintaan
+                                    alert("Terjadi kesalahan: " + error);
+                                },
+                            });
+                        });
+
+                        document.getElementById("calculate-button").onclick =
+                            function () {
+                                // Gunakan nilai asli untuk perhitungan
+                                calculate(formula, originalValue);
+                            };
+                    },
+                });
+            } else {
+                // Menampilkan pesan jika data anggota tidak ditemukan
+                Swal.fire({
+                    title: "Detail Formula",
+                    text: "Formula Price Eror.",
+                    icon: "error",
+                    confirmButtonText: "Tutup",
+                });
+            }
+        },
+        error: function (xhr, status, error) {
+            // Menampilkan pesan kesalahan
+            Swal.fire({
+                title: "Terjadi Kesalahan",
+                text: "Terjadi kesalahan saat memuat detail formula.",
+                icon: "error",
+                confirmButtonText: "Tutup",
+            });
+        },
+    });
+});
+
+function calculate(formula, originalValue) {
+    $.ajax({
+        url: "/admin/formula-lpse",
+        method: "GET",
+        success: function (response) {
+            var formula = response.formula;
+
+            // Menggunakan nilai asli yang disimpan
+            var inputValue = parseFloat(originalValue);
+
+            if (!isNaN(inputValue)) {
+                // Rumus
+                var feeMarketplace = Math.round(
+                    inputValue *
+                        (formula.fee_mp_percent /
+                            (100 - formula.fee_mp_percent))
+                );
+                var hargaDasarLPSE =
+                    Math.ceil(
+                        ((inputValue + feeMarketplace) * 100) /
+                            (100 - formula.pph) /
+                            1000
+                    ) * 1000;
+                var ppn = hargaDasarLPSE * (formula.ppn / 100);
+                var hargaTayang = hargaDasarLPSE + ppn;
+
+                var formattedInputValue = inputValue.toLocaleString("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                });
+                var formattedFeeMarketplace = feeMarketplace.toLocaleString(
+                    "id-ID",
+                    {
+                        style: "currency",
+                        currency: "IDR",
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0,
+                    }
+                );
+                var formattedHargaDasarLPSE = hargaDasarLPSE.toLocaleString(
+                    "id-ID",
+                    {
+                        style: "currency",
+                        currency: "IDR",
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0,
+                    }
+                );
+                var formattedPPN = ppn.toLocaleString("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                });
+                var formattedHargaTayang = hargaTayang.toLocaleString("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                });
+
+                document.getElementById("calculation-results").innerHTML = `
+            <h4>Hasil Perhitungan:</h4>
+
+            <div style="text-align: justify;">
+                            <table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd;">
+                                <thead>
+                                    <tr>
+                                        <th style="padding: 8px; border-bottom: 1px solid #ddd;">Harga Seller</th>
+                                        <th style="padding: 8px; border-bottom: 1px solid #ddd;">Fee Marketplace</th>
+                                        <th style="padding: 8px; border-bottom: 1px solid #ddd;">Harga Dasar LPSE</th>
+                                        <th style="padding: 8px; border-bottom: 1px solid #ddd;">PPN</th>
+                                        <th style="padding: 8px; border-bottom: 1px solid #ddd;">Harga Tayang</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">${formattedInputValue}</td>
+                                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">${formattedFeeMarketplace}</td>
+                                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">${formattedHargaDasarLPSE}</td>
+                                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">${formattedPPN}</td>
+                                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">${formattedHargaTayang}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+        `;
+            } else {
+                document.getElementById("calculation-results").innerHTML =
+                    "Masukkan nilai yang valid.";
+            }
+        },
+    });
+}

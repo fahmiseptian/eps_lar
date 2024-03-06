@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Shop;
 use App\Models\Member;
+use App\Models\Lpse_config;
+use Illuminate\Http\Request; 
 
 class ShopController extends Controller
 {
@@ -126,4 +128,55 @@ public function updateTypeDown($id)
         $member->update(['member_status' => 'delete', 'registered_member' => 0]);
         return redirect()->back()->with('success', 'Anggota berhasil dihapus.');
     }
+
+    public function lpse_config()
+    {
+        $datashop = Shop::where('status', '!=', 'delete')
+                        ->orderBy('id', 'desc')
+                        ->get();
+
+        return view('admin.shop.lpse-config', ['datashop' => $datashop]);
+    }
+
+    public function updateIsTop($id) {
+        try {
+            $shop = Shop::findOrFail($id);
+            $newTOP = $shop->is_top === '1' ? '0' : '1';
+            $shop->update(['is_top' => $newTOP]);
+
+            return response()->json(['is_top' => $shop->is_top]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function formulaLpse()
+    {
+        $lpse = Lpse_config::orderBy('id', 'desc')
+                        ->first();  
+
+        $formula = $lpse->only('ppn','pph','fee_mp_percent');
+        return response()->json(['formula' => $formula]);
+    }
+
+
+    public function updateFormula(Request $request)
+    {
+        // Validasi permintaan
+        $request->validate([
+            'pph' => 'required',
+            'ppn' => 'required',
+            'fee_mp_percent' => 'required',
+        ]);
+
+        // Update formula di database
+        $formula = Lpse_config::first();
+        $formula->pph = $request->pph;
+        $formula->ppn = $request->ppn;
+        $formula->fee_mp_percent = $request->fee_mp_percent;
+        $formula->save();
+
+        return response()->json(['message' => 'Formula updated successfully']);
+    }
+
 }
