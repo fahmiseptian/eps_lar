@@ -34,19 +34,21 @@ Route::get('/admin/invoice/{id}', [InvoiceController::class, 'detail'])->name('a
 // Admin Shop
 Route::get('/admin/shop', [ShopController::class, 'shop'] , function () {});
 Route::get('/admin/shop/lpse-config', [ShopController::class, 'lpse_config'] , function () {});
-Route::post('/admin/update-is-top/{id}', [ShopController::class, 'updateIsTop']);
+Route::get('/admin/update-is-top/{id}', [ShopController::class, 'updateIsTop']);
 Route::get('/admin/shop/{id}', [ShopController::class, 'detail'])->name('admin.shop.detail');
 Route::post('/admin/update-formula', [ShopController::class, 'updateFormula']);
+Route::get('/admin/update-product-lpse/{id}', [ShopController::class, 'updateProduct']);
 Route::get('/admin/formula-lpse', [ShopController::class, 'formulaLpse'])->name('admin.formula-lpse');
-Route::get('/admin/shop/{id}/update-status', [ShopController::class, 'updateStatus'])->name('admin.shop.update-status');
+Route::get('/admin/shop/{id}/update-status', [ShopController::class, 'updateStatus']);
 Route::get('/admin/shop/{id}/delete', [ShopController::class, 'delete'])->name('admin.shop.delete');
+Route::get('/admin/shop/{id}/product', [ShopController::class, 'getProduct']);
 Route::get('/admin/shop/{id}/update-type-up', [ShopController::class, 'updateTypeUp'])->name('admin.shop.update-type-up');
 Route::get('/admin/shop/{id}/update-type-down', [ShopController::class, 'updateTypeDown'])->name('admin.shop.update-type-down');
 
 // Admin Member
 Route::get('/admin/member', [MemberController::class, 'index'])->name('admin.member.index');
 Route::get('/admin/member/{id}', [MemberController::class, 'show'])->name('admin.member.show');
-Route::get('/admin/member/{id}/toggle-status', [MemberController::class, 'toggleStatus'])->name('admin.member.toggle-status');
+Route::post('/admin/member/{id}/toggle-status', [MemberController::class, 'toggleStatus'])->name('admin.member.toggle-status');
 Route::get('/admin/member/{id}/delete', [MemberController::class, 'delete'])->name('admin.members.delete');
 
 // login
