@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Shop;
 use App\Models\Member;
 use App\Models\Lpse_config;
+use App\Models\Product;
 use Illuminate\Http\Request; 
 
 class ShopController extends Controller
@@ -179,4 +180,29 @@ public function updateTypeDown($id)
         return response()->json(['message' => 'Formula updated successfully']);
     }
 
+
+    // Mengambil produk dengan id shop
+    public function getProduct($id)
+    {
+        $products = Product::where('id_shop', $id)->get();
+        if ($products->isEmpty()) {
+            return response()->json(['message' => 'Tidak ada produk yang ditemukan untuk toko dengan ID yang diberikan'], 404);
+        }
+        return response()->json(['products' => $products]);
+    }
+
+    // update status product
+    public function updateProduct($id)
+    {
+        try {
+            $product = Product::find($id);
+            $newStatus = $product->status_lpse === '1' ? '0' : '1';
+            $product->update(['status_lpse' => $newStatus]);
+
+            return response()->json(['status_lpse' => "sasasa"]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }
+
