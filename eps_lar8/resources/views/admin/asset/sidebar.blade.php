@@ -7,7 +7,7 @@
           <img src="{{ asset('/img/user2-160x160.jpg') }}" class="img-circle" alt="User Image" />
         </div>
         <div class="pull-left info">
-          <p>Alexander Pierce</p>
+          <p><?=session()->get('username') ?></p>
 
           <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
         </div>
@@ -24,6 +24,7 @@
             <li class="active"><a href="index2.html"><i class="fa fa-circle-o"></i> Dashboard v2</a></li>
           </ul>
         </li>
+        <li><a href="#"><i class="fa fa-circle-o text-danger"></i> Test LINK</a></li>
         <li class="treeview">
             <a href="#">
               <i class="fa fa-files-o"></i>

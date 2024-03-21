@@ -301,7 +301,12 @@ document.getElementById("formula-price").addEventListener("click", function () {
                                 data: { ...newData, _token: csrfToken },
                                 success: function (response) {
                                     // Tampilkan pesan sukses atau gagal
-                                    alert(response.message);
+                                    Swal.fire({
+                                        icon: "success",
+                                        title: "Your work has been saved",
+                                        showConfirmButton: false,
+                                        timer: 1500
+                                      });
 
                                     // Tampilkan kembali input fields dengan nilai yang baru disimpan
                                     $row.find("td:not(:last-child)").each(

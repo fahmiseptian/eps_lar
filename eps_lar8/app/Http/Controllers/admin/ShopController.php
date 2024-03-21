@@ -7,10 +7,29 @@ use App\Models\Shop;
 use App\Models\Member;
 use App\Models\Lpse_config;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Http\Request; 
 
 class ShopController extends Controller
 {
+    protected $user_id;
+    protected $username;
+    protected $access_id;
+    protected $data;
+
+    public function __construct(Request $request)
+    {
+        // Login
+        $this->middleware('admin');
+        // menagmbil data dari session
+        $this->user_id = $request->session()->get('id');
+		$this->username = $request->session()->get('username');
+		$this->access_id 	= $request->session()->get('access_id');
+        // Membuat $this->data
+        $this->data['title'] = 'Shop';
+        $this->data['profile'] = User::find($this->access_id);
+    }
+    
     public function shop()
     {
         $datashop = Shop::where('status', '!=', 'delete')

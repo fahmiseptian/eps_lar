@@ -3,27 +3,42 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Model;
+use App\Libraries\Encryption; 
 
-
-class User extends Authenticatable
+class User extends Model
 {
-    use HasFactory, Notifiable;
-    protected $hidden = ['password, email'];
+    use HasFactory;
 
     protected $table = 'user';
+    protected $primaryKey = 'id';
+    protected $fillable = [
+        'username','password', 'id_admin', 'access_id',
+    ];
+    protected $hidden = [
+        'password', 'remember_token',
+    ];
+    protected $Encryption;
 
-    protected $guard = 'admin';
-
-    // Implementasi metode yang diperlukan dari Authenticatable
-    public function getAuthIdentifierName()
+    protected static function booted()
     {
-        return 'id'; // Kolom yang digunakan sebagai identifier (biasanya 'id')
+        static::retrieved(function ($model) {
+            $model->Encryption = new Encryption();
+        });
     }
 
-    public function getAuthIdentifier()
+    public function decryptPassword($password)
     {
-        return $this->getKey();
+        if ($this->Encryption !== null) {
+            $cek = $this->Encryption->decrypt($password);
+
+            if ($cek === false) {
+                return "Error";
+            } 
+
+            return $cek;
+        } else {
+            return "Encryption object is not initialized";
+        }
     }
 }
