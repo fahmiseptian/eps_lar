@@ -6,7 +6,7 @@ use App\Http\Controllers\Admin\ShopController;
 use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\HomeController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\Admin\MenuController;
 
 
 /*
@@ -31,14 +31,18 @@ Route::get('/admin/logout', [AuthController::class, 'logout'])->name('admin.logo
 Route::group(['middleware' => 'admin'], function () {
     Route::get('/admin', [HomeController::class, 'index'])->name('admin');
 
+    // membuat Menu
+    Route::get('/admin/menu/create', [MenuController::class, 'create'])->name('admin.menu.create');
+    Route::post('/admin/menu/store', [MenuController::class, 'store'])->name('admin.menu.store');
+
     // Admin list Invoice
-    Route::get('/admin/list-inv', [InvoiceController::class, 'list_inv'] , function () {});
-    Route::get('/admin/list-cancelled-inv', [InvoiceController::class, 'inv_cancelled'] , function () {});
+    Route::get('/admin/list-inv', [InvoiceController::class, 'list_inv'])->name('admin.list-inv');
+    Route::get('/admin/list-cancelled-inv', [InvoiceController::class, 'inv_cancelled'])->name('admin.list-cancelled-inv');
     Route::get('/admin/invoice/{id}', [InvoiceController::class, 'detail'])->name('admin.invoice.detail');
 
     // Admin Shop
-    Route::get('/admin/shop', [ShopController::class, 'shop'] , function () {});
-    Route::get('/admin/shop/lpse-config', [ShopController::class, 'lpse_config'] , function () {});
+    Route::get('/admin/shop', [ShopController::class, 'shop'])->name('admin.shop');
+    Route::get('/admin/shop/lpse-config', [ShopController::class, 'lpse_config'])->name('admin.shop.lpse');
     Route::get('/admin/update-is-top/{id}', [ShopController::class, 'updateIsTop']);
     Route::get('/admin/shop/{id}', [ShopController::class, 'detail'])->name('admin.shop.detail');
     Route::post('/admin/update-formula', [ShopController::class, 'updateFormula']);

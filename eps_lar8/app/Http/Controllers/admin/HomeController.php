@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Product;
 use App\Models\Shop;
 use App\Models\Member;
+use App\Models\Menu;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -15,6 +16,7 @@ class HomeController extends Controller
     protected $username;
     protected $access_id;
     protected $data;
+    protected $menu;
 
     public function __construct(Request $request)
     {
@@ -27,6 +29,8 @@ class HomeController extends Controller
         // Membuat $this->data
         $this->data['title'] = 'Dashboard';
         $this->data['profile'] = User::find($this->access_id);
+
+        $this->menu = Menu::where('status', 1)->orderBy('urutan')->get();
     }
 
     public function index()
@@ -40,7 +44,7 @@ class HomeController extends Controller
         $member = Member::where('member_status', 'active')->count();
         $this->data['member'] = $member;
 
-        return view('admin.home.index', $this->data);
+        return view('admin.home.index', ['menus' => $this->menu] , $this->data);
     }
 }
 

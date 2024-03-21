@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Shop;
 use App\Models\Member;
 use App\Models\Lpse_config;
+use App\Models\Menu;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request; 
@@ -16,6 +17,7 @@ class ShopController extends Controller
     protected $username;
     protected $access_id;
     protected $data;
+    protected $menu;
 
     public function __construct(Request $request)
     {
@@ -28,6 +30,8 @@ class ShopController extends Controller
         // Membuat $this->data
         $this->data['title'] = 'Shop';
         $this->data['profile'] = User::find($this->access_id);
+
+        $this->menu = Menu::where('status', 1)->orderBy('urutan')->get();
     }
     
     public function shop()
@@ -36,7 +40,7 @@ class ShopController extends Controller
                         ->orderBy('id', 'desc')
                         ->get();
 
-        return view('admin.shop.index', ['datashop' => $datashop]);
+        return view('admin.shop.index',$this->data , ['datashop' => $datashop , 'menus' => $this->menu]);
     }
 
     public function detail($id)

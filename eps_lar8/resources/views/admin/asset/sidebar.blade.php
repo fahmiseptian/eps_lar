@@ -1,19 +1,50 @@
 <aside class="main-sidebar">
     <!-- sidebar: style can be found in sidebar.less -->
     <section class="sidebar">
-      <!-- Sidebar user panel -->
-      <div class="user-panel">
-        <div class="pull-left image">
-          <img src="{{ asset('/img/user2-160x160.jpg') }}" class="img-circle" alt="User Image" />
-        </div>
-        <div class="pull-left info">
-          <p><?=session()->get('username') ?></p>
+        <!-- Sidebar user panel -->
+        <div class="user-panel">
+            <div class="pull-left image">
+                <img src="{{ asset('/img/user2-160x160.jpg') }}" class="img-circle" alt="User Image" />
+            </div>
+            <div class="pull-left info">
+                <p><?= session()->get('username') ?></p>
 
-          <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+                <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+            </div>
         </div>
-      </div>
-      <!-- sidebar menu: : style can be found in sidebar.less -->
-      <ul class="sidebar-menu">
+        <ul class="sidebar-menu">
+            <li class="header">MAIN NAVIGATION</li>
+            @foreach ($menus as $menu)
+                <li>
+                    @if ($menu->route)
+                        <a href="{{ route($menu->route) }}">
+                        @else
+                            <a href="#">
+                    @endif
+                    <i class="fa {{ $menu->icon }}"></i>{{ $menu->nama }}
+                    @if ($menu->children->isNotEmpty())
+                        <i class="fa fa-angle-left pull-right"></i>
+                    @endif
+                    </a>
+                    @if ($menu->children->isNotEmpty())
+                        <ul class="treeview-menu">
+                            @foreach ($menu->children as $childMenu)
+                                <li class="{{ Request::is($childMenu->route) ? 'active' : '' }}">
+                                    @if ($childMenu->route)
+                                        <a href="{{ route($childMenu->route) }}"><i class="fa fa-circle-o"></i>
+                                            {{ $childMenu->nama }}</a>
+                                    @else
+                                        <a href="#"><i class="fa fa-circle-o"></i> {{ $childMenu->nama }}</a>
+                                    @endif
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </li>
+            @endforeach
+        </ul>
+        <!-- sidebar menu: : style can be found in sidebar.less -->
+        {{-- <ul class="sidebar-menu">
         <li class="header">MAIN NAVIGATION</li>
         <li class="active treeview">
           <a href="#">
@@ -42,7 +73,7 @@
         <li><a href="#"><i class="fa fa-circle-o text-danger"></i> Important</a></li>
         <li><a href="#"><i class="fa fa-circle-o text-warning"></i> Warning</a></li>
         <li><a href="#"><i class="fa fa-circle-o text-info"></i> Information</a></li>
-      </ul>
+      </ul> --}}
     </section>
     <!-- /.sidebar -->
-  </aside>
+</aside>
