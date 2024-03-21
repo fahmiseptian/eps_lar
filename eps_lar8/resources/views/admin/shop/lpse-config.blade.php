@@ -52,7 +52,7 @@
                                                     <td>{{ $i++ }}</td>
                                                     <td>{{ $item->name }}</td>
                                                     <td>
-                                                        <button onclick="updateType('{{ $item->id }}')"
+                                                        <button 
                                                             class="btn 
                                 @if ($item->type === 'silver') btn-secondary 
                                 @elseif($item->type === 'gold') 

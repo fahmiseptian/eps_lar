@@ -12,12 +12,7 @@ $(function () {
 
 function detail(id) {
     // Menampilkan loading spinner
-    Swal.fire({
-        title: "Memuat...",
-        html: '<div class="spinner-border" role="status"><span class="sr-only">Memuat...</span></div>',
-        showConfirmButton: false,
-        allowOutsideClick: false,
-    });
+    loading();
 
     // Mengambil data anggota menggunakan AJAX
     $.ajax({
@@ -75,12 +70,8 @@ function detail(id) {
 
 // Upadte Status
 function updateStatus(id) {
-    Swal.fire({
-        title: "Memuat...",
-        html: '<div class="spinner-border" role="status"><span class="sr-only">Memuat...</span></div>',
-        showConfirmButton: false,
-        allowOutsideClick: false,
-    });
+    loading();
+
     console.log("Shop ID:", id);
     $.ajax({
         url: "/admin/shop/" + id + "/update-status",
@@ -117,12 +108,7 @@ function deleteShop(id) {
 }
 
 function updateTypeUp(id) {
-    Swal.fire({
-        title: "Memuat...",
-        html: '<div class="spinner-border" role="status"><span class="sr-only">Memuat...</span></div>',
-        showConfirmButton: false,
-        allowOutsideClick: false,
-    });
+    loading();
 
     console.log("Shop ID:", id);
 
@@ -150,12 +136,7 @@ function updateTypeUp(id) {
 }
 
 function updateTypeDown(id) {
-    Swal.fire({
-        title: "Memuat...",
-        html: '<div class="spinner-border" role="status"><span class="sr-only">Memuat...</span></div>',
-        showConfirmButton: false,
-        allowOutsideClick: false,
-    });
+    loading();
 
     console.log("Shop ID:", id);
 
@@ -190,14 +171,10 @@ toggleIcons.forEach(function (icon) {
         console.log(shopId);
         // Kirim permintaan AJAX untuk memperbarui nilai is_top
         fetch("/admin/update-is-top/" + shopId, {
-            method: "POST",
+            method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRF-TOKEN": "{{ csrf_token() }}",
             },
-            body: JSON.stringify({
-                is_top: isTop,
-            }),
         })
             .then((response) => {
                 if (!response.ok) {
@@ -223,12 +200,7 @@ toggleIcons.forEach(function (icon) {
 
 document.getElementById("formula-price").addEventListener("click", function () {
     // Menampilkan SweetAlert
-    Swal.fire({
-        title: "Memuat...",
-        html: '<div class="spinner-border" role="status"><span class="sr-only">Memuat...</span></div>',
-        showConfirmButton: false,
-        allowOutsideClick: false,
-    });
+    loading();
 
     $.ajax({
         url: "/admin/formula-lpse",
@@ -323,15 +295,18 @@ document.getElementById("formula-price").addEventListener("click", function () {
                             var csrfToken = document
                                 .querySelector('meta[name="csrf-token"]')
                                 .getAttribute("content");
-
-                            // Kirim perubahan ke server menggunakan AJAX
                             $.ajax({
                                 url: "/admin/update-formula",
                                 method: "POST",
                                 data: { ...newData, _token: csrfToken },
                                 success: function (response) {
                                     // Tampilkan pesan sukses atau gagal
-                                    alert(response.message);
+                                    Swal.fire({
+                                        icon: "success",
+                                        title: "Your work has been saved",
+                                        showConfirmButton: false,
+                                        timer: 1500
+                                      });
 
                                     // Tampilkan kembali input fields dengan nilai yang baru disimpan
                                     $row.find("td:not(:last-child)").each(
@@ -479,5 +454,74 @@ function calculate(formula, originalValue) {
                     "Masukkan nilai yang valid.";
             }
         },
+    });
+}
+
+function detailProduct(id) {
+    loading();
+
+    console.log("Shop ID:", id);
+    $.ajax({
+        url: "/admin/shop/" + id + "/product/",
+        method: "GET",
+        success: function (response) {
+            var products = response.products;
+            var htmlContent = '<table class="table">';
+            htmlContent +=
+                '<thead><tr><th rowspan="2">Nama</th><th rowspan="2">Tanggal Update</th><th rowspan="2">Stok</th><td align="center" colspan="2"> <b> Action </b> </td></tr>';
+            htmlContent += "<tbody>";
+            products.forEach(function (product) {
+                htmlContent +=
+                    "<tr>" +
+                    '<td align="left">' +
+                    product.name +
+                    "</td>" +
+                    '<td align="left">' +
+                    product.last_update +
+                    "</td>" +
+                    '<td align="left">' +
+                    product.stock +
+                    "</td>" +
+                    '<td align="center"> <a class="glyphicon ' +
+                    (product.status_lpse == 1
+                        ? "glyphicon-eye-open"
+                        : "glyphicon-eye-close") +
+                    '" id="update-status" data-product-id="' +
+                    product.id +
+                    '"data-product-status="' +
+                    product.status_lpse +
+                    '"></a></td>' +
+                    '<td align="center"> <a class="glyphicon glyphicon-log-in" id="review-product"></a></td>' +
+                    "</tr>";
+            });
+            htmlContent += "</tbody></table>";
+
+            Swal.fire({
+                title: "Detail Produk",
+                html: htmlContent,
+                showConfirmButton: true,
+                allowOutsideClick: true,
+                width: "50%",
+                didOpen: function () {
+                }
+            });
+        },
+        error: function (xhr, status, error) {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Produk Toko Ini tidak ada",
+            });
+        },
+    });
+}
+
+
+function loading() {
+    Swal.fire({
+        title: "Memuat...",
+        html: '<div class="spinner-border" role="status"><span class="sr-only">Memuat...</span></div>',
+        showConfirmButton: false,
+        allowOutsideClick: false,
     });
 }

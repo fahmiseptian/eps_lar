@@ -72,13 +72,13 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\User::class, // Model untuk user biasa
+            'model' => App\Models\Member::class, // Model untuk user biasa
             'table' => 'member',
             'username' => 'username', // Kolom untuk otentikasi
         ],
         'admins' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Admin\User::class, // Model untuk admin
+            'model' => App\Models\User::class, // Model untuk admin
             'table' => 'user',
             'username' => 'username', // Kolom untuk otentikasi
         ],

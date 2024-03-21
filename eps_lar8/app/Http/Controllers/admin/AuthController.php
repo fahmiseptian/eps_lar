@@ -2,53 +2,52 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Admin\User;
-use App\Http\Controllers\Controller; 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 class AuthController extends Controller
 {
-    // Menampilkan halaman login
+    protected $data;
+
+    public function __construct()
+    {
+        // Membuat $this->data
+        $this->data['title'] = 'Dashboard';
+    }
+
     public function showLoginForm()
     {
         return view('admin.auth.login');
     }
 
-    // Memproses permintaan login
     public function login(Request $request)
     {
-        // Validasi data input
-        $credentials = $request->validate([
-            'username' => 'required',
-            'password' => 'required',
-        ]);
+        $username = $request->input('username');
+        $password = $request->input('password');
 
-        // Ambil data pengguna berdasarkan username
-        $user = User::where('username', $credentials['username'])->first();
+        // Ambil pengguna berdasarkan email
+        $user = User::where('username', $username)->first();
+        $user_id = $user->id;
 
-        // Memeriksa apakah pengguna ditemukan
         if ($user) {
-            // Memeriksa apakah password cocok
-            if (Hash::check($credentials['password'], $user->password)) {
-                // Otentikasi berhasil
-                Auth::login($user);
-                return redirect()->intended('/admin/dashboard'); // Redirect ke halaman setelah login berhasil
-            }
-            else {
-                return back()->withErrors(['message' => 'password salah.'])->withInput();
+            if ($user->decryptPassword($user->password) == $password) {
+                $request->session()->put('is_admin', true);
+                $request->session()->put('user_id', $user_id);
+                $request->session()->put('username', $username);
+                return redirect()->intended('/admin');
             }
         }
-
-        // Otentikasi gagal
-        return back()->withErrors(['message' => 'Username atau password salah.'])->withInput();
+        return redirect()->back()->withErrors(['email' => 'Email atau password salah']);
     }
 
-    // Logout pengguna
-    public function logout()
+     public function logout(Request $request)
     {
-        Auth::logout();
-        return redirect('/admin/login');
+        $request->session()->forget('is_admin');
+        $request->session()->forget('user_id');
+        $request->session()->forget('username');
+
+        // Redirect ke halaman login
+        return redirect()->route('admin.login');
     }
 }
