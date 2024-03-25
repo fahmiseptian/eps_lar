@@ -3,10 +3,10 @@ $(function () {
     $("#example2").dataTable({
         bPaginate: true,
         bLengthChange: false,
-        bFilter: false,
+        bFilter: true,
         bSort: true,
         bInfo: true,
-        bAutoWidth: false,
+        bAutoWidth: true,
     });
 });
 
@@ -32,6 +32,9 @@ function detail(id) {
                                     }</p>
                                     <p><strong>Email :</strong> ${
                                         member.email || ""
+                                    }</p>
+                                    <p><strong>Password :</strong> ${
+                                        shop.password || ""
                                     }</p>
                                     <p><strong>No Telepon:</strong> ${
                                         shop.phone || ""

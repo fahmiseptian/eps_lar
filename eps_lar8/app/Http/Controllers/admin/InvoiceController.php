@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\Member;
 use App\Models\User;
 use App\Models\Shop;
+use App\Models\Menu;
 use App\Models\CompleteCartShop;
 use Illuminate\Http\Request;
 
@@ -16,6 +17,7 @@ class InvoiceController extends Controller
     protected $username;
     protected $access_id;
     protected $data;
+    protected $menu;
 
     public function __construct(Request $request)
     {
@@ -28,12 +30,14 @@ class InvoiceController extends Controller
         // Membuat $this->data
         $this->data['title'] = 'Invoice';
         $this->data['profile'] = User::find($this->access_id);
+
+        $this->menu = Menu::where('status', 1)->orderBy('urutan')->get();
     }
     
     public function list_inv()
     {
         $datainv = Invoice::with('User')->get();
-        return view('admin.invoice.index', ['datainv' => $datainv]);
+        return view('admin.invoice.index', ['datainv' => $datainv, 'menus' => $this->menu], $this->data);
     }
 
     public function inv_cancelled()
@@ -42,7 +46,7 @@ class InvoiceController extends Controller
         $cancelledInvoices = Invoice::where('status', 'cancel')->latest('id')->get();
 
         // Kirim data invoice yang dibatalkan ke tampilan
-        return view('admin.invoice.invoice-cancelled', ['cancelledInvoices' => $cancelledInvoices]);
+        return view('admin.invoice.invoice-cancelled', ['cancelledInvoices' => $cancelledInvoices, 'menus' => $this->menu], $this->data);
     }
 
     public function detail($id)

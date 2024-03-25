@@ -47,7 +47,7 @@
                                             <tr>
                                                 <td>{{ $i++ }}</td>
                                                 <td>{{ $invoice->invoice }}</td>
-                                                <td>{{ $invoice->total }}</td>
+                                                <td>{{ str_replace(',', '.', number_format($invoice->total)) }}</td>
                                                 <td>
                                                     <?php
                                                     if ($invoice->completeCartShop->status == 'cancel_by_seller') {
@@ -69,8 +69,9 @@
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    <button onclick="detail('{{ $invoice->id }}')"
-                                                        class="btn btn-info">Detail Pesanan</button>
+                                                    <a style="font-size: larger" onclick="detail('{{ $invoice->id }}')" class="glyphicon glyphicon-info-sign"></a> &nbsp;
+                                                    <a style="font-size: larger" onclick="upload('{{ $invoice->id }}')" class="glyphicon glyphicon-upload"></a> &nbsp;
+                                                    <a style="font-size: larger" onclick="view('{{ $invoice->id }}')" class="glyphicon glyphicon-file"></a>
                                                 </td>
                                             </tr>
                                         @endforeach
