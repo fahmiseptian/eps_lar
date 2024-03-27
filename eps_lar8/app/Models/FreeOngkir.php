@@ -5,14 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Shop_courier extends Model
+class FreeOngkir extends Model
 {
     public $timestamps = false;
-    protected $table = 'shop_courier';
-    protected $primaryKey = 'id'; 
+    protected $table = 'free_ongkir';   
     protected $fillable = [
         'id_shop',
-        'id_courier',
-        'created_date',
+        'id_province',
+        'status',
+        'datetime'
     ];
 }

@@ -2,6 +2,7 @@
 <html>
 @include('seller.asset.header')
 
+
 <body class="skin-blue">
     <div class="wrapper">
         @include('seller.asset.topbar')
@@ -13,6 +14,9 @@
                     <div class="col-md-10">
                         <!-- general form elements disabled -->
                         <div class="box box-warning">
+                            <h3 style="margin-left: 15px; margin-bottom:-5px"> <b>Pengaturan Pengiriman</b></h3>
+		                    <small style="margin-left: 15px; "  >Pengaturan yang berhubungan dengan jasa kirim</small>
+                            <hr>
                             <table id="example2" class="table table-bordered table-hover">
                                 <thead>
                                     <tr>
@@ -38,10 +42,10 @@
                                     @foreach ($datacourier as $item)
                                     <tr>
                                         <td></td>
-                                        <td>{{ $item->name }}  <a class="fa fa-question-circle" onclick="showDescription('{{ $item->description }}')"></a> </td>
+                                        <td>{{ $item->name }} <a class="fa fa-question-circle" onclick="showDescription('{{ $item->description }}', '{{ $item->max_weight }}')"></a> </td>
                                         <td>
                                             <label class="switch">
-                                                <input type="checkbox">
+                                                <input type="checkbox" data-courier-id="{{ $item->id }}" {{ $item->checked ? 'checked' : '' }} onchange="toggleCourier(this)">
                                                 <span class="slider round"></span>
                                             </label>
                                         </td>
@@ -49,12 +53,12 @@
                                     @endforeach
                                     <tr>
                                         <td style="width: 15px">
-                                            <p style="font-size: xx-large; margin:5px" class="fa fa-truck"></p>
+                                            <p style="font-size: xx-large; margin:5px" class="fa fa-calendar-o"></p>
                                         </td>
                                         <td><b> Dikirim dalam </b> <br> <small>Ubah jumlah hari "Dikirim dalam" untuk
                                                 semua produk yang ada di toko Anda.</small> </td>
                                         <td>
-                                            action
+                                            <a href="#" class="btn btn-info">Ubah</a>
                                         </td>
                                     </tr>
                                 </tbody>

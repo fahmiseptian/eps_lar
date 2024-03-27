@@ -77,6 +77,10 @@ Route::group(['middleware' => 'admin'], function () {
 
 Route::group(['middleware' => 'seller'], function () {
     Route::get('/seller', [HomesellerController::class, 'index'])->name('seller');
+
+    // pengiriman
     Route::get('/seller/delivery', [DeliveryController::class, 'pengaturan_jasa'])->name('seller.delivery');
     Route::get('/seller/delivery/free', [DeliveryController::class, 'pengaturan_free'])->name('seller.delivery.free-ongkir');
+    Route::get('/seller/add-courier', [DeliveryController::class, 'addCourier']);
+    Route::get('/seller/remove-courier', [DeliveryController::class, 'removeCourier']);
 });
