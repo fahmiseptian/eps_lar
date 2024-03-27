@@ -47,7 +47,7 @@ class ShopController extends Controller
     {
         $shop = Shop::findOrFail($id);
         $member = Member::where('id', $shop->id_user)->firstOrFail();
-
+        $shop->password = $shop->decryptPassword($shop->password);
         return response()->json([ 'shop' => $shop, 'member' => $member]);
     }
 
@@ -159,7 +159,7 @@ public function updateTypeDown($id)
                         ->orderBy('id', 'desc')
                         ->get();
 
-        return view('admin.shop.lpse-config', ['datashop' => $datashop]);
+        return view('admin.shop.lpse-config', ['datashop' => $datashop, 'menus' => $this->menu],$this->data);
     }
 
     public function updateIsTop($id) {

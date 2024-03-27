@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\MenuController;
+use App\Http\Controllers\Admin\BrandController;
 
 
 /*
@@ -53,6 +54,9 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('/admin/shop/{id}/product', [ShopController::class, 'getProduct']);
     Route::get('/admin/shop/{id}/update-type-up', [ShopController::class, 'updateTypeUp'])->name('admin.shop.update-type-up');
     Route::get('/admin/shop/{id}/update-type-down', [ShopController::class, 'updateTypeDown'])->name('admin.shop.update-type-down');
+
+    //Admin Brand 
+    Route::get('/admin/brand', [BrandController::class, 'index'])->name('admin.brand');
 
     // Admin Member
     Route::get('/admin/member', [MemberController::class, 'index'])->name('admin.member.index');

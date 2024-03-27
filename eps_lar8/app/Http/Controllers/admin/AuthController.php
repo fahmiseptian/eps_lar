@@ -13,12 +13,12 @@ class AuthController extends Controller
     public function __construct()
     {
         // Membuat $this->data
-        $this->data['title'] = 'Dashboard';
+        $this->data['title'] = 'LOGIN';
     }
 
     public function showLoginForm()
     {
-        return view('admin.auth.login');
+        return view('admin.auth.login',$this->data);
     }
 
     public function login(Request $request)
