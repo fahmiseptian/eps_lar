@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Access;
 
 class AuthController extends Controller
 {
@@ -31,10 +32,14 @@ class AuthController extends Controller
 
         if ($user) {
             $user_id = $user->id;
+            $access_id = $user->access_id;
+            $access = Access::where('id', $access_id)->first();
+            $access_name = $access->name;
             if ($user->decryptPassword($user->password) == $password) {
                 $request->session()->put('is_admin', true);
                 $request->session()->put('user_id', $user_id);
                 $request->session()->put('username', $username);
+                $request->session()->put('access_name', $access_name);
                 return redirect()->intended('/admin');
             }
         }
