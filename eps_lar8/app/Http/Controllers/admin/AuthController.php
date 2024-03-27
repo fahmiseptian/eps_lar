@@ -28,9 +28,9 @@ class AuthController extends Controller
 
         // Ambil pengguna berdasarkan email
         $user = User::where('username', $username)->first();
-        $user_id = $user->id;
 
         if ($user) {
+            $user_id = $user->id;
             if ($user->decryptPassword($user->password) == $password) {
                 $request->session()->put('is_admin', true);
                 $request->session()->put('user_id', $user_id);
@@ -38,7 +38,7 @@ class AuthController extends Controller
                 return redirect()->intended('/admin');
             }
         }
-        return redirect()->back()->withErrors(['email' => 'Email atau password salah']);
+        return redirect()->back()->withErrors(['error' => 'Username atau password salah']);
     }
 
      public function logout(Request $request)

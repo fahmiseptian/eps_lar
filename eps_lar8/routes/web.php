@@ -8,6 +8,9 @@ use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Seller\LoginSellerController;
+use App\Http\Controllers\Seller\HomesellerController;
+use App\Http\Controllers\Seller\DeliveryController;
 
 
 /*
@@ -28,6 +31,12 @@ Route::get('/', function () {
 Route::get('/admin/login', [AuthController::class, 'showLoginForm'])->name('admin.login');
 Route::post('/admin/login', [AuthController::class, 'login'])->name('admin.login');
 Route::get('/admin/logout', [AuthController::class, 'logout'])->name('admin.logout');
+
+// Login Seller
+Route::get('/seller/login', [LoginSellerController::class, 'showLoginForm'])->name('seller.login');
+Route::post('/seller/login', [LoginSellerController::class, 'login']);
+Route::get('/seller/logout', [LoginSellerController::class, 'logout'])->name('seller.logout');
+
 // Routes Milik Admin
 Route::group(['middleware' => 'admin'], function () {
     Route::get('/admin', [HomeController::class, 'index'])->name('admin');
@@ -65,3 +74,9 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('/admin/member/{id}/delete', [MemberController::class, 'delete'])->name('admin.members.delete');
 });
 
+
+Route::group(['middleware' => 'seller'], function () {
+    Route::get('/seller', [HomesellerController::class, 'index'])->name('seller');
+    Route::get('/seller/delivery', [DeliveryController::class, 'pengaturan_jasa'])->name('seller.delivery');
+    Route::get('/seller/delivery/free', [DeliveryController::class, 'pengaturan_free'])->name('seller.delivery.free-ongkir');
+});
