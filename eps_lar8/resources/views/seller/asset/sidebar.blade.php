@@ -44,23 +44,18 @@
                 </ul>
             </li>
             <li class="list-sidebar">
-                <a href="#">
-                    <i class="fa fa-tasks"></i> <span>Pesanan Saya</span> <i class="fa fa-angle-left pull-right"></i>
+                <a href="{{ route('seller.order') }}">
+                    <i class="fa fa-tasks"></i> <span>Pesanan Saya</span>
                 </a>
-                <ul class="treeview-menu">
-                    <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Pesanan</a></li>
-                    <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Pembatalan</a></li>
-                    <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Pengembalian</a></li>
-                </ul>
             </li>
             <li class="list-sidebar">
                 <a href="#">
                     <i class="fa fa-dropbox"></i> <span>Produk Saya</span> <i class="fa fa-angle-left pull-right"></i>
                 </a>
                 <ul class="treeview-menu">
-                    <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Pesanan</a></li>
-                    <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Pembatalan</a></li>
-                    <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Pengembalian</a></li>
+                    <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Produk</a></li>
+                    <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Tambah Produk</a></li>
+                    <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Pelanggaran Saya</a></li>
                 </ul>
             </li>
             <li class="list-sidebar">

@@ -22,7 +22,8 @@
                                         <th style="width: 15px" rowspan="3">
                                             <p style="font-size: xx-large; margin:5px" class="fa fa-flag"></p>
                                         </th>
-                                        <td colspan="2"><b>Free Ongkir</b><br><small>Pilihan Provinsi Gratis Ongkos Kirim.</small></td>
+                                        <td colspan="2"><b>Free Ongkir</b><br><small>Pilihan Provinsi Gratis
+                                                Ongkos Kirim.</small></td>
                                         <td></td>
                                     </tr>
                                 </thead>
@@ -30,7 +31,8 @@
                                     <tr>
                                         <td></td>
                                         <td colspan="2">
-                                            <p><b>Provinsi</b><br><small>Pilih provinsi yang kamu inginkan untuk gratis ongkir.</small></p>
+                                            <p><b>Provinsi</b><br><small>Pilih provinsi yang kamu inginkan untuk
+                                                    gratis ongkir.</small></p>
                                         </td>
                                         <td></td>
                                     </tr>
@@ -40,16 +42,15 @@
                                             @foreach ($Province as $item)
                                                 <div class="col-md-3">
                                                     <label class="checkbox-container">{{ $item->province_name }}
-                                                        <input type="checkbox" class="minimal" data-province-id="{{ $item->id_province }}" {{ $item->checked ? 'checked' : '' }} onchange="updateFreeOngkir(this)">
+                                                        <input type="checkbox" class="minimal"
+                                                            data-province-id="{{ $item->province_id }}"
+                                                            {{ $item->checked ? 'checked' : '' }}
+                                                            onchange="togglefreeCourier(this)">
                                                         <span class="checkmark"></span>
                                                     </label>
                                                 </div>
                                             @endforeach
                                         </td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td align="center"><a href="" class="btn btn-info">Simpan</a></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -61,7 +62,7 @@
         </div>
     </div>
 </body>
-<script src="{{ asset('/js/function/seller/dashboard.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/js/function/seller/delivery.js') }}" type="text/javascript"></script>
 
 @include('seller.asset.footer')
 

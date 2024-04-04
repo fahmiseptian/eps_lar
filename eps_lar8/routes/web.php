@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Seller\LoginSellerController;
 use App\Http\Controllers\Seller\HomesellerController;
 use App\Http\Controllers\Seller\DeliveryController;
+use App\Http\Controllers\Seller\OrederController;
 
 
 /*
@@ -83,4 +84,13 @@ Route::group(['middleware' => 'seller'], function () {
     Route::get('/seller/delivery/free', [DeliveryController::class, 'pengaturan_free'])->name('seller.delivery.free-ongkir');
     Route::get('/seller/add-courier', [DeliveryController::class, 'addCourier']);
     Route::get('/seller/remove-courier', [DeliveryController::class, 'removeCourier']);
+    Route::get('/seller/add-free-courier', [DeliveryController::class, 'addfreeCourier']);
+    Route::get('/seller/remove-free-courier', [DeliveryController::class, 'removefreeCourier']);
+
+    // order
+    Route::get('/seller/order', [OrederController::class, 'index'])->name('seller.order');
+    Route::post('/seller/order/accept', [OrederController::class, 'acceptOrder']);
+    Route::post('/seller/order/cancel', [OrederController::class, 'cancelOrder']);
+    Route::get('/seller/order/detail/{id_cart_shop}', [OrederController::class, 'detailOrder'])->name('seller.order.detail');
+    Route::get('/seller/order/filter/{status_order}', [OrederController::class, 'filterOrder'])->name('seller.order.filter');
 });

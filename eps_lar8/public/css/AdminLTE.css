@@ -26,6 +26,145 @@ body {
   overflow-x: hidden;
   overflow-y: auto;
 }
+
+.table-detail-order {
+  overflow-x: auto; /* Untuk mengaktifkan scrolling horizontal jika tabel terlalu lebar */
+}
+
+.table-detail-order table {
+  width: 100%; /* Agar tabel mengisi lebar kontainer */
+  border-collapse: collapse; /* Agar border di antara sel tidak terlihat */
+}
+
+.table-detail-order th, .table-detail-order td {
+  padding: 8px; /* Padding untuk sel */
+  text-align: left; /* Rata kiri teks dalam sel */
+  border-bottom: 1px solid #ddd; /* Garis pemisah antar baris */
+}
+
+.table-detail-order tr:hover {
+  background-color: #f5f5f5; /* Warna latar saat hover */
+}
+
+.table-detail-order td:last-child {
+  text-align: right; /* Rata kanan untuk sel terakhir */
+}
+
+.btn-container {
+  display: flex;
+  justify-content: flex-end; /* Menggeser konten ke ujung kanan */
+}
+
+.btn-container a {
+  margin-left: 5px; /* Memberikan jarak antara tombol-tombol */
+}
+
+.filter-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px;
+}
+
+.filter-links a {
+  text-decoration: none;
+  padding: 10px 20px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  color: #333;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* tambahkan bayangan */
+}
+
+.filter-links a:hover {
+  background-color: #e0e0e0;
+  transform: translateY(-2px); /* efek naik saat hover */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* bayangan lebih besar saat hover */
+}
+
+.detail-column {
+  display: none;
+}
+
+.detailbiaya >table{
+  margin-left:50%;
+  width: 50%;
+}
+.detailbiayaorder >table{
+  margin-left:50%;
+  width: 50%;
+}
+
+@media only screen and (max-width: 600px) {
+.detailbiaya >table{
+  margin-left:0;
+  width: 100%;
+}
+.detailbiayaorder >table{
+  margin-left:0;
+  width: 100%;
+}
+
+.detailproduct > td{
+  margin: 10px;
+}
+
+  .detail-column {
+    display: inline;
+  }
+  .detail-full {
+    display: none;
+  }
+
+  .filter-links {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.filter-links a:not(:last-child) {
+  margin-bottom: 10px;
+}
+
+.filter-links a {
+    text-decoration: none;
+    padding: 5px 10px;
+    margin: 5px;
+    background-color: hsl(0, 0%, 94%);
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    color: #333;
+    text-align: center;
+    white-space: nowrap;
+}
+
+    .filter-links a:hover {
+        background-color: #e0e0e0;
+    }
+    .filter-links {
+        justify-content: center;
+    }
+
+
+  .table-detail-order th, .table-detail-order td {
+    padding: 1px; /* Padding untuk sel */
+    text-align: left; /* Rata kiri teks dalam sel */
+    border-bottom: 1px solid #ddd; /* Garis pemisah antar baris */
+    font-size: small;
+  }
+
+  .btn-container {
+      display: block; /* Mengubah tata letak tombol menjadi blok */
+      text-align: right; /* Menggeser tombol ke kanan */
+  }
+
+  .btn-container a {
+      display: block; /* Mengubah tata letak tombol menjadi blok */
+      margin-top: 5px; /* Memberikan jarak antara tombol-tombol */
+  }
+}
 /* Layout */
 .wrapper {
   height: 100%;

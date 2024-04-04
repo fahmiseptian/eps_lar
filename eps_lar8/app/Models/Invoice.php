@@ -11,7 +11,7 @@ class Invoice extends Model
 
     protected $table = 'complete_cart';
     protected $primaryKey = 'id';
-    protected $visible = ['invoice'];
+    protected $visible = ['invoice','id_cart'];
 
     public function user()
     {

@@ -52,7 +52,9 @@ class DeliveryController extends Controller
 
     public function pengaturan_free()
     {
-        $Province = Province::where('country_id', 1)->get();
+        $Province = Province::where('country_id', 1) 
+        ->orderBy('province_name', 'asc')             
+        ->get();       
 
         foreach ($Province as $active) {
             $is_check = FreeOngkir::where('id_shop', $this->seller)
@@ -92,5 +94,34 @@ class DeliveryController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    public function addfreeCourier(Request $request) {
+        $id_province = $request->input('id_province');
+        $shopId = $this->seller;
+        $currentDateTime = Carbon::now();
+
+        FreeOngkir::create([
+            'id_shop' => $shopId,
+            'id_province' => $id_province,
+            'status' => 1,
+            'datetime' => $currentDateTime,
+        ]);
+        
+        return response()->json(['success' => true]);
+    }
+    
+    public function removefreeCourier(Request $request)
+    {
+        $id_province = $request->input('id_province');
+        $shopId = $this->seller;
+
+        FreeOngkir::where('id_shop', $shopId)
+            ->where('id_province', $id_province)
+            ->delete();
+
+        return response()->json(['success' => true]);
+    }
+
+    
 
 }
