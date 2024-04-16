@@ -50,17 +50,4 @@ class AuthController extends Controller
         // Redirect ke halaman login
         return redirect()->route('admin.login');
     }
-
-    public function test()
-    {
-        $this->data['test'] = 'User';
-        $users = User::all(); 
-        foreach ($users as $user) {
-            $user->decrypted_password = $user->decryptPassword($user->password);
-            $user->ecrpyt = $user->encryptPassword( $user->decrypted_password);
-        }
-        $this->data['users'] = $users;
-
-        return view('admin.test', $this->data);
-    }
 }

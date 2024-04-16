@@ -97,6 +97,27 @@ body {
   width: 50%;
 }
 
+.list-tipeProduk ul {
+  display: flex;
+  list-style-type: none;
+  padding: 0;
+}
+
+.list-tipeProduk li {
+  margin-right: 10px; /* Jarak antar item */
+}
+
+.list-tipeProduk li a {
+  text-decoration: none;
+  color: black;
+  padding: 5px;
+  border-bottom: 2px solid transparent; /* Garis bawah */
+}
+
+.list-tipeProduk li a.active {
+  border-bottom-color: orangered; /* Memberi warna biru pada kelas aktif */
+}
+
 @media only screen and (max-width: 600px) {
 .detailbiaya >table{
   margin-left:0;

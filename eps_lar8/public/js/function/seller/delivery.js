@@ -174,3 +174,40 @@ function removefreeCourier(id_province) {
     });
     
 }
+
+async function ubahestimasi() {
+console.log("dsadas");
+const { value: estimasi } = await Swal.fire({
+    title: "Masukkan Estimasi Packing",
+    input: "range",
+    icon: "question",
+    inputLabel: "Estimasi Packing",
+    inputAttributes: {
+        min: "1",
+        max: "7",
+        step: "1"
+    },
+    inputValue: 2,
+    showCancelButton: true,
+    confirmButtonText: "OK",
+    cancelButtonText: "Batal",
+    reverseButtons: true,
+    allowOutsideClick: false,
+});
+
+// Jika pengguna mengklik tombol OK dan memberikan nilai estimasi
+if (estimasi) {
+    console.log(estimasi);
+}
+
+// Contoh kode ajax jika Anda perlu menggunakan csrfToken
+// var csrfToken = $('meta[name="csrf-token"]').attr('content');
+// $.ajax({
+//     url: "/seller/order/cencel",
+//     type: "POST",
+//     data: { id_cart_shop: id_cart_shop, note: noteSeller, _token: csrfToken },
+//     success: function () {
+//         location.reload();
+//     },
+// });
+}

@@ -12,6 +12,7 @@ use App\Http\Controllers\Seller\LoginSellerController;
 use App\Http\Controllers\Seller\HomesellerController;
 use App\Http\Controllers\Seller\DeliveryController;
 use App\Http\Controllers\Seller\OrederController;
+use App\Http\Controllers\Seller\ProductController;
 
 
 /*
@@ -93,4 +94,8 @@ Route::group(['middleware' => 'seller'], function () {
     Route::post('/seller/order/cancel', [OrederController::class, 'cancelOrder']);
     Route::get('/seller/order/detail/{id_cart_shop}', [OrederController::class, 'detailOrder'])->name('seller.order.detail');
     Route::get('/seller/order/filter/{status_order}', [OrederController::class, 'filterOrder'])->name('seller.order.filter');
+
+    // Product
+    Route::get('/seller/product/', [ProductController::class, 'index'])->name('seller.product');
+    Route::get('/seller/product/{status}', [ProductController::class, 'filterProduct'])->name('seller.product.filter');
 });

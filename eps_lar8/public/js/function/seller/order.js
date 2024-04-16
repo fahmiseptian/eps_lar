@@ -1,15 +1,4 @@
-$(function () {
-    $("#example1").dataTable();
-    $("#example2").dataTable({
-        bPaginate: true,
-        bLengthChange: true,
-        bFilter: true,
-        bSort: false,
-        bInfo: true,
-        bAutoWidth: true,
-    });
-});
-
+var csrfToken = $('meta[name="csrf-token"]').attr('content');
 function toggleFilterorder(element) {
     var status_order = element.getAttribute("data-status-order");
 

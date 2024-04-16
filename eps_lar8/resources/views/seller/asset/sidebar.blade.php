@@ -53,7 +53,7 @@
                     <i class="fa fa-dropbox"></i> <span>Produk Saya</span> <i class="fa fa-angle-left pull-right"></i>
                 </a>
                 <ul class="treeview-menu">
-                    <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Produk</a></li>
+                    <li><a style="color: #eee" href="{{ route('seller.product') }}"><i class="fa fa-circle-o"></i> Produk</a></li>
                     <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Tambah Produk</a></li>
                     <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Pelanggaran Saya</a></li>
                 </ul>

@@ -181,7 +181,7 @@
                                         <td><b>Keperluan</b></td>
                                     </tr>
                                     <tr>
-                                        <td>{{ $detailOrder->email }}</td>
+                                        <td >{{ $detailOrder->email }}</td>
                                         <td>{{ $detailOrder->npwp }}</td>
                                         <td>{{ $detailOrder->keperluan }}</td>
                                     </tr>
