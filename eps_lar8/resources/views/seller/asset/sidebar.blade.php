@@ -54,7 +54,7 @@
                 </a>
                 <ul class="treeview-menu">
                     <li><a style="color: #eee" href="{{ route('seller.product') }}"><i class="fa fa-circle-o"></i> Produk</a></li>
-                    <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Tambah Produk</a></li>
+                    <li><a style="color: #eee" href="{{ route('seller.product.add') }}"><i class="fa fa-circle-o"></i> Tambah Produk</a></li>
                     <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Pelanggaran Saya</a></li>
                 </ul>
             </li>

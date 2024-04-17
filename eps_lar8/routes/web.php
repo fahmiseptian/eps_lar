@@ -97,5 +97,9 @@ Route::group(['middleware' => 'seller'], function () {
 
     // Product
     Route::get('/seller/product/', [ProductController::class, 'index'])->name('seller.product');
+    Route::get('/seller/product/test/{id}', [ProductController::class, 'test']);
+    Route::get('/seller/product/add', [ProductController::class, 'showaddProduct'])->name('seller.product.add');
+    Route::post('/seller/product/addProduct', [ProductController::class, 'addProduct'])->name('seller.product.addProduct');
     Route::get('/seller/product/{status}', [ProductController::class, 'filterProduct'])->name('seller.product.filter');
+    Route::get('/seller/product/category/level2/{id_level1}', [ProductController::class, 'getCategoryLevel2']);
 });

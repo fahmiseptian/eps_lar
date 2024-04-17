@@ -29,17 +29,17 @@ $(document).ready(function(){
         e.preventDefault(); // Prevent form submission
 
         // Validate hCaptcha
-        var response = hcaptcha.getResponse();
-        if (!response) {
-            Swal.fire({
-                title: "Error",
-                text: "Please complete the hCaptcha.",
-                icon: "error",
-                showConfirmButton: false,
-                timer: 1500,
-            });
-            return;
-        }
+        // var response = hcaptcha.getResponse();
+        // if (!response) {
+        //     Swal.fire({
+        //         title: "Error",
+        //         text: "Please complete the hCaptcha.",
+        //         icon: "error",
+        //         showConfirmButton: false,
+        //         timer: 1500,
+        //     });
+        //     return;
+        // }
 
         var loginUrl = $(this).attr('action');
         var formData = $(this).serialize();
