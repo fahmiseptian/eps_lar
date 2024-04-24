@@ -156,7 +156,6 @@
 </body>
 {{-- footer --}}
 @include('seller.asset.footer')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- page script -->
 <script src="{{ asset('/js/function/seller/product.js') }}" type="text/javascript"></script>
 

@@ -25,6 +25,13 @@ class Shop extends Model
         });
     }
 
+    public static function getTypeById($id)
+    {
+        return self::where('id', $id)
+                    ->pluck('type')
+                    ->first();
+    }
+
     public function decryptPassword($password)
     {
         if ($this->Encryption !== null) {

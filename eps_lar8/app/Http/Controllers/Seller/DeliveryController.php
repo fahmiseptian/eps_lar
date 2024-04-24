@@ -24,16 +24,13 @@ class DeliveryController extends Controller
     {
         $this->seller 	= $request->session()->get('seller_id');
 
-        $sellerType =Shop::where('id', $this->seller)
-                    ->pluck('type')
-                    ->first();
-        $saldo =Saldo::where('id_shop', $this->seller)
-                ->where('status', 'pending')
-                ->sum('total_diterima_seller');
+        $sellerType     = Shop::getTypeById($this->seller);
+        $saldoPending   = Saldo::calculatePendingSaldo($this->seller);
+        
         // Membuat $this->data
         $this->data['title'] = 'Delivery';
         $this->data['seller_type'] = $sellerType;
-        $this->data['saldo'] = $saldo;
+        $this->data['saldo'] = $saldoPending;
     }
 
     public function pengaturan_jasa()

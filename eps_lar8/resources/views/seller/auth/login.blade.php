@@ -11,7 +11,7 @@
                 <!-- general form elements disabled -->
                 <div class="box box-warning">
                     <div class="logo-login">
-                        <img src="{{ asset('/img/logo-eps.png') }}" class="logologin" />
+                        <img src="{{ asset('/img/app/logo-eps.png') }}" class="logologin" />
                     </div>
                     <div class="box-header">
                         <ul class="horizontal-list">

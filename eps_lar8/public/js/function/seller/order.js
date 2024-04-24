@@ -1,4 +1,29 @@
 var csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+$(function() {
+    // Konfigurasi DataTables untuk kedua tabel
+    var dataTableOptions = {
+        bPaginate: true,
+        bLengthChange: false,
+        bFilter: true,
+        bSort: true,
+        bInfo: true,
+        bAutoWidth: true,
+    };
+
+    // Inisialisasi DataTables
+    $("#example1").dataTable(dataTableOptions);
+    $("#example2").dataTable(dataTableOptions);
+
+    // Jika lebar jendela kurang dari atau sama dengan 800 piksel, atur lebar kolom pencarian
+    if (window.innerWidth <= 800) {
+        $(".dataTables_filter input").css({
+            width: "110px",
+        });
+    }
+});
+
+
 function toggleFilterorder(element) {
     var status_order = element.getAttribute("data-status-order");
 

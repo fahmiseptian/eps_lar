@@ -28,17 +28,15 @@ class OrederController extends Controller
                     ->join('member_address as ma', 'm.id', '=', 'ma.member_id')
                     ->join('city as c', 'ma.city_id', '=', 'c.city_id');
 
-        $sellerType =Shop::where('id', $this->seller)
-                    ->pluck('type')
-                    ->first();
+                    $this->seller 	= $request->session()->get('seller_id');
 
-        $saldo =Saldo::where('id_shop', $this->seller)
-                ->where('status', 'pending')
-                ->sum('total_diterima_seller');
-
-        $this->data['title'] = 'Order';
-        $this->data['seller_type'] = $sellerType;
-        $this->data['saldo'] = $saldo;
+                    $sellerType     = Shop::getTypeById($this->seller);
+                    $saldoPending   = Saldo::calculatePendingSaldo($this->seller);
+                    
+                    // Membuat $this->data
+                    $this->data['title'] = 'order';
+                    $this->data['seller_type'] = $sellerType;
+                    $this->data['saldo'] = $saldoPending;
     }
 
     public function index()

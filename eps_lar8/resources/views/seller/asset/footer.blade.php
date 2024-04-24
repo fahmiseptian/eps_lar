@@ -1,6 +1,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- jQuery -->
-<script src="{{ asset('/plugins/jQuery/jQuery-2.1.3.min.js') }}"></script>
+{{-- <script src="{{ asset('/plugins/jQuery/jQuery-2.1.3.min.js') }}"></script> --}}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Bootstrap 3.3.2 JS -->
 <script src="{{ asset('/bootstraps/js/bootstrap.min.js') }}"></script>
 <!-- SlimScroll -->
@@ -9,8 +10,6 @@
 <script src="{{ asset('/plugins/fastclick/fastclick.min.js') }}"></script>
 <!-- AdminLTE App -->
 <script src="{{ asset('/js/app.min.js') }}"></script>
-<!-- Your custom script -->
-<script src="{{ asset('/js/function/seller/delivery.js') }}"></script>
 <!-- Sparkline -->
 <script src="{{ asset('/plugins/sparkline/jquery.sparkline.min.js') }}"></script>
 <!-- jvectormap -->
@@ -30,7 +29,7 @@
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
 <script src="{{ asset('/js/pages/dashboard2.js') }}"></script>
 <!-- AdminLTE for demo purposes -->
-<script src="{{ asset('/js/demo.js') }}"></script>
+{{-- <script src="{{ asset('/js/demo.js') }}"></script> --}}
 <script>
     function confirmLogout(element) {
         var logoutUrl = element.getAttribute('data-logout-url');
