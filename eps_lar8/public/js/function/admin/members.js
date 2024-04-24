@@ -21,30 +21,49 @@ function showDetail(id) {
 
     // Mengambil data anggota menggunakan AJAX
     $.ajax({
-        url: "/admin/member/" + id,
+        url: baseUrl + "/admin/member/" + id,
         method: "GET",
         success: function (response) {
             var member = response.member;
 
             if (member) {
+
                 // Menampilkan informasi anggota dengan SweetAlert
                 Swal.fire({
                     title: "Detail Anggota",
                     html: `
-                        <div style="text-align: justify;">
-                            <p><strong>Email:</strong> ${member.email || ""}</p>
-                            <p><strong>Instansi Satuan Kerja:</strong> ${
-                                member.instansi || ""
-                            }</p>
-                            <p><strong>Nama:</strong> ${member.nama || ""}</p>
-                            <p><strong>No Telepon:</strong> ${
-                                member.no_telpon || ""
-                            }</p>
-                            <p><strong>NPWP:</strong> ${member.npwp || ""}</p>
-                            <p><strong>Alamat:</strong> ${
-                                member.npwp_address || ""
-                            }</p>
-                        </div>
+                        <table style="width:100%">
+                            <tr>
+                                <td style="width: 37%; text-align: right;"><strong>Email</strong></td>
+                                <td style="width: 3%; text-align: left;"><strong>:</strong></td>
+                                <td style="width: 60%; text-align: left;">${member.email || ""}</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 37%; text-align: right;"><strong>Instansi Satuan Kerja</strong></td>
+                                <td style="width: 3%; text-align: left;"><strong>:</strong></td>
+                                <td style="width: 60%; text-align: left;">${(member.satker || "") + (member.satker && member.instansi ? ', ' : '') + (member.instansi || "")}</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 37%; text-align: right;"><strong>Nama</strong></td>
+                                <td style="width: 3%; text-align: left;"><strong>:</strong></td>
+                                <td style="width: 60%; text-align: left;">${member.nama || ""}</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 37%; text-align: right;"><strong>No Telepon</strong></td>
+                                <td style="width: 3%; text-align: left;"><strong>:</strong></td>
+                                <td style="width: 60%; text-align: left;">${member.no_hp || ""}</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 37%; text-align: right;"><strong>NPWP</strong></td>
+                                <td style="width: 3%; text-align: left;"><strong>:</strong></td>
+                                <td style="width: 60%; text-align: left;">${member.npwp || ""}</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 37%; text-align: right;"><strong>Alamat</strong></td>
+                                <td style="width: 3%; text-align: left;"><strong>:</strong></td>
+                                <td style="width: 60%; text-align: left;">${member.npwp_address || ""}</td>
+                            </tr>
+                        </table>
                     `,
                     confirmButtonText: "Tutup",
                 });
@@ -83,7 +102,7 @@ function toggleStatus(id) {
     // Mengirimkan permintaan AJAX untuk mengubah status anggota dengan ID yang diberikan
     console.log('Toggle status member dengan ID:', id);
     $.ajax({
-        url: '/admin/member/' + id + '/toggle-status',
+        url: baseUrl + '/admin/member/' + id + '/toggle-status',
         type: 'POST',
         data: {
             // Menyertakan token CSRF dalam data
@@ -100,21 +119,40 @@ function toggleStatus(id) {
     });
 }
 
-
 function deleteMember(id) {
-    // Mengirimkan permintaan AJAX untuk menghapus anggota dengan ID yang diberikan
-    if (confirm("Apakah Anda yakin ingin menghapus anggota ini?")) {
-        $.ajax({
-            url: "/admin/member/" + id + "/delete",
-            method: "GET",
-            success: function (response) {
-                alert("Anggota berhasil dihapus.");
-                // Refresh halaman untuk memperbarui tampilan
-                location.reload();
-            },
-            error: function (xhr, status, error) {
-                alert("Terjadi kesalahan saat menghapus anggota.");
-            },
-        });
-    }
+    // Menampilkan pesan konfirmasi SweetAlert
+    Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: "Anda akan menghapus anggota ini!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Jika pengguna mengonfirmasi penghapusan, mengirimkan permintaan AJAX
+            $.ajax({
+                url: baseUrl + "/admin/member/" + id + "/delete",
+                method: "GET",
+                success: function (response) {
+                    Swal.fire(
+                        'Berhasil!',
+                        'Anggota berhasil dihapus.',
+                        'success'
+                    );
+                    // Refresh halaman untuk memperbarui tampilan
+                    location.reload();
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire(
+                        'Error!',
+                        'Terjadi kesalahan saat menghapus anggota.',
+                        'error'
+                    );
+                },
+            });
+        }
+    });
 }

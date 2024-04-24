@@ -11,9 +11,10 @@ class User extends Model
     use HasFactory;
 
     protected $table = 'user';
+    public $timestamps = false;
     protected $primaryKey = 'id';
     protected $fillable = [
-        'username','password', 'id_admin', 'access_id',
+        'username','password', 'id_admin', 'access_id', 'active', 'created_by', 'updated_by', 'updated_date', 'deleted_by', 'deleted_date'
     ];
     protected $hidden = [
         'password', 'remember_token',
@@ -40,5 +41,21 @@ class User extends Model
         } else {
             return "Encryption object is not initialized";
         }
+    }
+
+    public function encryptPassword($password)
+    {
+        $encryption = new Encryption(); // Membuat instance objek Encryption
+        return $encryption->encrypt($password);
+    }
+
+    public function access()
+    {
+        return $this->belongsTo(Access::class, 'access_id');
+    }
+
+    public function profile()
+    {
+        return $this->belongsTo(User_profile::class, 'id');
     }
 }

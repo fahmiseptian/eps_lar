@@ -26,82 +26,93 @@
                         <!-- general form elements -->
                         <div class="box box-primary">
                             <div class="box-header">
-                                <div class="col-md-10" style="padding-left: 0;">
-                                    <h3 class="box-title">List Menu</h3>
+                                <div class="col-md-9" style="padding-left: 0;">
+                                    <h3 class="box-title">List User</h3>
                                 </div>
                                 <!-- Daftar Parent Menu -->
-                                <div class="col-md-2">
-                                    <a href="javascript:;" id="parentMenuList" class="pull-right">
-                                        <h2 class="box-title" id="parentMenuList">List Parent ID</h2>
+                                <div class="col-md-3">
+                                    <a href="javascript:;" id="accessList" class="pull-right">
+                                        <h2 class="box-title" id="accessList">List Access</h2>
                                         <i class="fa fa-angle-left"></i>
                                     </a>
                                 </div>
                             </div><!-- /.box-header -->
                             <div class="box-body">
-                                <div class="col-md-10">
+                                <div class="col-md-9">
                                 </div>
-                                <div class="col-md-2">
-                                    <table id="parentmenu" class="table table-bordered table-hover" style="display:none;">
+                                <div class="col-md-3" id="accesses" style="display:none;">
+                                    <button onclick="addAccess()" class="btn btn-primary pull-right" style="margin-bottom: 10px;">
+                                        <i class="fa fa-plus-circle"></i>
+                                        Add Access
+                                    </button>
+                                    <br>
+                                    <table class="table table-bordered table-hover">
                                         <!-- Tabel daftar parent menu akan ditampilkan di sini -->
                                         <tr>
-                                            <th widht=90%>Parent Name</th>
-                                            <th width=10%>ID</th>
+                                            <th widht=20%>No</th>
+                                            <th widht=40%>Access</th>
+                                            <th width=40%>Action</th>
                                         </tr>
-                                        @foreach ($listparent as $parentmenu)
+                                        @php $x = 1 @endphp
+                                        @foreach ($accesses as $access)
                                             <tr>
-                                                <td>{{ $parentmenu->nama }}</td>
-                                                <td>{{ $parentmenu->id }}</td>
+                                                <td>{{ $x++ }}</td>
+                                                <td>{{ $access->name }}</td>
+                                                <td>
+                                                    <button type="button" class="btn btn-transparent" onclick="editAccess('{{ $access->id }}', '{{ $access->name }}', '{{ $access->code }}')" title="Edit Access">
+                                                        <span class="material-symbols-outlined" id="icon-warning">
+                                                            edit_square
+                                                        </span>
+                                                    </button>
+                                                    <button type="button" class="btn btn-transparent" onclick="deleteAccess('{{ $access->id }}', '{{ $access->name }}')" title="Hapus Access">
+                                                        <span class="material-symbols-outlined" id="icon-delete">
+                                                            delete
+                                                        </span>
+                                                    </button>
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </table>
                                 </div>
+                                    
                                 <table id="example2" class="table table-bordered table-hover">
                                     <thead>
                                         <tr>
                                             <th>No</th>
                                             <!-- <th>Id</th> -->
-                                            <th>Nama</th>
-                                            <th>Route</th>
-                                            <th>Icon</th>
-                                            <th>Urutan</th>
+                                            <th>Username</th>
+                                            <th>Access</th>
                                             <th>Status</th>
-                                            <th>Parent ID</th>
-                                            <th>Akses</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @php $i = 1 @endphp
-                                        @foreach ($listmenu as $menu)
+                                        @foreach ($users as $user)
                                             <tr>
                                                 <td>{{ $i++ }}</td>
-                                                <!-- <td>{{ $menu->id }}</td> -->
-                                                <td>{{ $menu->nama }}</td>
-                                                <td>{{ $menu->route }}</td>
-                                                <td>{{ $menu->icon }}</td>
-                                                <td>{{ $menu->urutan }}</td>
+                                                <!-- <td>{{ $user->id }}</td> -->
+                                                <td>{{ $user->username }}</td>
+                                                <td>{{ $user->access->name }}</td>
                                                 <td>
-                                                    @if($menu->status == 1)
-                                                        Parent
-                                                    @elseif($menu->status == 2)
-                                                        Children
+                                                    @if($user->active == 1)
+                                                        Aktif
                                                     @else
-                                                        Nonaktif
+                                                        Tidak Aktif
                                                     @endif
                                                 </td>
-                                                <td>{{ $menu->parent_id }}</td>
                                                 <td>
-                                                    @foreach($accesses as $access)
-                                                        <input type="checkbox" name="access_{{ $access->code }}" value="1" {{ $menu->{$access->code} == 1 ? 'checked' : '' }} disabled> {{ $access->name }}<br>
-                                                    @endforeach
-                                                </td>
-                                                <td>
-                                                    <button type="button" class="btn btn-transparent" onclick="editMenu('{{ $menu->id }}')" title="Edit Menu">
+                                                    <button type="button" class="btn btn-transparent" onclick="detailUser('{{ $user->id }}')" title="Info Detail">
+                                                        <span class="material-symbols-outlined" id="icon-info">
+                                                            info
+                                                        </span>
+                                                    </button>
+                                                    <button type="button" class="btn btn-transparent" onclick="editUser('{{ $user->id }}')" title="Edit User">
                                                         <span class="material-symbols-outlined" id="icon-warning">
                                                             edit_square
                                                         </span>
                                                     </button>
-                                                    <button type="button" class="btn btn-transparent" onclick="deleteMenu('{{ $menu->id }}')" title="Hapus Menu">
+                                                    <button type="button" class="btn btn-transparent" onclick="deleteUser('{{ $user->id }}')" title="Hapus User">
                                                         <span class="material-symbols-outlined" id="icon-delete">
                                                             delete
                                                         </span>
@@ -115,13 +126,9 @@
                                         <tr>
                                             <th>No</th>
                                             <!-- <th>Id</th> -->
-                                            <th>Nama</th>
-                                            <th>Route</th>
-                                            <th>Icon</th>
-                                            <th>Urutan</th>
+                                            <th>Username</th>
+                                            <th>Access</th>
                                             <th>Status</th>
-                                            <th>Parent ID</th>
-                                            <th>Akses</th>
                                             <th>Action</th>
                                         </tr>
                                     </tfoot>
@@ -141,6 +148,6 @@
 @include('admin.asset.footer')
 
 <!-- page script -->
-<script src="{{ asset('/js/function/admin/menu.js') }}" type="text/javascript"></script>
+<script src="{{ asset('/js/function/admin/user.js') }}" type="text/javascript"></script>
 
 </html>

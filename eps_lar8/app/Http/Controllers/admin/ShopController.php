@@ -16,6 +16,8 @@ class ShopController extends Controller
     protected $user_id;
     protected $username;
     protected $access_id;
+    protected $access_name;
+    protected $access_code;
     protected $data;
     protected $menu;
 
@@ -27,11 +29,13 @@ class ShopController extends Controller
         $this->user_id = $request->session()->get('id');
 		$this->username = $request->session()->get('username');
 		$this->access_id 	= $request->session()->get('access_id');
+		$this->access_name 	= $request->session()->get('access_name');
+		$this->access_code 	= $request->session()->get('access_code');
         // Membuat $this->data
         $this->data['title'] = 'Shop';
         $this->data['profile'] = User::find($this->access_id);
 
-        $this->menu = Menu::where('status', 1)->orderBy('urutan')->get();
+        $this->menu = Menu::where('status', 1)->where($this->access_code, 1)->orderBy('urutan')->get();
     }
     
     public function shop()
@@ -150,7 +154,7 @@ public function updateTypeDown($id)
         $shop->update(['status' => 'delete']);
         $member = Member::where('id', $shop->id_user)->firstOrFail();
         $member->update(['member_status' => 'delete', 'registered_member' => 0]);
-        return redirect()->back()->with('success', 'Anggota berhasil dihapus.');
+        return redirect()->back()->with('success', 'Toko berhasil dihapus.');
     }
 
     public function lpse_config()

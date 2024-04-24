@@ -17,10 +17,14 @@
             <li class="header">MAIN NAVIGATION</li>
             @foreach ($menus as $menu)
                 <li>
-                    @if ($menu->route)
-                        <a href="{{ route($menu->route) }}">
+                    @if ($menu->children->isNotEmpty())
+                        <a href="#">
                         @else
-                            <a href="#">
+                            @if ($menu->route)
+                                <a href="{{ route($menu->route) }}">
+                                @else
+                                    <a href="#">
+                            @endif
                     @endif
                     <i class="fa {{ $menu->icon }}"></i>{{ $menu->nama }}
                     @if ($menu->children->isNotEmpty())
@@ -32,10 +36,10 @@
                             @foreach ($menu->children as $childMenu)
                                 <li class="{{ Request::is($childMenu->route) ? 'active' : '' }}">
                                     @if ($childMenu->route)
-                                        <a href="{{ route($childMenu->route) }}"><i class="fa fa-circle-o"></i>
+                                        <a href="{{ route($childMenu->route) }}"><i class="fa {{ $childMenu->icon }}"></i>
                                             {{ $childMenu->nama }}</a>
                                     @else
-                                        <a href="#"><i class="fa fa-circle-o"></i> {{ $childMenu->nama }}</a>
+                                        <a href="#"><i class="fa fa {{ $childMenu->icon }}"></i> {{ $childMenu->nama }}</a>
                                     @endif
                                 </li>
                             @endforeach

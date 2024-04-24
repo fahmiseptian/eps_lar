@@ -40,11 +40,13 @@ public function login(Request $request)
                 $request->session()->put('is_seller', true);
                 $request->session()->put('seller_id', $seller->id);
                 $request->session()->put('seller', $seller->name);
-                return response()->json(["success" => true], Response::HTTP_OK);
+                return redirect()->intended('/seller');
             }
         }
     }
-    return response()->json(['error' => 'Username atau password salah'], Response::HTTP_UNPROCESSABLE_ENTITY);
+    // Jika tidak berhasil, kembalikan ke halaman login dengan pesan error
+    $request->session()->put('error_seller', 'Email atau password salah');
+    return redirect()->route('seller.login')->with('error', 'Email atau password salah');
 }
 
 

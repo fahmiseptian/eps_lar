@@ -3,10 +3,11 @@ $(function () {
     $("#example2").dataTable({
         bPaginate: true,
         bLengthChange: false,
-        bFilter: true,
+        bFilter: false,
         bSort: true,
         bInfo: true,
         bAutoWidth: true,
+        responsive: true,
     });
 });
 
@@ -16,37 +17,55 @@ function detail(id) {
 
     // Mengambil data anggota menggunakan AJAX
     $.ajax({
-        url: "/admin/shop/" + id,
+        url: baseUrl + "/admin/shop/" + id,
         method: "GET",
         success: function (response) {
             var shop = response.shop;
             var member = response.member;
             if (shop) {
-                // Menampilkan informasi anggota dengan SweetAlert
+
+                // Menampilkan informasi toko dengan SweetAlert
                 Swal.fire({
                     title: "Detail Toko",
                     html: `
-                                <div style="text-align: justify;">
-                                    <p><strong>Nama Toko:</strong> ${
-                                        shop.name || ""
-                                    }</p>
-                                    <p><strong>Email :</strong> ${
-                                        member.email || ""
-                                    }</p>
-                                    <p><strong>Password :</strong> ${
-                                        shop.password || ""
-                                    }</p>
-                                    <p><strong>No Telepon:</strong> ${
-                                        shop.phone || ""
-                                    }</p>
-                                    <p><strong>No NIK:</strong> ${
-                                        shop.nik_pemilik || ""
-                                    }</p>
-                                    <p><strong>NPWP :</strong> ${
-                                        shop.npwp || ""
-                                    }</p>
-                                </div>
-                            `,
+                        <table style="width:100%">
+                            <tr>
+                                <td style="width: 30%; text-align: right;"><strong>Nama Toko</strong></td>
+                                <td style="width: 3%; text-align: left;"><strong>:</strong></td>
+                                <td style="width: 67%; text-align: left;">${shop.name || ""}</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 30%; text-align: right;"><strong>Email</strong></td>
+                                <td style="width: 3%; text-align: left;"><strong>:</strong></td>
+                                <td style="width: 67%; text-align: left;">${member.email || ""}</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 30%; text-align: right;"><strong>Password</strong></td>
+                                <td style="width: 3%; text-align: left;"><strong>:</strong></td>
+                                <td style="width: 67%; text-align: left;">${shop.password || ""}</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 30%; text-align: right;"><strong>No Telepon</strong></td>
+                                <td style="width: 3%; text-align: left;"><strong>:</strong></td>
+                                <td style="width: 67%; text-align: left;">${shop.phone || ""}</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 30%; text-align: right;"><strong>Nama Pemilik</strong></td>
+                                <td style="width: 3%; text-align: left;"><strong>:</strong></td>
+                                <td style="width: 67%; text-align: left;">${shop.nama_pemilik || ""}</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 30%; text-align: right;"><strong>No NIK</strong></td>
+                                <td style="width: 3%; text-align: left;"><strong>:</strong></td>
+                                <td style="width: 67%; text-align: left;">${shop.nik_pemilik || ""}</td>
+                            </tr>
+                            <tr>
+                                <td style="width: 30%; text-align: right;"><strong>NPWP</strong></td>
+                                <td style="width: 3%; text-align: left;"><strong>:</strong></td>
+                                <td style="width: 67%; text-align: left;">${shop.npwp || ""}</td>
+                            </tr>
+                        </table>
+                    `,
                     confirmButtonText: "Tutup",
                 });
             } else {
@@ -76,8 +95,9 @@ function updateStatus(id) {
     loading();
 
     console.log("Shop ID:", id);
+    console.log(baseUrl);
     $.ajax({
-        url: "/admin/shop/" + id + "/update-status",
+        url: baseUrl + "admin/shop/" + id + "/update-status",
         type: "GET",
         success: function (response) {
             console.log("Status anggota berhasil diubah");
@@ -94,20 +114,41 @@ function updateStatus(id) {
 }
 
 function deleteShop(id) {
-    if (confirm("Apakah Anda yakin ingin menghapus Toko ini?")) {
-        $.ajax({
-            url: "/admin/shop/" + id + "/delete",
-            method: "GET",
-            success: function (response) {
-                alert("Toko berhasil dihapus.");
-                // Refresh halaman untuk memperbarui tampilan
-                location.reload();
-            },
-            error: function (xhr, status, error) {
-                alert("Terjadi kesalahan saat menghapus Toko.");
-            },
-        });
-    }
+    // Menampilkan pesan konfirmasi SweetAlert
+    Swal.fire({
+        title: 'Apakah Anda yakin?',
+        text: "Anda akan menghapus toko ini!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Jika pengguna mengonfirmasi penghapusan, mengirimkan permintaan AJAX
+            $.ajax({
+                url: baseUrl + "/admin/shop/" + id + "/delete",
+                method: "GET",
+                success: function (response) {
+                    Swal.fire(
+                        'Berhasil!',
+                        'Toko berhasil dihapus.',
+                        'success'
+                    );
+                    // Refresh halaman untuk memperbarui tampilan
+                    location.reload();
+                },
+                error: function (xhr, status, error) {
+                    Swal.fire(
+                        'Error!',
+                        'Terjadi kesalahan saat menghapus toko.',
+                        'error'
+                    );
+                },
+            });
+        }
+    });
 }
 
 function updateTypeUp(id) {
@@ -116,7 +157,7 @@ function updateTypeUp(id) {
     console.log("Shop ID:", id);
 
     $.ajax({
-        url: "/admin/shop/" + id + "/update-type-up",
+        url: baseUrl + "/admin/shop/" + id + "/update-type-up",
         type: "GET",
         success: function (response) {
             if (response.message === "Teratas") {
@@ -144,7 +185,7 @@ function updateTypeDown(id) {
     console.log("Shop ID:", id);
 
     $.ajax({
-        url: "/admin/shop/" + id + "/update-type-down",
+        url: baseUrl + "/admin/shop/" + id + "/update-type-down",
         type: "GET",
         success: function (response) {
             if (response.message === "Terbawah") {

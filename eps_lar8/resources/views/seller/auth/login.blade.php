@@ -5,6 +5,21 @@
 
 <body class="login-page">
     <section class="content">
+    @if(session('error_seller'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: "{{ session('error_seller') }}",
+                showConfirmButton: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Hapus session error_seller
+                    <?php session()->forget('error_seller'); ?>
+                }
+            });
+        </script>
+    @endif
         <div class="row">
             <div class="col-md-8"></div>
             <div class="col-md-4">

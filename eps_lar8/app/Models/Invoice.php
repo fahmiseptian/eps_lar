@@ -12,10 +12,16 @@ class Invoice extends Model
     protected $table = 'complete_cart';
     protected $primaryKey = 'id';
     protected $visible = ['invoice'];
+    public $timestamps = false;
 
-    public function user()
+    public function finance()
     {
         return $this->belongsTo(User::class, 'updated_status_by');
+    }
+
+    public function pajak()
+    {
+        return $this->belongsTo(User::class, 'pelapor_pajak');
     }
 
     public function completeCartShop()

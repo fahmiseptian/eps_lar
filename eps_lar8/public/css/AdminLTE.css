@@ -133,6 +133,38 @@ body {
     transform: translate(230px, 0);
   }
 }
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 1,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24;
+}
+#icon-info {
+  font-size: 30px;
+  color: deepskyblue;
+}
+#icon-delete {
+  font-size: 30px;
+  color: red;
+}
+#icon-active {
+  font-size: 30px;
+  color: forestgreen;
+}
+#icon-disable {
+  font-size: 30px;
+  color: grey;
+}
+#icon-warning {
+  font-size: 30px;
+  color: greenyellow;
+}
+.btn-transparent {
+background-color: transparent;
+border: 2px;
+padding: 0;
+}
 .content-wrapper,
 .right-side {
   min-height: 100%;
@@ -751,6 +783,15 @@ width: 30px;
 .sidebar-menu .treeview-menu > li > a > .fa-angle-down {
   width: auto;
 }
+
+.rotate-icon {
+  -webkit-transition: all 0.3s ease-in-out; /* Safari */
+  transition: all 0.3s ease-in-out;
+  -ms-transform: rotate(-90deg); /* IE 9 */
+  -webkit-transform: rotate(-90deg); /* Chrome, Safari, Opera */
+  transform: rotate(-90deg);
+}
+
 /*
  * Component: Dropdown menus
  * -------------------------

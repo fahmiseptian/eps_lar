@@ -11,7 +11,7 @@ class Shop extends Model
     use HasFactory;
     protected $table = 'shop';
     public $timestamps = false;
-    protected $visible = ['nama_pt','name','nik_pemilik','npwp','phone','password'];
+    protected $visible = ['nama_pt','name','nik_pemilik','npwp','phone','password', 'nama_pemilik'];
     protected $fillable = [
         'status','type','is_top',
     ];
