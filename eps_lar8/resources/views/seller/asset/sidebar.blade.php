@@ -10,7 +10,7 @@
             <div class="pull-left info">
                 <a href="#" class="seller_type">
                     @if ($seller_type == 'trusted_seller')
-                        <img src="{{ asset('/img/trusted-seller.png') }}" />
+                        <img src="{{ asset('/img/app/trusted-seller.png') }}" />
                     @endif
                 </a>
                 <h5> <b><?= session()->get('seller') ?></b></h5>
@@ -21,7 +21,7 @@
         <div class="seller-balance">
             <div class="info">
                 <p>Saldo Anda</p>
-                <h4>Rp <?= number_format($saldo) ?></h4>
+                <h4>Rp {{number_format($saldo, 0, ',', '.')}}</h4>
                 <hr width="100%" align="center">
             </div>
 
@@ -44,23 +44,18 @@
                 </ul>
             </li>
             <li class="list-sidebar">
-                <a href="#">
-                    <i class="fa fa-tasks"></i> <span>Pesanan Saya</span> <i class="fa fa-angle-left pull-right"></i>
+                <a href="{{ route('seller.order') }}">
+                    <i class="fa fa-tasks"></i> <span>Pesanan Saya</span>
                 </a>
-                <ul class="treeview-menu">
-                    <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Pesanan</a></li>
-                    <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Pembatalan</a></li>
-                    <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Pengembalian</a></li>
-                </ul>
             </li>
             <li class="list-sidebar">
                 <a href="#">
                     <i class="fa fa-dropbox"></i> <span>Produk Saya</span> <i class="fa fa-angle-left pull-right"></i>
                 </a>
                 <ul class="treeview-menu">
-                    <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Pesanan</a></li>
-                    <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Pembatalan</a></li>
-                    <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Pengembalian</a></li>
+                    <li><a style="color: #eee" href="{{ route('seller.product') }}"><i class="fa fa-circle-o"></i> Produk</a></li>
+                    <li><a style="color: #eee" href="{{ route('seller.product.add') }}"><i class="fa fa-circle-o"></i> Tambah Produk</a></li>
+                    <li><a style="color: #eee" href="{{ route('seller.product.violation') }}"><i class="fa fa-circle-o"></i> Pelanggaran Saya</a></li>
                 </ul>
             </li>
             <li class="list-sidebar">
@@ -78,10 +73,10 @@
                     <i class="fa fa-money"></i> <span>Keuangan</span> <i class="fa fa-angle-left pull-right"></i>
                 </a>
                 <ul class="treeview-menu">
-                    <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Penghasilan</a></li>
-                    <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Saldo</a></li>
-                    <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Rekening</a></li>
-                    <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Pembayaran</a></li>
+                    <li><a style="color: #eee" href="{{ route('seller.finance')}}"><i class="fa fa-circle-o"></i> Penghasilan</a></li>
+                    <li><a style="color: #eee" href="{{ route('seller.finance.saldo')}}"><i class="fa fa-circle-o"></i> Saldo</a></li>
+                    <li><a style="color: #eee" href="{{ route('seller.finance.rekening')}}"><i class="fa fa-circle-o"></i> Rekening</a></li>
+                    <li><a style="color: #eee" href="{{ route('seller.finance.pembayaran')}}"><i class="fa fa-circle-o"></i> Pembayaran</a></li>
                 </ul>
             </li>
             <li class="list-sidebar">

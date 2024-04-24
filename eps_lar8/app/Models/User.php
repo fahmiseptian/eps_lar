@@ -31,13 +31,22 @@ class User extends Model
     public function decryptPassword($password)
     {
         if ($this->Encryption !== null) {
-            $cek = $this->Encryption->decrypt($password);
+            $decrypted = $this->Encryption->decrypt($password);
 
-            if ($cek === false) {
+            if ($decrypted === false) {
                 return "Error";
             } 
 
-            return $cek;
+            return $decrypted;
+        } else {
+            return "Encryption object is not initialized";
+        }
+    }
+
+    public function encryptPassword($password)
+    {
+        if ($this->Encryption !== null) {
+            return $this->Encryption->encrypt($password);
         } else {
             return "Encryption object is not initialized";
         }
