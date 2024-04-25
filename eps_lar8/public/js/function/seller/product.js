@@ -34,7 +34,7 @@ function toggleFilterProduct(element) {
     console.log(status);
     $.ajax({
         type: "GET",
-        url: "/seller/product/" + status,
+        url: appUrl + "/seller/product/" + status,
         success: function (data) {
             console.log("berhasil ");
             window.location.href = "/seller/product/" + status;
@@ -50,7 +50,7 @@ $(document).ready(function() {
         var level1Value = $(this).val();
         if (level1Value !== '') {
             $.ajax({
-                url: '/seller/product/category/level2/' + level1Value,
+                url: appUrl + '/seller/product/category/level2/' + level1Value,
                 type: 'GET',
                 success: function(response) {
                     $('#kategori-level2').empty();

@@ -16,27 +16,26 @@
                 <div class="row">
                     <div class="col-md-1"></div>
                     <div class="col-md-10">
-                        <div class="box box-info">
-                            <div class="box-body">
-                                <div class="filter-links">
-                                    <a href="{{ route('seller.order') }}">Semua</a>
-                                    <a href="javascript:;" data-status-order="waiting_accept_order"
-                                        onclick="toggleFilterorder(this)">Perlu Dikemas</a>
-                                    <a href="javascript:;" data-status-order="on_packing_process"
-                                        onclick="toggleFilterorder(this)">Perlu Dikirim</a>
-                                    <a href="javascript:;" data-status-order="send_by_seller"
-                                        onclick="toggleFilterorder(this)">Dikirim</a>
-                                    <a href="javascript:;" data-status-order="complete"
-                                        onclick="toggleFilterorder(this)">Pesanan Diterima</a>
-                                    <a href="javascript:;" data-status-order="done"
-                                        onclick="toggleFilterorder(this)">Selesai</a>
-                                    <a href="javascript:;" data-status-order="cancel_by_seller"
-                                        onclick="toggleFilterorder(this)">Dibatalkan</a>
-                                    {{-- <a href="javascript:;" data-status-order="refund" onclick="toggleFilterorder(this)">Pengembalian</a> --}}
+                        <div class="box box-info"
+                            style="background-color: #e3f2fd; border: 2px solid #2196f3; border-radius: 10px; box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.15); padding: 16px; margin-bottom: 20px;">
+                            <div class="box-header"
+                                style="background-color: #2196f3; color: #fff; padding: 8px 16px; border-radius: 8px 8px 0 0;">
+                                <h3>Daftar Pesanan</h3>
+                            </div>
+                            <div class="box-body" style="padding: 16px;">
+                                <div class="filter-links" id="filter-links">
+                                    <a href="{{ route('seller.order') }}" class="filter-link">Semua</a>
+                                    <a href="javascript:;" class="filter-link" data-status-order="waiting_accept_order" onclick="toggleFilterorder(this)">Perlu Dikemas</a>
+                                    <a href="javascript:;" class="filter-link" data-status-order="on_packing_process" onclick="toggleFilterorder(this)">Perlu Dikirim</a>
+                                    <a href="javascript:;" class="filter-link" data-status-order="send_by_seller" onclick="toggleFilterorder(this)">Dikirim</a>
+                                    <a href="javascript:;" class="filter-link" data-status-order="complete" onclick="toggleFilterorder(this)">Pesanan Diterima</a>
+                                    <a href="javascript:;" class="filter-link" data-status-order="done" onclick="toggleFilterorder(this)">Selesai</a>
+                                    <a href="javascript:;" class="filter-link" data-status-order="cancel_by_seller" onclick="toggleFilterorder(this)">Dibatalkan</a>
+                                    <!-- <a href="javascript:;" class="filter-link" data-status-order="refund" onclick="toggleFilterorder(this)">Pengembalian</a> -->
                                 </div>
-
-                                <table id="example2" class="table table-bordered table-hover" style="width: 100%">
-                                    <thead>
+                                <table id="example2" class="table table-bordered table-hover table-striped"
+                                    style="width: 100%;">
+                                    <thead style="background-color: #FC6703; color: #fff;">
                                         <tr>
                                             <th>Invoice</th>
                                             <th class="detail-full">Tanggal Pesan</th>
@@ -90,7 +89,7 @@
                                             </tr>
                                         @endforeach
                                     </tbody>
-                                    <tfoot>
+                                    <tfoot style="background-color: #FC6703; color: #fff;">
                                         <tr>
                                             <th>Invoice</th>
                                             <th class="detail-full">Tanggal Pesan</th>
@@ -105,6 +104,7 @@
                                 </table>
                             </div>
                         </div>
+
                     </div>
                     <div class="col-md-1"></div>
                 </div>

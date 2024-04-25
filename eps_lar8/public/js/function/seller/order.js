@@ -1,6 +1,6 @@
-var csrfToken = $('meta[name="csrf-token"]').attr('content');
+var csrfToken = $('meta[name="csrf-token"]').attr("content");
 
-$(function() {
+$(function () {
     // Konfigurasi DataTables untuk kedua tabel
     var dataTableOptions = {
         bPaginate: true,
@@ -23,13 +23,12 @@ $(function() {
     }
 });
 
-
 function toggleFilterorder(element) {
     var status_order = element.getAttribute("data-status-order");
 
     $.ajax({
         type: "GET",
-        url: "/seller/order/filter/" + status_order,
+        url: appUrl + "/seller/order/filter/" + status_order,
         success: function (data) {
             console.log("berhasil ");
             window.location.href = "/seller/order/filter/" + status_order;
@@ -45,7 +44,7 @@ function viewDetail(element) {
 
     $.ajax({
         type: "GET",
-        url: "/seller/order/detail/" + id_cart_shop,
+        url: appUrl + "/seller/order/detail/" + id_cart_shop,
         success: function (data) {
             console.log("berhasil");
             window.location.href = "/seller/order/detail/" + id_cart_shop;
@@ -89,7 +88,7 @@ $(document).on("click", ".accept-this-order", function () {
                 .querySelector('meta[name="csrf-token"]')
                 .getAttribute("content");
             $.ajax({
-                url: "/seller/order/accept",
+                url: appUrl + "/seller/order/accept",
                 type: "POST",
                 data: { id_cart_shop: id_cart_shop, _token: csrfToken },
                 success: function () {
@@ -120,9 +119,13 @@ $(document).on("click", ".cancel-order", async function () {
             .querySelector('meta[name="csrf-token"]')
             .getAttribute("content");
         $.ajax({
-            url: "/seller/order/cencel",
+            url: appUrl + "/seller/order/cencel",
             type: "POST",
-            data: { id_cart_shop: id_cart_shop, note: noteSeller, _token: csrfToken },
+            data: {
+                id_cart_shop: id_cart_shop,
+                note: noteSeller,
+                _token: csrfToken,
+            },
             success: function () {
                 location.reload();
             },

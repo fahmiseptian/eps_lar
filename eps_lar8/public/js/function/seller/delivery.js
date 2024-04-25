@@ -1,4 +1,7 @@
 var csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+
+
 $(function () {
     $("#example1").dataTable();
     $("#example2").dataTable({
@@ -44,11 +47,14 @@ function toggleCourier(checkbox) {
 }
 
 function addCourier(courierId) {
+    var csrfToken = document
+                .querySelector('meta[name="csrf-token"]')
+                .getAttribute("content");
     $.ajax({
-        type: 'GET',
-        url: '/seller/add-courier',
+        type: 'post',
+        url: appUrl + '/seller/add-courier/',
         data: {
-            courierId: courierId,
+            courierId: courierId, _token: csrfToken 
         },
         success: function(data) {
             Swal.fire({
@@ -74,11 +80,14 @@ function addCourier(courierId) {
 
 
 function removeCourier(courierId) {
+    var csrfToken = document
+                .querySelector('meta[name="csrf-token"]')
+                .getAttribute("content");
     $.ajax({
-        type: 'GET',
-        url: '/seller/remove-courier',
+        type: 'POST',
+        url: appUrl +'/seller/remove-courier',
         data: {
-            courierId: courierId,
+            courierId: courierId, _token: csrfToken
         },
         success: function(data) {
             Swal.fire({
@@ -118,7 +127,7 @@ function togglefreeCourier(checkbox) {
 function addfreeCourier(id_province) {
     $.ajax({
         type: 'GET',
-        url: '/seller/add-free-courier',
+        url: appUrl + '/seller/add-free-courier',
         data: {
             id_province: id_province,
         },
@@ -148,7 +157,7 @@ function addfreeCourier(id_province) {
 function removefreeCourier(id_province) {
     $.ajax({
         type: 'GET',
-        url: '/seller/remove-free-courier',
+        url: appUrl + '/seller/remove-free-courier',
         data: {
             id_province: id_province,
         },

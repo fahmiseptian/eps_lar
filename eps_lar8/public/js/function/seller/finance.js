@@ -44,7 +44,7 @@ function showTab(tabName) {
 $(document).on("click", "#editRekening", function () {
     var rekeningId = $(this).attr("data-id");
     $.ajax({
-        url: "/seller/finance/getRekening/" + rekeningId,
+        url: appUrl + "/seller/finance/getRekening/" + rekeningId,
         type: "get",
         success: function (response) {
             if (response && response.data_rekening_seller) {
@@ -136,16 +136,16 @@ $(document).on("click", "#hapusRekening", function () {
         icon: "warning",
         showCancelButton: true,
         confirmButtonText: "Ya, hapus",
-        cancelButtonText: "Batal"
+        cancelButtonText: "Batal",
     }).then((result) => {
         if (result.isConfirmed) {
             // Jika konfirmasi penghapusan disetujui, kirim permintaan POST ke server
             $.ajax({
-                url: "/seller/finance/deleteRekening/" + rekeningId,
+                url: appUrl + "/seller/finance/deleteRekening/" + rekeningId,
                 type: "POST",
                 data: {
                     _token: $('meta[name="csrf-token"]').attr("content"), // Kirim token CSRF jika diperlukan
-                    id: rekeningId
+                    id: rekeningId,
                 },
                 success: function (response) {
                     if (response.success) {
@@ -166,8 +166,12 @@ $(document).on("click", "#hapusRekening", function () {
                     }
                 },
                 error: function (xhr, status, error) {
-                    Swal.fire("Gagal", "Terjadi kesalahan saat menghapus rekening.", "error");
-                }
+                    Swal.fire(
+                        "Gagal",
+                        "Terjadi kesalahan saat menghapus rekening.",
+                        "error"
+                    );
+                },
             });
         }
     });
@@ -182,50 +186,58 @@ $(document).on("click", "#editDefaultRekening", function () {
         showCancelButton: true,
         confirmButtonText: "Ya, jadikan rekening utama",
         cancelButtonText: "Batal",
-        reverseButtons: true
+        reverseButtons: true,
     }).then((result) => {
         if (result.isConfirmed) {
             // Kirim permintaan ke server untuk mengubah rekening utama
             $.ajax({
-                url: "/seller/finance/updateDefaultRekening",
+                url: appUrl + "/seller/finance/updateDefaultRekening",
                 type: "POST",
                 data: {
                     id: rekeningId,
-                    _token: $('meta[name="csrf-token"]').attr("content")
+                    _token: $('meta[name="csrf-token"]').attr("content"),
                 },
                 success: function (response) {
-                    Swal.fire("Sukses", "Rekening utama berhasil diubah", "success").then(() => {
+                    Swal.fire(
+                        "Sukses",
+                        "Rekening utama berhasil diubah",
+                        "success"
+                    ).then(() => {
                         window.location.reload();
                     });
                 },
                 error: function (xhr, status, error) {
-                    Swal.fire("Error", "Terjadi kesalahan saat mengubah rekening utama", "error");
-                }
+                    Swal.fire(
+                        "Error",
+                        "Terjadi kesalahan saat mengubah rekening utama",
+                        "error"
+                    );
+                },
             });
         }
     });
 });
 
-$(document).on('click', '#updatePIN', function() {
-    document.getElementById('overlay').style.display = 'none';
-    document.getElementById('loading').style.display = 'flex'; //menampilkan loading
+$(document).on("click", "#updatePIN", function () {
+    document.getElementById("overlay").style.display = "none";
+    document.getElementById("loading").style.display = "flex"; //menampilkan loading
     $.ajax({
-        url: "/seller/finance/sendVerificationCode",
+        url: appUrl + "/seller/finance/sendVerificationCode",
         type: "POST",
         headers: {
             "X-CSRF-Token": $('meta[name="csrf-token"]').attr("content"),
         },
-        success: function(response) {
+        success: function (response) {
             // Tampilkan input untuk kode verifikasi
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('loading').style.display = 'none'; //tutup loading
+            document.getElementById("overlay").style.display = "block";
+            document.getElementById("loading").style.display = "none"; //tutup loading
             Swal.fire({
                 title: "Verifikasi Email",
-                input: 'text',
+                input: "text",
                 inputPlaceholder: "Masukkan kode verifikasi",
                 showCancelButton: true,
-                confirmButtonText: 'Verifikasi',
-                cancelButtonText: 'Batal',
+                confirmButtonText: "Verifikasi",
+                cancelButtonText: "Batal",
                 focusConfirm: false,
                 preConfirm: (code) => {
                     // Kirim kode verifikasi ke server untuk diverifikasi
@@ -234,20 +246,24 @@ $(document).on('click', '#updatePIN', function() {
                         body: JSON.stringify({ code: code }),
                         headers: {
                             "Content-Type": "application/json",
-                            "X-CSRF-Token": $('meta[name="csrf-token"]').attr("content"),
+                            "X-CSRF-Token": $('meta[name="csrf-token"]').attr(
+                                "content"
+                            ),
                         },
                     })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error("Kode verifikasi salah.");
-                        }
-                        return response.json();
-                    })
-                    .catch(error => {
-                        Swal.showValidationMessage(`Terjadi kesalahan: ${error.message}`);
-                    });
+                        .then((response) => {
+                            if (!response.ok) {
+                                throw new Error("Kode verifikasi salah.");
+                            }
+                            return response.json();
+                        })
+                        .catch((error) => {
+                            Swal.showValidationMessage(
+                                `Terjadi kesalahan: ${error.message}`
+                            );
+                        });
                 },
-            }).then(result => {
+            }).then((result) => {
                 if (result.isConfirmed) {
                     // Jika verifikasi berhasil, tampilkan modal untuk memperbarui PIN
                     Swal.fire({
@@ -265,12 +281,13 @@ $(document).on('click', '#updatePIN', function() {
                             </form>
                         `,
                         showCancelButton: true,
-                        confirmButtonText: 'Update',
-                        cancelButtonText: 'Batal',
+                        confirmButtonText: "Update",
+                        cancelButtonText: "Batal",
                         focusConfirm: false,
                         preConfirm: () => {
                             // Ambil data dari form
-                            const form = document.getElementById("updatePinForm");
+                            const form =
+                                document.getElementById("updatePinForm");
                             const formData = new FormData(form);
 
                             // Validasi pin dan konfirmasi pin
@@ -278,7 +295,9 @@ $(document).on('click', '#updatePIN', function() {
                             const confirmNewPin = formData.get("confirmNewPin");
 
                             if (newPin !== confirmNewPin) {
-                                Swal.showValidationMessage("PIN baru dan konfirmasi PIN baru tidak cocok.");
+                                Swal.showValidationMessage(
+                                    "PIN baru dan konfirmasi PIN baru tidak cocok."
+                                );
                                 return false;
                             }
 
@@ -287,22 +306,32 @@ $(document).on('click', '#updatePIN', function() {
                                 method: "POST",
                                 body: formData,
                                 headers: {
-                                    "X-CSRF-Token": $('meta[name="csrf-token"]').attr("content"),
+                                    "X-CSRF-Token": $(
+                                        'meta[name="csrf-token"]'
+                                    ).attr("content"),
                                 },
                             })
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error("Gagal memperbarui PIN saldo.");
-                                }
-                                return response.json();
-                            })
-                            .catch(error => {
-                                Swal.showValidationMessage(`Terjadi kesalahan: ${error.message}`);
-                            });
+                                .then((response) => {
+                                    if (!response.ok) {
+                                        throw new Error(
+                                            "Gagal memperbarui PIN saldo."
+                                        );
+                                    }
+                                    return response.json();
+                                })
+                                .catch((error) => {
+                                    Swal.showValidationMessage(
+                                        `Terjadi kesalahan: ${error.message}`
+                                    );
+                                });
                         },
-                    }).then(finalResult => {
+                    }).then((finalResult) => {
                         if (finalResult.isConfirmed) {
-                            Swal.fire('Sukses', 'PIN saldo penjual berhasil diperbarui', 'success').then(() => {
+                            Swal.fire(
+                                "Sukses",
+                                "PIN saldo penjual berhasil diperbarui",
+                                "success"
+                            ).then(() => {
                                 // Refresh halaman setelah menutup modal Swal
                                 window.location.reload();
                             });
@@ -311,13 +340,12 @@ $(document).on('click', '#updatePIN', function() {
                 }
             });
         },
-        error: function(xhr, status, error) {
-            Swal.fire("Error", "Terjadi kesalahan saat mengirim kode verifikasi", "error");
+        error: function (xhr, status, error) {
+            Swal.fire(
+                "Error",
+                "Terjadi kesalahan saat mengirim kode verifikasi",
+                "error"
+            );
         },
     });
 });
-
-
-
-
-
