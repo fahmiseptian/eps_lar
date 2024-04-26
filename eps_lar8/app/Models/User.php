@@ -45,15 +45,6 @@ class User extends Model
 
     public function encryptPassword($password)
     {
-        if ($this->Encryption !== null) {
-            return $this->Encryption->encrypt($password);
-        } else {
-            return "Encryption object is not initialized";
-        }
-    }
-
-    public function encryptPassword($password)
-    {
         $encryption = new Encryption(); // Membuat instance objek Encryption
         return $encryption->encrypt($password);
     }

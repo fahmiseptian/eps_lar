@@ -95,7 +95,7 @@ function upload_cancel(invoiceId) {
             const formData = new FormData();
             formData.append('file', file);
 
-            return fetch(`/admin/invoice/upload/cancel/${invoiceId}`, {
+            return fetch(baseUrl + `/admin/invoice/upload/cancel/${invoiceId}`, {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -144,7 +144,7 @@ function reupload_cancel(invoiceId) {
             const formData = new FormData();
             formData.append('file', file);
 
-            return fetch(`/admin/invoice/reupload/cancel/${invoiceId}`, {
+            return fetch(baseUrl + `/admin/invoice/reupload/cancel/${invoiceId}`, {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -186,7 +186,7 @@ function view_cancel(invoiceId) {
 
     // Mengambil URL file invoice menggunakan AJAX
     $.ajax({
-        url: `/admin/invoice/view/cancel/${invoiceId}`,
+        url: baseUrl + `/admin/invoice/view/cancel/${invoiceId}`,
         method: 'GET',
         success: function(response) {
             const fileUrl = response.file_url;

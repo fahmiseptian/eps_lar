@@ -26,12 +26,61 @@
                         <!-- general form elements -->
                         <div class="box box-primary">
                             <div class="box-header">
-                                <h3 class="box-title">Add User</h3>
+                                <div class="col-md-9" style="padding-left: 0;">
+                                    <h3 class="box-title">List User</h3>
+                                </div>
+                                <!-- Daftar List Access -->
+                                <div class="col-md-3">
+                                    <a href="javascript:;" id="accessList" class="pull-right">
+                                        <h2 class="box-title" id="accessList">List Access</h2>
+                                        <i class="fa fa-angle-left"></i>
+                                    </a>
+                                </div>
                             </div><!-- /.box-header -->
-                            <!-- form start -->
-                            <form role="form" action="{{ route('admin.user.store') }}" method="POST">
+                               
+                            <div class="box-body">
+                                <div class="row">
+                                    <div class="col-md-9">
+                                    </div>
+                                    <div class="col-md-3" id="accesses" style="display:none;">
+                                        <button onclick="addAccess()" class="btn btn-primary pull-right" style="margin-bottom: 10px;">
+                                            <i class="fa fa-plus-circle"></i>
+                                            Add Access
+                                        </button>
+                                        <br>
+                                        <table class="table table-bordered table-hover">
+                                            <!-- Tabel daftar list access akan ditampilkan di sini -->
+                                            <tr>
+                                                <th widht=20%>No</th>
+                                                <th widht=40%>Access</th>
+                                                <th width=40%>Action</th>
+                                            </tr>
+                                            @php $x = 1 @endphp
+                                            @foreach ($accesses as $access)
+                                                <tr>
+                                                    <td>{{ $x++ }}</td>
+                                                    <td>{{ $access->name }}</td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-transparent" onclick="editAccess('{{ $access->id }}', '{{ $access->name }}', '{{ $access->code }}')" title="Edit Access">
+                                                            <span class="material-symbols-outlined" id="icon-warning">
+                                                                edit_square
+                                                            </span>
+                                                        </button>
+                                                        <button type="button" class="btn btn-transparent" onclick="deleteAccess('{{ $access->id }}', '{{ $access->name }}')" title="Hapus Access">
+                                                            <span class="material-symbols-outlined" id="icon-delete">
+                                                                delete
+                                                            </span>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </table>
+                                    </div>
+                                </div>
+                                
+                                <form role="form" action="{{ route('admin.user.store') }}" method="POST">
                                 @csrf
-                                <div class="box-body">
+                                
                                     <div class="form-group">
                                         <label for="nama">Username</label>
                                         <input type="text" name="username" class="form-control" required>

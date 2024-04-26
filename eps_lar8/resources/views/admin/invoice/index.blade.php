@@ -59,7 +59,7 @@
                                                 </td>
 
                                                 <td>{{ $item->invoice }}</td>
-                                                <td>Rp. {{ number_format($item->total, 0, ',', '.') }}</td>
+                                                <td>Rp{{ number_format($item->total, 0, ',', '.') }}</td>
 
                                                 <td>
 

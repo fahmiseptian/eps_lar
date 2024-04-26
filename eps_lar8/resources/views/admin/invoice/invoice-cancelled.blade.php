@@ -47,7 +47,7 @@
                                             <tr>
                                                 <td>{{ $i++ }}</td>
                                                 <td>{{ $invoice->invoice }}</td>
-                                                <td>{{ str_replace(',', '.', number_format($invoice->total)) }}</td>
+                                                <td>Rp{{ number_format($invoice->total, 0, ',', '.') }}</td>
                                                 <td>
                                                     @if ($invoice->completeCartShop->status == 'cancel_by_seller')
                                                         Dibatalkan oleh Penjual

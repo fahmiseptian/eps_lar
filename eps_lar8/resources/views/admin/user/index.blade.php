@@ -29,7 +29,7 @@
                                 <div class="col-md-9" style="padding-left: 0;">
                                     <h3 class="box-title">List User</h3>
                                 </div>
-                                <!-- Daftar Parent Menu -->
+                                <!-- Daftar List Access -->
                                 <div class="col-md-3">
                                     <a href="javascript:;" id="accessList" class="pull-right">
                                         <h2 class="box-title" id="accessList">List Access</h2>
@@ -47,7 +47,7 @@
                                     </button>
                                     <br>
                                     <table class="table table-bordered table-hover">
-                                        <!-- Tabel daftar parent menu akan ditampilkan di sini -->
+                                        <!-- Tabel daftar list access akan ditampilkan di sini -->
                                         <tr>
                                             <th widht=20%>No</th>
                                             <th widht=40%>Access</th>

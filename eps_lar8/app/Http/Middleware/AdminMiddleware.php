@@ -13,6 +13,11 @@ class AdminMiddleware
             return redirect()->route('admin.login')->with('error', 'Anda tidak memiliki izin untuk mengakses halaman ini.');
         }
 
+        // Cek apakah access_code not null pada sesi
+        if (!$request->session()->has('access_code') || !$request->session()->get('access_code')) {
+            return redirect()->route('admin.login')->with('error', 'Anda harus melakukan login ulang.');
+        }
+
         return $next($request);
     }
 }
