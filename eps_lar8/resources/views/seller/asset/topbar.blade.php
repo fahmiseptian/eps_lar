@@ -27,3 +27,8 @@
 <div id="loading"  hidden>
       <img src="{{ asset('/img/app/loader_eps.gif') }}" width="400px">
 </div>
+
+<script>
+    const appUrl = "{{ env('APP_URL') }}";
+    window.appUrl = appUrl;
+</script>

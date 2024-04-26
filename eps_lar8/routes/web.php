@@ -13,10 +13,11 @@ use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Seller\LoginSellerController;
 use App\Http\Controllers\Seller\HomesellerController;
 use App\Http\Controllers\Seller\DeliveryController;
-use App\Http\Controllers\seller\FinanceController;
+use App\Http\Controllers\Seller\FinanceController;
 use App\Http\Controllers\Seller\OrederController;
 use App\Http\Controllers\Seller\ProductController;
 use App\Http\Controllers\seller\ShophealthController;
+use Illuminate\Support\Facades\Artisan;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +32,10 @@ use App\Http\Controllers\seller\ShophealthController;
 
 Route::get('/', function () {
     return view('welcome');});
+    
+// Route::get('/foo', function () {
+//     Artisan::call('storage:link');
+// });
 
 // login Admin
 Route::get('/admin/login', [AuthController::class, 'showLoginForm'])->name('admin.login');
@@ -115,8 +120,8 @@ Route::group(['middleware' => 'seller'], function () {
     // pengiriman
     Route::get('/seller/delivery', [DeliveryController::class, 'pengaturan_jasa'])->name('seller.delivery');
     Route::get('/seller/delivery/free', [DeliveryController::class, 'pengaturan_free'])->name('seller.delivery.free-ongkir');
-    Route::get('/seller/add-courier', [DeliveryController::class, 'addCourier']);
-    Route::get('/seller/remove-courier', [DeliveryController::class, 'removeCourier']);
+    Route::post('/seller/add-courier', [DeliveryController::class, 'addCourier']);
+    Route::post('/seller/remove-courier', [DeliveryController::class, 'removeCourier']);
     Route::get('/seller/add-free-courier', [DeliveryController::class, 'addfreeCourier']);
     Route::get('/seller/remove-free-courier', [DeliveryController::class, 'removefreeCourier']);
 
@@ -157,3 +162,4 @@ Route::group(['middleware' => 'seller'], function () {
     Route::get('/seller/product/la/product/{id}', [ProductController::class, 'productAll']);
     Route::get('/seller/product/get/product/{id}', [ProductController::class, 'addOldProduct']); //ngambil Data Product di table yang lama
 });
+

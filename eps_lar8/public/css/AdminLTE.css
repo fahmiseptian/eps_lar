@@ -84,34 +84,6 @@ body {
   /* Memberikan jarak antara tombol-tombol */
 }
 
-.filter-links {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 10px;
-}
-
-.filter-links a {
-  text-decoration: none;
-  padding: 10px 20px;
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  color: #333;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  /* tambahkan bayangan */
-}
-
-.filter-links a:hover {
-  background-color: #e0e0e0;
-  transform: translateY(-2px);
-  /* efek naik saat hover */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  /* bayangan lebih besar saat hover */
-}
-
 .highlight {
   border-bottom: 3px solid #FC6703;
 }
@@ -334,6 +306,28 @@ top: 10px; /* Atur jarak atas elemen */
   background-color: #ddd;
 }
 
+.filter-links {
+  display: flex;
+  overflow-x: auto; /* Tambahkan scrollbar horizontal jika diperlukan */
+  padding: 10px 0;
+  white-space: nowrap; /* Membuat elemen tetap dalam satu baris */
+}
+
+/* Gaya umum untuk elemen filter-link */
+.filter-link {
+  text-decoration: none;
+  color: #000;
+  padding: 8px 16px; /* Menambahkan padding agar elemen lebih jelas */
+  border-radius: 5px;
+  margin-right: 8px; /* Jarak antara elemen */
+  transition: background-color 0.3s ease;
+}
+
+/* Efek hover */
+.filter-link:hover {
+  background-color: #f0f0f0;
+}
+
 @media only screen and (max-width: 600px) {
  /* Kontainer Kartu Kredit */
  .credit-card-container {
@@ -374,37 +368,6 @@ top: 10px; /* Atur jarak atas elemen */
   .detail-full {
     display: none;
   }
-
-  .filter-links {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .filter-links a:not(:last-child) {
-    margin-bottom: 10px;
-  }
-
-  .filter-links a {
-    text-decoration: none;
-    padding: 5px 10px;
-    margin: 5px;
-    background-color: hsl(0, 0%, 94%);
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    color: #333;
-    text-align: center;
-    white-space: nowrap;
-  }
-
-  .filter-links a:hover {
-    background-color: #e0e0e0;
-  }
-
-  .filter-links {
-    justify-content: center;
-  }
-
 
   .table-detail-order th,
   .table-detail-order td {
