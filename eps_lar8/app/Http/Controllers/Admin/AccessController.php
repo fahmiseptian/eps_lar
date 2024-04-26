@@ -15,6 +15,7 @@ class AccessController extends Controller
     protected $username;
     protected $access_id;
     protected $access_name;
+    protected $access_code;
     protected $data;
     protected $menu;
 
@@ -27,11 +28,12 @@ class AccessController extends Controller
 		$this->username = $request->session()->get('username');
 		$this->access_id 	= $request->session()->get('access_id');
 		$this->access_name 	= $request->session()->get('access_name');
+		$this->access_code 	= $request->session()->get('access_code');
         // Membuat $this->data
         $this->data['title'] = 'Access';
         $this->data['profile'] = User::find($this->access_id);
 
-        $this->menu = Menu::where('status', 1)->where($this->access_name, 1)->orderBy('urutan')->get();
+        $this->menu = Menu::where('status', 1)->where($this->access_code, 1)->orderBy('urutan')->get();
     }
     
     public function access()

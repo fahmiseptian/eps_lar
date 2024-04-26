@@ -456,7 +456,6 @@ body {
     /* Hilangkan margin kanan */
   }
 
-
   .dataTables_filter input {
     width: 100%;
     /* Atur lebar kolom pencarian menjadi 100% */
@@ -670,6 +669,38 @@ background-color: transparent;
 border: 2px;
 padding: 0;
 }
+
+.pagination {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.pagination button {
+  margin: 0px;
+  padding: 5px 10px;
+  background-color: #f0f0f0;
+  border: 0.5px solid #ddd;
+  cursor: pointer;
+}
+
+.pagination button.current {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+  cursor: not-allowed;
+}
+
+.pagination button.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.pagination p {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #666;
+}
+
 .content-wrapper,
 .right-side {
   min-height: 100%;

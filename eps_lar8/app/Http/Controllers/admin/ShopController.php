@@ -169,7 +169,7 @@ public function updateTypeDown($id)
     public function updateIsTop($id) {
         try {
             $shop = Shop::findOrFail($id);
-            $newTOP = $shop->is_top === '1' ? '0' : '1';
+            $newTOP = $shop->is_top === 1 ? 0 : 1;
             $shop->update(['is_top' => $newTOP]);
 
             return response()->json(['is_top' => $shop->is_top]);
@@ -208,13 +208,15 @@ public function updateTypeDown($id)
     }
 
 
-    // Mengambil produk dengan id shop
-    public function getProduct($id)
+    public function getProduct(Request $request, $id)
     {
-        $products = Product::where('id_shop', $id)->get();
+        $perPage = $request->input('per_page', 10); // Menentukan jumlah produk per halaman, defaultnya adalah 10
+        $products = Product::where('id_shop', $id)->paginate($perPage);
+    
         if ($products->isEmpty()) {
             return response()->json(['message' => 'Tidak ada produk yang ditemukan untuk toko dengan ID yang diberikan'], 404);
         }
+    
         return response()->json(['products' => $products]);
     }
 

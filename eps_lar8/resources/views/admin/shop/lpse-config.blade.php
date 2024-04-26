@@ -24,7 +24,7 @@
                 <div class="row">
                     <div class="col-xs-12">
                         <div class="box">
-                            <div class="box-body" id="formula-price">
+                            <div class="box-body" id="formula-price" style="cursor: pointer;">
                                 <h4>Formulasi Harga</h4>
                             </div>
                         </div>
@@ -66,20 +66,22 @@
                                                     </td>
                                                     <td>{{ $item->created_date }}</td>
                                                     <td>
-                                                        <a class="is_top @if ($item->is_top == 1) glyphicon glyphicon-ok-sign @else glyphicon glyphicon-remove-sign @endif"
-                                                            style="font-size: 20px;" data-shop-id="{{ $item->id }}"
-                                                            data-is-top="{{ $item->is_top }}">
-                                                        </a>
+                                                        <button type="button" class="btn btn-transparent is_top" title="Ubah Status TOP" data-shop-id="{{ $item->id }}" data-is-top="{{ $item->is_top }}">
+                                                            <span class="material-symbols-outlined" id="{{ $item->is_top === 1 ? 'icon-active' : 'icon-disable' }}">
+                                                                {{ $item->is_top === 1 ? 'calendar_clock' : 'event_busy' }}
+                                                            </span>
+                                                        </button>
                                                     </td>
                                                     <td>
                                                         <a onclick="detailDocument('{{ $item->id }}')"
                                                             class="glyphicon glyphicon-folder-open"></a>
                                                         <span style="margin-right: 10px;"></span>
 
-                                                        <a onclick="detailProduct('{{ $item->id }}')"
-                                                            class="glyphicon glyphicon-th-list"></a>
-                                                        <span style="margin-right: 10px;"></span>
-
+                                                        <button type="button" class="btn btn-transparent" onclick="detailProduct('{{ $item->id }}')" title="List Product">
+                                                            <span class="material-symbols-outlined" id="icon-info">
+                                                                format_list_bulleted
+                                                            </span>
+                                                        </button>
                                                         <a onclick="reviewToko('{{ $item->id }}')"
                                                             class="glyphicon glyphicon-log-in"></a>
 

@@ -207,38 +207,60 @@ function updateTypeDown(id) {
     });
 }
 
-var toggleIcons = document.querySelectorAll(".is_top");
-toggleIcons.forEach(function (icon) {
-    icon.addEventListener("click", function () {
+var toggleButtons = document.querySelectorAll(".is_top");
+
+toggleButtons.forEach(function(button) {
+    button.addEventListener("click", function() {
         var shopId = this.getAttribute("data-shop-id");
-        var isTop = this.getAttribute("data-is-top");
-        console.log(shopId);
+        
+        loading();
+
         // Kirim permintaan AJAX untuk memperbarui nilai is_top
-        fetch("/admin/update-is-top/" + shopId, {
+        fetch(baseUrl + "/admin/update-is-top/" + shopId, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
             },
         })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
-                return response.json();
-            })
-            .then((data) => {
-                // Mengubah ikon dan data is_top berdasarkan respons
-                if (data.is_top == 1) {
-                    icon.classList.remove("glyphicon-remove-sign");
-                    icon.classList.add("glyphicon-ok-sign");
-                    icon.setAttribute("data-is-top", 1);
-                } else {
-                    icon.classList.remove("glyphicon-ok-sign");
-                    icon.classList.add("glyphicon-remove-sign");
-                    icon.setAttribute("data-is-top", 0);
-                }
-            })
-            .catch((error) => console.error("Error:", error));
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Sembunyikan pesan loading setelah permintaan selesai
+            Swal.close();
+
+            // Mengubah ikon dan data is_top berdasarkan respons
+            var icon = this.querySelector('.material-symbols-outlined');
+            if (data.is_top == 1) {
+                icon.textContent = 'calendar_clock';
+                icon.setAttribute("id", "icon-active");
+                this.setAttribute("data-is-top", 1);
+            } else {
+                icon.textContent = 'event_busy';
+                icon.setAttribute("id", "icon-disable");
+                this.setAttribute("data-is-top", 0);
+            }
+
+            // Tampilkan pesan status berhasil
+            Swal.fire({
+                icon: 'success',
+                title: 'Status berhasil diperbarui!',
+                showConfirmButton: false,
+                timer: 1500 // Hide after 1.5 seconds
+            });
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            // Tampilkan pesan status gagal
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal memperbarui status',
+                text: 'Terjadi kesalahan saat memperbarui status, silakan coba lagi.',
+            });
+        });
     });
 });
 
@@ -278,7 +300,7 @@ document.getElementById("formula-price").addEventListener("click", function () {
                             <input type="text" class="form-control" id="inputFeeMPPercent" value="${formula.fee_mp_percent}" required>
                         </td>
                         <th style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">
-                            <a class="glyphicon glyphicon-saved" id="formula-saved">Simpan </a>
+                            <a id="formula-saved" style="cursor: pointer;"><i class="fa fa-floppy-o"></i> Simpan</a>
                         </th>
                     </tr>
                 </tbody>
@@ -503,63 +525,177 @@ function calculate(formula, originalValue) {
 
 function detailProduct(id) {
     loading();
+    var currentPage = 1; // Halaman saat ini
 
-    console.log("Shop ID:", id);
-    $.ajax({
-        url: "/admin/shop/" + id + "/product/",
-        method: "GET",
-        success: function (response) {
-            var products = response.products;
-            var htmlContent = '<table class="table">';
-            htmlContent +=
-                '<thead><tr><th rowspan="2">Nama</th><th rowspan="2">Tanggal Update</th><th rowspan="2">Stok</th><td align="center" colspan="2"> <b> Action </b> </td></tr>';
-            htmlContent += "<tbody>";
-            products.forEach(function (product) {
-                htmlContent +=
-                    "<tr>" +
-                    '<td align="left">' +
-                    product.name +
-                    "</td>" +
-                    '<td align="left">' +
-                    product.last_update +
-                    "</td>" +
-                    '<td align="left">' +
-                    product.stock +
-                    "</td>" +
-                    '<td align="center"> <a class="glyphicon ' +
-                    (product.status_lpse == 1
-                        ? "glyphicon-eye-open"
-                        : "glyphicon-eye-close") +
-                    '" id="update-status" data-product-id="' +
-                    product.id +
-                    '"data-product-status="' +
-                    product.status_lpse +
-                    '"></a></td>' +
-                    '<td align="center"> <a class="glyphicon glyphicon-log-in" id="review-product"></a></td>' +
-                    "</tr>";
-            });
-            htmlContent += "</tbody></table>";
+    window.loadProducts = function(page) {
+        loading();
+    
+        $.ajax({
+            url: baseUrl + "/admin/shop/" + id + "/product/",
+            method: "GET",
+            data: { page: page, per_page: 10 },
+            success: function (response) {
+                // Hapus SweetAlert loading setelah mendapatkan respons dari server
+                Swal.close();
 
-            Swal.fire({
-                title: "Detail Produk",
-                html: htmlContent,
-                showConfirmButton: true,
-                allowOutsideClick: true,
-                width: "50%",
-                didOpen: function () {
+                var products = response.products.data; // Akses properti data
+                var currentPage = response.products.current_page; // Halaman saat ini
+                var lastPage = response.products.last_page; // Halaman terakhir
+                var totalRecords = response.products.total; // Total data produk
+
+                if (!Array.isArray(products)) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: "Data produk tidak valid.",
+                    });
+                    return;
                 }
-            });
-        },
-        error: function (xhr, status, error) {
-            Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: "Produk Toko Ini tidak ada",
-            });
-        },
-    });
+    
+                var htmlContent = '<table class="table">';
+                htmlContent +=
+                    '<thead><tr><th rowspan="2">Nama</th><th rowspan="2">Tanggal Update</th><th rowspan="2">Stok</th><td align="center" colspan="2"> <b> Action </b> </td></tr>';
+                htmlContent += "<tbody>";
+                products.forEach(function (product) {
+                    htmlContent +=
+                        "<tr>" +
+                        '<td align="left">' +
+                        product.name +
+                        "</td>" +
+                        '<td align="left">' +
+                        product.last_update +
+                        "</td>" +
+                        '<td align="left">' +
+                        product.stock +
+                        "</td>" +
+                        '<td align="center"> <a class="glyphicon ' +
+                        (product.status_lpse == 1
+                            ? "glyphicon-eye-open"
+                            : "glyphicon-eye-close") +
+                        '" id="update-status" data-product-id="' +
+                        product.id +
+                        '"data-product-status="' +
+                        product.status_lpse +
+                        '"></a></td>' +
+                        '<td align="center"> <a class="glyphicon glyphicon-log-in" id="review-product"></a></td>' +
+                        "</tr>";
+                });
+                htmlContent += "</tbody></table>";
+    
+                Swal.fire({
+                    title: "Detail Produk",
+                    html: htmlContent,
+                    showConfirmButton: false, // Tidak menampilkan tombol konfirmasi
+                    width: "50%",
+                    didOpen: function () {
+                        // Membuat tombol navigasi paginasi
+                        var paginationHtml = '<div class="pagination">';
+                        if (currentPage > 1) {
+                            paginationHtml += '<button onclick="loadProducts(' + (currentPage - 1) + ')">Prev</button>';
+                        } else {
+                            paginationHtml += '<button class="disabled">Prev</button>';
+                        }
+
+                        var startPage = Math.max(1, currentPage - 2);
+                        var endPage = Math.min(startPage + 4, lastPage);
+                        if (lastPage - currentPage < 2) {
+                            startPage = Math.max(1, lastPage - 4);
+                        }
+                        for (var i = startPage; i <= endPage; i++) {
+                            if (i === currentPage) {
+                                paginationHtml += '<button class="current">' + i + '</button>';
+                            } else {
+                                paginationHtml += '<button onclick="loadProducts(' + i + ')">' + i + '</button>';
+                            }
+                        }
+
+                        if (currentPage < lastPage) {
+                            paginationHtml += '<button onclick="loadProducts(' + (currentPage + 1) + ')">Next</button>';
+                        } else {
+                            paginationHtml += '<button class="disabled">Next</button>';
+                        }
+                        paginationHtml += '</div>';
+                        
+                        paginationHtml += '<p>Showing ' + ((currentPage - 1) * 10 + 1) + ' to ' + Math.min(currentPage * 10, totalRecords) + ' of ' + totalRecords + ' entries</p>';
+    
+                        // Menambahkan tombol paginasi ke dalam SweetAlert
+                        $(".swal2-html-container").append(paginationHtml);
+                    }
+                });
+            },
+            error: function (xhr, status, error) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Toko ini tidak memiliki produk.",
+                });
+            },
+        });
+    }
+
+    // Panggil loadProducts untuk halaman pertama saat detailProduct dipanggil
+    loadProducts(currentPage);
 }
 
+
+// function detailProduct(id) {
+//     loading();
+
+//     console.log("Shop ID:", id);
+//     $.ajax({
+//         url: "/admin/shop/" + id + "/product/",
+//         method: "GET",
+//         success: function (response) {
+//             var products = response.products;
+//             var htmlContent = '<table class="table">';
+//             htmlContent +=
+//                 '<thead><tr><th rowspan="2">Nama</th><th rowspan="2">Tanggal Update</th><th rowspan="2">Stok</th><td align="center" colspan="2"> <b> Action </b> </td></tr>';
+//             htmlContent += "<tbody>";
+//             products.forEach(function (product) {
+//                 htmlContent +=
+//                     "<tr>" +
+//                     '<td align="left">' +
+//                     product.name +
+//                     "</td>" +
+//                     '<td align="left">' +
+//                     product.last_update +
+//                     "</td>" +
+//                     '<td align="left">' +
+//                     product.stock +
+//                     "</td>" +
+//                     '<td align="center"> <a class="glyphicon ' +
+//                     (product.status_lpse == 1
+//                         ? "glyphicon-eye-open"
+//                         : "glyphicon-eye-close") +
+//                     '" id="update-status" data-product-id="' +
+//                     product.id +
+//                     '"data-product-status="' +
+//                     product.status_lpse +
+//                     '"></a></td>' +
+//                     '<td align="center"> <a class="glyphicon glyphicon-log-in" id="review-product"></a></td>' +
+//                     "</tr>";
+//             });
+//             htmlContent += "</tbody></table>";
+
+//             Swal.fire({
+//                 title: "Detail Produk",
+//                 html: htmlContent,
+//                 showConfirmButton: true,
+//                 allowOutsideClick: true,
+//                 width: "50%",
+//                 didOpen: function () {
+//                 }
+//             });
+//         },
+//         error: function (xhr, status, error) {
+//             Swal.fire({
+//                 icon: "error",
+//                 title: "Oops...",
+//                 text: "Produk Toko Ini tidak ada",
+//             });
+//         },
+//     });
+// }
 
 function loading() {
     Swal.fire({
