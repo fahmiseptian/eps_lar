@@ -35,5 +35,13 @@ class CompleteCartShop extends Model
         }
         return  $query->count();
     }
+
+    public function getCountOrderByIdshop($id_shop, $status) {
+        return self::where('id_shop', $id_shop)
+                ->where('status', $status)
+                ->count();
+    }
+
+    
     
 }

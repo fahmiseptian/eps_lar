@@ -10,6 +10,7 @@ use App\Models\CompleteCartShop;
 use App\Models\Operational;
 use App\Models\Saldo;
 use App\Models\Nego;
+use App\Models\Products;
 use Illuminate\Http\Request;
 
 class HomesellerController extends Controller
@@ -26,88 +27,37 @@ class HomesellerController extends Controller
 
         $sellerType     = Shop::getTypeById($this->seller);
         $saldoPending   = Saldo::calculatePendingSaldo($this->seller);
+        $p_habis   = Products::getProductByIdShop($this->seller,['stock' => '0']);
         
         // Membuat $this->data
         $this->data['title'] = 'Dashboard';
         $this->data['seller_type'] = $sellerType;
         $this->data['saldo'] = $saldoPending;
+        $this->data['product_habis'] = $p_habis;
     }
 
     public function index()
     {
-        $neworder = CompleteCartShop::where('id_shop', $this->seller)
-                ->where('status', 'waiting_accept_order')
-                ->count();
-        $this->data['neworder'] = $neworder;
-        $ondelivery = CompleteCartShop::where('id_shop', $this->seller)
-                ->where('status', 'send_by_seller')
-                ->count();
-        $this->data['ondelivery'] = $ondelivery;
-        $order = CompleteCartShop::where('id_shop', $this->seller)
-                ->count();
-        $this->data['order'] = $order;
-
-        $ordercomplete = CompleteCartShop::where('id_shop', $this->seller)
-                ->where('status', 'complete')
-                ->count();
-        if ($ordercomplete >0) {
-            $persentaseorder = round(($ordercomplete / $order) * 100);
-        }else{
-            $persentaseorder=0;
-        }
-        $this->data['persentaseorder'] = $persentaseorder;
-        
-        $currentDay = strtolower(date('l')); 
-        $dayMap = [
-            'monday' => 1,
-            'tuesday' => 2,
-            'wednesday' => 3,
-            'thursday' => 4,
-            'friday' => 5,
-            'saturday' => 6,
-            'sunday' => 7
-        ];
-        $idDay = $dayMap[$currentDay];
-        $Operational = Operational::where('id_shop', $this->seller)
-                                    ->where('id_day', $idDay)
-                                    ->first();
-        if ($Operational) {
-            $start_time = substr($Operational->start_time, 0, 5);
-            $end_time = substr($Operational->end_time, 0, 5);
-            if ($Operational->is_active == 'Y') {
-                $this->data['Operational'] = 'Toko buka';
-            } else {
-                $this->data['Operational'] = 'Toko tutup';
-            }
-        } else {
-            $start_time = null;
-            $end_time = null;
-            $this->data['Operational'] = 'Tidak ada data operasional untuk hari ini';
-        }
-        $this->data['start_time'] = $start_time;
-        $this->data['end_time'] = $end_time;
-
-        $jmlhproduct = Product::where('id_shop', $this->seller)->count();
-        $this->data['jmlhproduct'] = $jmlhproduct;
-
-        $nego = Nego::where('id_shop', $this->seller)
-                ->where('status', 0)
-                ->count();
-        $this->data['nego'] = $nego;
-
-        $negoSukses = Nego::where('id_shop', $this->seller)
-                  ->where('status', 1)
+        $neworder =CompleteCartShop::getCountOrderByIdshop($this->seller,'waiting_accept_order');
+        $ondelivery =CompleteCartShop::getCountOrderByIdshop($this->seller,'on_packing_process');
+        $order = CompleteCartShop::where('id_shop', $this->seller)->count();
+        $jmlhproduct = Products::where('id_shop', $this->seller)->count();
+        $newNego = Nego::JumlahNegoUlang($this->seller,['status_nego' ,'=', 0]);
+        $NegoUlang = Nego::JumlahNegoUlang($this->seller,['status_nego' ,'>=', 2]);
+        $jumlah_nego = Nego::where('id_shop', $this->seller)
+                  ->where('status', '!=', 0)
+                  ->where('complete_checkout',1) 
                   ->count();
-        $totalNego = Nego::where('id_shop', $this->seller)
-                        ->count();
-        if ($totalNego > 0) {
-            $persentaseSukses = round(($negoSukses / $totalNego) * 100);
-        } else {
-            $persentaseSukses = 0;
-        }
-        $this->data['persentase_sukses'] = $persentaseSukses;
-
-
+        $pendapatanHariIni = Saldo::getPendapatanHariIni($this->seller);
+        
+        $this->data['neworder'] = $neworder;
+        $this->data['ondelivery'] = $ondelivery;
+        $this->data['order'] = $order;
+        $this->data['newNego'] = $newNego;
+        $this->data['NegoUlang'] = $NegoUlang;
+        $this->data['Nego'] = $jumlah_nego;
+        $this->data['jmlhproduct'] = $jmlhproduct;
+        $this->data['pendapatanHariIni'] = $pendapatanHariIni;
 
         return view('seller.home.dashboard',$this->data);
     }
