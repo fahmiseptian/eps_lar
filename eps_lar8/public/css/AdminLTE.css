@@ -14,6 +14,54 @@
 html,
 body {
   min-height: 100%;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Kotak */
+.box-home {
+  background-color: #FFF8EC;
+  border: 2px solid #FC6703;
+  border-radius: 10px;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.15);
+  padding: 16px;
+  margin-bottom: 20px;
+  width: 100%;
+  display: flex;
+}
+
+.box-home:hover {
+  background-color: #FCE9D7; /* Mengubah warna latar belakang saat hover */
+  border-color: #FF5500; /* Mengubah warna border saat hover */
+  transform: translateY(-5px); /* Menggeser elemen ke atas untuk efek "melayang" */
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2); /* Meningkatkan shadow saat hover */
+  transition: all 0.3s ease; /* Transisi halus */
+}
+
+/* Item */
+.item {
+  text-align: center;
+  flex: 1;
+  padding: 10px;
+  border-left: 1px solid #FC6703;
+}
+
+.item:hover {
+  background-color: #FFDAB9; /* Mengubah warna latar belakang saat hover */
+  color: #FF5500; /* Mengubah warna teks saat hover */
+  transform: translateY(-3px); /* Menggeser elemen sedikit ke atas untuk efek "melayang" */
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2); /* Menambahkan bayangan saat hover */
+  transition: all 0.3s ease; /* Transisi halus */
+}
+
+.box-home .item:first-child {
+  border-left: none;
+}
+
+/* Font style */
+p,
+b {
+  margin: 5px 0;
+  /* Kurangi margin */
 }
 
 .layout-boxed html,
@@ -38,7 +86,8 @@ body {
   height: 100vh;
   justify-content: center;
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.5); /* Latar belakang abu-abu transparan */
+  background-color: rgba(0, 0, 0, 0.5);
+  /* Latar belakang abu-abu transparan */
 }
 
 .table-detail-order {
@@ -102,6 +151,31 @@ body {
   width: 50%;
 }
 
+.daily ul {
+  display: flex;
+  justify-content: space-between;
+  list-style-type: none;
+  padding: 0;
+}
+
+.daily li {
+  margin-right: 10px;
+  /* Jarak antar item */
+}
+
+.daily li a {
+  text-decoration: none;
+  color: black;
+  padding: 5px;
+  border-bottom: 2px solid transparent;
+  /* Garis bawah */
+}
+
+.daily li a.active {
+  border-bottom-color: orangered;
+  /* Memberi warna biru pada kelas aktif */
+}
+
 .list-tipeProduk ul {
   display: flex;
   justify-content: space-between;
@@ -133,8 +207,10 @@ body {
 
 /* Gaya Kartu Kredit */
 .credit-card {
-  width: 300px; /* Lebar kartu */
-  height: 180px; /* Tinggi kartu */
+  width: 300px;
+  /* Lebar kartu */
+  height: 180px;
+  /* Tinggi kartu */
   border-radius: 12px;
   background: linear-gradient(135deg, #2193b0, #6dd5ed);
   color: white;
@@ -142,23 +218,31 @@ body {
   margin: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   font-family: 'Arial', sans-serif;
-  margin-right: 10px; /* Memberikan jarak antara kartu */
+  margin-right: 10px;
+  /* Memberikan jarak antara kartu */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
 }
 
 .credit-card:hover {
-  transform: scale(1.05); /* Membesarkan kartu sedikit */
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3); /* Memberikan bayangan */
-  z-index: 10; /* Meningkatkan z-index untuk memastikan kartu berada di atas elemen lain */
+  transform: scale(1.05);
+  /* Membesarkan kartu sedikit */
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+  /* Memberikan bayangan */
+  z-index: 10;
+  /* Meningkatkan z-index untuk memastikan kartu berada di atas elemen lain */
 }
 
 /* Kontainer Kartu Kredit */
 .credit-card-container {
-  display: flex; /* Mengatur kartu secara horizontal */
-  flex-wrap: wrap; /* Membungkus kartu ke baris baru jika tidak cukup ruang */
-  gap: 10px; /* Jarak antara kartu */
-  justify-content: center; /* Memusatkan kartu di tengah */
+  display: flex;
+  /* Mengatur kartu secara horizontal */
+  flex-wrap: wrap;
+  /* Membungkus kartu ke baris baru jika tidak cukup ruang */
+  gap: 10px;
+  /* Jarak antara kartu */
+  justify-content: center;
+  /* Memusatkan kartu di tengah */
 }
 
 .add-card {
@@ -176,7 +260,8 @@ body {
 
 .add-card i {
   font-size: 40px;
-  color: #4caf50; /* Warna ikon */
+  color: #4caf50;
+  /* Warna ikon */
 }
 
 /* Gaya Logo dan Nama Bank */
@@ -202,21 +287,29 @@ body {
 /* Gaya Elemen Default-Rek */
 .default-rek {
   background-color: green;
-width: 10px; /* Lebar elemen */
-height: 20px; /* Tinggi elemen */
-position: absolute; /* Posisi elemen absolute */
-top: 10px; /* Atur jarak atas elemen */
+  width: 10px;
+  /* Lebar elemen */
+  height: 20px;
+  /* Tinggi elemen */
+  position: absolute;
+  /* Posisi elemen absolute */
+  top: 10px;
+  /* Atur jarak atas elemen */
 }
 
 /* Gaya Kontainer Ikon */
 .icon-container {
-  display: flex; /* Mengatur ikon secara horizontal */
-  flex-direction: column; /* Ikon disusun secara vertikal */
-  align-items: flex-end; /* Ikon disejajarkan ke kanan */
+  display: flex;
+  /* Mengatur ikon secara horizontal */
+  flex-direction: column;
+  /* Ikon disusun secara vertikal */
+  align-items: flex-end;
+  /* Ikon disejajarkan ke kanan */
 }
 
 .icon-container i {
-  margin-bottom: 10px; /* Memberikan jarak antara ikon */
+  margin-bottom: 10px;
+  /* Memberikan jarak antara ikon */
 }
 
 /* Mengatur gaya untuk kolom pencarian */
@@ -248,30 +341,41 @@ top: 10px; /* Atur jarak atas elemen */
 
 /* Gaya untuk elemen bLengthChange di DataTables */
 .dataTables_length {
-  display: flex; /* Mengatur elemen sebagai fleksibel */
-  align-items: center; /* Menyelaraskan elemen secara vertikal */
-  gap: 10px; /* Memberikan jarak antara elemen di dalamnya */
+  display: flex;
+  /* Mengatur elemen sebagai fleksibel */
+  align-items: center;
+  /* Menyelaraskan elemen secara vertikal */
+  gap: 10px;
+  /* Memberikan jarak antara elemen di dalamnya */
 }
 
 /* Gaya untuk label dan dropdown */
 .dataTables_length label {
-  font-size: 14px; /* Ukuran font */
-  color: #333; /* Warna teks */
+  font-size: 14px;
+  /* Ukuran font */
+  color: #333;
+  /* Warna teks */
 }
 
 /* Gaya untuk dropdown */
 .dataTables_length select {
-  padding: 3px; /* Padding di dalam dropdown */
+  padding: 3px;
+  /* Padding di dalam dropdown */
   margin: 5px;
-  border-radius: 5px; /* Membulatkan sudut dropdown */
-  border: 1px solid #ccc; /* Warna garis tepi */
-  outline: none; /* Hilangkan outline saat elemen fokus */
-  transition: border-color 0.2s ease-in-out; /* Efek transisi untuk garis tepi */
+  border-radius: 5px;
+  /* Membulatkan sudut dropdown */
+  border: 1px solid #ccc;
+  /* Warna garis tepi */
+  outline: none;
+  /* Hilangkan outline saat elemen fokus */
+  transition: border-color 0.2s ease-in-out;
+  /* Efek transisi untuk garis tepi */
 }
 
 /* Mengubah warna garis tepi saat elemen fokus */
 .dataTables_length select:focus {
-  border-color: #007bff; /* Warna garis tepi saat fokus */
+  border-color: #007bff;
+  /* Warna garis tepi saat fokus */
 }
 
 .detail-small {
@@ -308,18 +412,22 @@ top: 10px; /* Atur jarak atas elemen */
 
 .filter-links {
   display: flex;
-  overflow-x: auto; /* Tambahkan scrollbar horizontal jika diperlukan */
+  overflow-x: auto;
+  /* Tambahkan scrollbar horizontal jika diperlukan */
   padding: 10px 0;
-  white-space: nowrap; /* Membuat elemen tetap dalam satu baris */
+  white-space: nowrap;
+  /* Membuat elemen tetap dalam satu baris */
 }
 
 /* Gaya umum untuk elemen filter-link */
 .filter-link {
   text-decoration: none;
   color: #000;
-  padding: 8px 16px; /* Menambahkan padding agar elemen lebih jelas */
+  padding: 8px 16px;
+  /* Menambahkan padding agar elemen lebih jelas */
   border-radius: 5px;
-  margin-right: 8px; /* Jarak antara elemen */
+  margin-right: 8px;
+  /* Jarak antara elemen */
   transition: background-color 0.3s ease;
 }
 
@@ -329,23 +437,30 @@ top: 10px; /* Atur jarak atas elemen */
 }
 
 @media only screen and (max-width: 600px) {
- /* Kontainer Kartu Kredit */
- .credit-card-container {
-  flex-direction: column; /* Mengubah tata letak ke kolom */
-  align-items: center; /* Pusatkan kartu di tengah */
-  gap: 15px; /* Jarak antara kartu */
-}
 
-/* Gaya Kartu Kredit */
-.credit-card {
-  width: 90%; /* Lebar kartu menjadi 90% dari lebar layar */
-  margin-right: 0; /* Hilangkan margin kanan */
-}
+  /* Kontainer Kartu Kredit */
+  .credit-card-container {
+    flex-direction: column;
+    /* Mengubah tata letak ke kolom */
+    align-items: center;
+    /* Pusatkan kartu di tengah */
+    gap: 15px;
+    /* Jarak antara kartu */
+  }
+
+  /* Gaya Kartu Kredit */
+  .credit-card {
+    width: 90%;
+    /* Lebar kartu menjadi 90% dari lebar layar */
+    margin-right: 0;
+    /* Hilangkan margin kanan */
+  }
 
 
   .dataTables_filter input {
-    width: 100%; /* Atur lebar kolom pencarian menjadi 100% */
-}
+    width: 100%;
+    /* Atur lebar kolom pencarian menjadi 100% */
+  }
 
   .detailbiaya>table {
     margin-left: 0;

@@ -38,63 +38,66 @@
                                 </li>
                             </ul>
                         </div>
-                        <div class="box box-info">
+                        <div class="box" style="background-color: #e3f2fd; border: 2px solid #FC6703; border-radius: 10px; box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.15); padding: 16px; margin-bottom: 20px;">
                             <div class="box-body">
-                                <table id="example2" class="table table-bordered table-hover" style="width: 100%">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th> Nama Barang</th>
-                                            <th class="detail-full">SKU</th>
-                                            <th class="detail-full">Harga</th>
-                                            <th class="detail-full">Harga Tayang (include PPN)</th>
-                                            <th class="detail-full">Stok</th>
-                                            <th>Status Tampil</th>
-                                            <th>Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @php $i = 1 @endphp
-                                        @foreach ($products as $product)
+                                <div class="table-responsive">
+                                    <table id="example2" class="table table-bordered table-hover table-striped"
+                                        style="width: 100%">
+                                        <thead style="background-color: #fff;">
                                             <tr>
-                                                <td>{{ $i++ }}</td>
-                                                <td><a href="#">{{ $product->name }}</a></td>
-                                                <td class="detail-full">{{ $product->sku }}</td>
-                                                <td class="detail-full">Rp.
-                                                    {{ str_replace(',', '.', number_format($product->price_exclude)) }}
-                                                </td>
-                                                <td class="detail-full">Rp.
-                                                    {{ str_replace(',', '.', number_format($product->price_tayang)) }}
-                                                </td>
-                                                <td class="detail-full">{{ $product->stock }}</td>
-                                                <td align="center">
-                                                    <a href="#">
-                                                        <img style="width: 50px"
-                                                             src="{{ asset('/img/app/' . ($product->status_display == 'Y' ? 'tayang.png' : 'tidak-tayang.png')) }}"
-                                                             alt="{{ $product->status_display == 'Y' ? 'Aktif' : 'Tidak Aktif' }}">
-                                                    </a>
-                                                </td>
-                                                <td>
-                                                    <span>sasassa</span>
-                                                    <span>sasassa</span>
-                                                    <span>sasassa</span>
-                                                </td>
+                                                <th>No</th>
+                                                <th> Nama Barang</th>
+                                                <th class="detail-full">SKU</th>
+                                                <th class="detail-full">Harga</th>
+                                                <th class="detail-full">Harga Tayang (include PPN)</th>
+                                                <th class="detail-full">Stok</th>
+                                                <th>Status Tampil</th>
+                                                <th>Aksi</th>
                                             </tr>
-                                        @endforeach
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Nama Barang</th>
-                                            <th class="detail-full">SKU</th>
-                                            <th class="detail-full">Harga</th>
-                                            <th class="detail-full">Harga Tayang (include PPN)</th>
-                                            <th class="detail-full">Stok</th>
-                                            <th>Status Tampil</th>
-                                            <th>Aksi</th>
-                                        </tr>
-                                    </tfoot>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            @php $i = 1 @endphp
+                                            @foreach ($products as $product)
+                                                <tr>
+                                                    <td>{{ $i++ }}</td>
+                                                    <td><a href="#">{{ $product->name }}</a></td>
+                                                    <td class="detail-full">{{ $product->sku }}</td>
+                                                    <td class="detail-full">Rp.
+                                                        {{ str_replace(',', '.', number_format($product->price_exclude)) }}
+                                                    </td>
+                                                    <td class="detail-full">Rp.
+                                                        {{ str_replace(',', '.', number_format($product->price_tayang)) }}
+                                                    </td>
+                                                    <td class="detail-full">{{ $product->stock }}</td>
+                                                    <td align="center">
+                                                        <a href="#">
+                                                            <img style="width: 50px"
+                                                                src="{{ asset('/img/app/' . ($product->status_display == 'Y' ? 'tayang.png' : 'tidak-tayang.png')) }}"
+                                                                alt="{{ $product->status_display == 'Y' ? 'Aktif' : 'Tidak Aktif' }}">
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <span>sasassa</span>
+                                                        <span>sasassa</span>
+                                                        <span>sasassa</span>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th>No</th>
+                                                <th>Nama Barang</th>
+                                                <th class="detail-full">SKU</th>
+                                                <th class="detail-full">Harga</th>
+                                                <th class="detail-full">Harga Tayang (include PPN)</th>
+                                                <th class="detail-full">Stok</th>
+                                                <th>Status Tampil</th>
+                                                <th>Aksi</th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>

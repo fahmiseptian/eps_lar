@@ -81,4 +81,13 @@ class Products extends Model implements HasMedia
         return $artworkUrls;
     }
 
+    public function getProductByIdShop($id_shop, $where) {
+
+		return self::where('id_shop', $id_shop)
+                   ->where('status_delete', 'N')
+                   ->where($where)
+                   ->select('id')
+                   ->count();
+	}
+
 }

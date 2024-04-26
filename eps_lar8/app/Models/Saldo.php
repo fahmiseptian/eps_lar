@@ -64,4 +64,13 @@ class Saldo extends Model
                         'm.instansi as nama_instansi'
                     ]);
     }
+
+    public function getPendapatanHariIni($id_shop) {
+		$date_now = date('Y-m-d');
+		return self::from('revenue')
+    ->where('id_shop', $id_shop)
+    ->where('status', 'revenue')
+    ->where('last_update', $date_now)
+    ->sum('total_diterima_seller');
+	}
 }
