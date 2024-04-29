@@ -48,7 +48,7 @@ Route::post('/seller/login', [LoginSellerController::class, 'login']);
 Route::get('/seller/logout', [LoginSellerController::class, 'logout'])->name('seller.logout');
 
 // Routes Milik Admin
-Route::group(['middleware' => 'admin'], function () {
+Route::group(['middleware' => ['admin', 'activity']], function () {
     Route::get('/admin', [HomeController::class, 'index'])->name('admin');
 
     // Admin Menu
