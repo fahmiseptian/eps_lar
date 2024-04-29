@@ -22,8 +22,12 @@ class HomeController extends Controller
 
     public function __construct(Request $request)
     {
+        if ($request->session()->get('access_code') == null) {
+            return redirect()->route('admin.logout');
+        }
+
         // Login
-        $this->middleware('admin');
+        $this->middleware(['admin', 'activity']);
         // menagmbil data dari session
         $this->user_id = $request->session()->get('id');
 		$this->username = $request->session()->get('username');
