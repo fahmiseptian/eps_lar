@@ -41,7 +41,7 @@
                                 '<a style="width:80%; margin:5px; background-color:green;color:white" data-id="' .
                                 $detailOrder->id_cart_shop .
                                 '" href="javascript:;" class="btn fa fa-check accept-this-order">&nbsp;Terima</a>
-                                                                                                                                                            <a style="width:80%; margin:5px; background-color:red;color:white" data-id="' .
+                                                        <a style="width:80%; margin:5px; background-color:red;color:white" data-id="' .
                                 $detailOrder->id_cart_shop .
                                 '" href="javascript:;" class="btn fa fa-times cancel-order">&nbsp;Tolak</a>';
                         } elseif (($detailOrder->status == 'waiting_accept_order' || $detailOrder->status == 'on_packing_process') && $detailOrder->status_pembayaran_top == '0' && $detailOrder->is_top == '0') {
@@ -52,7 +52,7 @@
                             $sta = 2;
                             $status = '<span style="width:100%;background-color:purple;" class="badge">Diproses</span>';
                         
-                            $action = '<a style="width:80%; margin:5px; background-color:green;color:white" data-id="' . $detailOrder->id . '" data-id_courier="' . $detailOrder->id_courier . '" href="javascript:;" class="btn fa fa-truck">&nbsp;Request <br> Pengiriman</a>';
+                            $action = '<a style="width:80%; margin:5px; background-color:green;color:white" data-id="' . $detailOrder->id_cart_shop . '" data-id_courier="' . $detailOrder->id_courier . '" href="javascript:;" class="btn fa fa-truck" id="request_courier">&nbsp;Request <br> Pengiriman</a>';
                         } elseif ($detailOrder->status == 'send_by_seller') {
                             $sta = 3;
                             $status = '<span style="width:100%;background-color:blue;" class="badge">Dikirim</span>';
@@ -60,12 +60,12 @@
                                 '<a style="width:80%; margin:5px; color:white" data-resi="' .
                                 $detailOrder->no_resi .
                                 '" href="javascript:;" class="btn btn-info fa fa-copy">&nbsp;Resi</a>
-                                <a style="width:80%; margin:5px; background-color:purple;color:white" data-id="' .
-                                $detailOrder->id .
-                                '" href="javascript:;" class="btn fa fa-map-marker">&nbsp;Lacak</a>';
+                                                        <a style="width:80%; margin:5px; background-color:purple;color:white" data-id="' .
+                                $detailOrder->id_cart_shop .
+                                '" href="javascript:;" class="btn fa fa-map-marker" id="lacakResi">&nbsp;Lacak</a>';
                         
                             if ($detailOrder->id_courier == '0') {
-                                $action .= '<a style="width:80%; margin:5px; color:white" data-id="' . $detailOrder->id . '" data-id_courier="' . $detailOrder->id_courier . '" href="javascript:;" class="btn btn-warning fa fa-upload">&nbsp; DO</a>';
+                                $action .= '<a style="width:80%; margin:5px; color:white" data-id="' . $detailOrder->id_cart_shop . '" data-id_courier="' . $detailOrder->id_courier . '" href="javascript:;" class="btn btn-warning fa fa-upload" id="uploadDO">&nbsp; DO</a>';
                             }
                         } elseif ($detailOrder->status == 'complete' && $detailOrder->no_resi != null && $pembayaran == true && $detailOrder->is_bast == '1') {
                             $sta = 4;
@@ -75,9 +75,9 @@
                                 '<a style="width:80%; margin:5px; color:white" data-resi="' .
                                 $detailOrder->no_resi .
                                 '" href="javascript:;" class="btn btn-info fa fa-copy">&nbsp;Resi</a>
-                                                                                                                                                            <a style="width:80%; margin:5px; background-color:purple;color:white" data-id="' .
-                                $detailOrder->id .
-                                '" href="javascript:;" class="btn fa fa-map-marker">&nbsp;Lacak</a>';
+                                                                                                                                                                                    <a style="width:80%; margin:5px; background-color:purple;color:white" data-id="' .
+                                $detailOrder->id_cart_shop .
+                                '" href="javascript:;" class="btn fa fa-map-marker" id="lacakResi">&nbsp;Lacak</a>';
                         } elseif ($detailOrder->status == 'complete' && $detailOrder->no_resi != null && $pembayaran == true) {
                             $sta = 4;
                             $status = '<span style="width:100%;background-color:green;" class="badge">Selesai</span>';
@@ -86,9 +86,9 @@
                                 '<a style="width:80%; margin:5px; color:white" data-resi="' .
                                 $detailOrder->no_resi .
                                 '" href="javascript:;" class="btn btn-info fa fa-copy">&nbsp;Resi</a>
-                                                                                                                                                            <a style="width:80%; margin:5px; background-color:purple;color:white" data-id="' .
-                                $detailOrder->id .
-                                '" href="javascript:;" class="btn fa fa-map-marker">&nbsp;Lacak</a>';
+                                                                                                                                                                                    <a style="width:80%; margin:5px; background-color:purple;color:white" data-id="' .
+                                $detailOrder->id_cart_shop .
+                                '" href="javascript:;" class="btn fa fa-map-marker" id="lacakResi">&nbsp;Lacak</a>';
                         } elseif ($detailOrder->status == 'complete' && $detailOrder->no_resi != null && $pembayaran == false) {
                             $sta = 5;
                             $status = '<span style="width:100%;background-color:yellow;" class="badge">Pesanan <br> sedang <br> dikirim</span>';
@@ -101,9 +101,9 @@
                                 '<a style="width:80%; margin:5px; color:white" data-resi="' .
                                 $detailOrder->no_resi .
                                 '" href="javascript:;" class="btn btn-info fa fa-copy">&nbsp;Resi</a>
-                                                                                                                                                            <a style="width:80%; margin:5px; background-color:purple;color:white" data-id="' .
-                                $detailOrder->id .
-                                '" href="javascript:;" class="btn fa fa-map-marker">&nbsp;Lacak</a>';
+                                                        <a style="width:80%; margin:5px; background-color:purple;color:white" data-id="' .
+                                $detailOrder->id_cart_shop .
+                                '" href="javascript:;" class="btn fa fa-map-marker" id="lacakResi">&nbsp;Lacak</a>';
                         } elseif ($detailOrder->status == 'waiting_approve_by_ppk') {
                             $sta = 6;
                             $status = '<span style="width:100%;background-color:red;" class="badge">Menunggu <br> Persetujuan <br> PPK</span>';
@@ -156,7 +156,9 @@
                                         <th></th>
                                         <th class="btn-container">
                                             @if ($detailOrder->no_resi != null)
-                                                <a href="#" class="btn btn-info fa fa-print">&nbsp;Cetak</a>
+                                                <a class="btn btn-info fa fa-print"
+                                                    data-id="<?= $detailOrder->id_cart_shop ?>"
+                                                    id="cetakLabel">&nbsp;Cetak</a>
                                             @else
                                                 <a style="background-color: transparent;" class="btn">&nbsp;</a>
                                             @endif
@@ -181,7 +183,7 @@
                                         <td><b>Keperluan</b></td>
                                     </tr>
                                     <tr>
-                                        <td >{{ $detailOrder->email }}</td>
+                                        <td>{{ $detailOrder->email }}</td>
                                         <td>{{ $detailOrder->npwp }}</td>
                                         <td>{{ $detailOrder->keperluan }}</td>
                                     </tr>
@@ -203,12 +205,22 @@
                             <div class="box-body">
                                 <table class="table-detail-order" style="width: 100%">
                                     <tr>
-                                        <td><a style="width: 100%" href="#"
-                                                class="btn btn-info fa fa-file-o">&nbsp;INVOICE</a></td>
-                                        <td><a style="width: 100%" href="#"
-                                                class="btn btn-info fa fa-file-o">&nbsp;KWOTANSI</a></td>
-                                        <td><a style="width: 100%" href="#"
-                                                class="btn btn-info fa fa-plus">&nbsp;KONTRAK</a></td>
+                                        <td><a style="width: 100%" class="btn btn-info fa fa-file-o"
+                                                data-id="<?= $detailOrder->id_cart_shop ?>"
+                                                id="cetakInvoice">&nbsp;INVOICE</a></td>
+                                        <td><a style="width: 100%"
+                                                class="btn btn-info fa fa-file-o" data-id="<?= $detailOrder->id_cart_shop ?>"
+                                                id="cetakkwantasi"> &nbsp;KWATANSI</a></td>
+                                        <td><a style="width: 100%" class="btn btn-info fa fa-plus">&nbsp;KONTRAK</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        @if ($detailOrder->is_bast == 1)
+                                            <td>
+                                                <a style="width: 100%" class="btn btn-info fa fa-plus" data-id="<?= $detailOrder->id_cart_shop ?>"
+                                                    id="cetakBast">&nbsp;Bast</a>
+                                            </td>
+                                        @endif
                                     </tr>
                                 </table>
                             </div>
@@ -285,27 +297,40 @@
                                         </tr>
                                         <tr>
                                             <td colspan="2">Subtotal belum PPN:</th>
-                                            <td style="color: :orangered">Rp. {{ str_replace(',', '.', number_format($detailOrder->sum_price_non_ppn)) }}</td>
+                                            <td style="color: :orangered">Rp.
+                                                {{ str_replace(',', '.', number_format($detailOrder->sum_price_non_ppn)) }}
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td colspan="2">Total Ongkos Kirim belum PPN :</td>
-                                            <td style="color: :orangered">Rp. {{ str_replace(',', '.', number_format($detailOrder->sum_shipping)) }}</td>
+                                            <td style="color: :orangered">Rp.
+                                                {{ str_replace(',', '.', number_format($detailOrder->sum_shipping)) }}
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td colspan="2">Total Asuransi Pengiriman belum PPN :</td>
-                                            <td style="color: :orangered">Rp. {{ str_replace(',', '.', number_format($detailOrder->insurance_nominal)) }}</td>
+                                            <td style="color: :orangered">Rp.
+                                                {{ str_replace(',', '.', number_format($detailOrder->insurance_nominal)) }}
+                                            </td>
                                         </tr>
                                         <tr>
-                                            <td colspan="2">PPN {{$detailOrder->val_ppn}}% :</td>
-                                            <td style="color: :orangered">Rp. {{ str_replace(',', '.', number_format($detailOrder->ppn_price)) }}</td>
+                                            <td colspan="2">PPN {{ $detailOrder->val_ppn }}% :</td>
+                                            <td style="color: :orangered">Rp.
+                                                {{ str_replace(',', '.', number_format($detailOrder->ppn_price)) }}
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td colspan="2">Total Diskon :</td>
-                                            <td style="color: :orangered">Rp. {{ str_replace(',', '.', number_format($detailOrder->sum_discount)) }}</td>
+                                            <td style="color: :orangered">Rp.
+                                                {{ str_replace(',', '.', number_format($detailOrder->sum_discount)) }}
+                                            </td>
                                         </tr>
                                         <tr>
-                                            <th style="color:orangered; font-size:15px" colspan="2">Total Pembayaran :</th>
-                                            <td style="color:orangered;" ><b> Rp. {{ str_replace(',', '.', number_format($detailOrder->total)) }} </b></td>
+                                            <th style="color:orangered; font-size:15px" colspan="2">Total Pembayaran
+                                                :</th>
+                                            <td style="color:orangered;"><b> Rp.
+                                                    {{ str_replace(',', '.', number_format($detailOrder->total)) }}
+                                                </b></td>
                                         </tr>
                                     </table>
                                 </div>

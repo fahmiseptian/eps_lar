@@ -1,5 +1,12 @@
 @import url(//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic);
 
+
+/* Kode warna */
+/* #FC6703 = Orange */
+/* #039be5 = Biru */
+/* cek turunan warna = https://uicolors.app/create */
+
+
 /*!
  *   AdminLTE v2.0.1
  *   Author: Almsaeed Studio
@@ -19,7 +26,7 @@ body {
 
 /* Kotak */
 .box-home {
-  background-color: #FFF8EC;
+  background-color: #fff8ec;
   border: 2px solid #FC6703;
   border-radius: 10px;
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.15);
@@ -30,8 +37,8 @@ body {
 }
 
 .box-home:hover {
-  background-color: #FCE9D7; /* Mengubah warna latar belakang saat hover */
-  border-color: #FF5500; /* Mengubah warna border saat hover */
+  background-color: #fff8ec; /* Mengubah warna latar belakang saat hover */
+  border-color: #FC6703; /* Mengubah warna border saat hover */
   transform: translateY(-5px); /* Menggeser elemen ke atas untuk efek "melayang" */
   box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2); /* Meningkatkan shadow saat hover */
   transition: all 0.3s ease; /* Transisi halus */

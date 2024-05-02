@@ -131,6 +131,14 @@ Route::group(['middleware' => 'seller'], function () {
     Route::post('/seller/order/cancel', [OrederController::class, 'cancelOrder']);
     Route::get('/seller/order/detail/{id_cart_shop}', [OrederController::class, 'detailOrder'])->name('seller.order.detail');
     Route::get('/seller/order/filter/{status_order}', [OrederController::class, 'filterOrder'])->name('seller.order.filter');
+    Route::post('/seller/order/addResi', [OrederController::class, 'updateResi']);
+    Route::post('/seller/order/lacakResi', [OrederController::class, 'lacakResi']);
+    Route::post('/seller/order/uploadDo', [OrederController::class, 'uploadDo']);
+    Route::get('/seller/order/test/{id}', [OrederController::class, 'test']);
+    Route::get('/seller/order/Resi/{id_cart_shop}', [OrederController::class, 'generateResiPDF']);
+    Route::get('/seller/order/invoice/{id_cart_shop}', [OrederController::class, 'generateINVPDF']);
+    Route::get('/seller/order/kwantasi/{id_cart_shop}', [OrederController::class, 'generateKwantasiPDF']);
+    Route::get('/seller/order/bast/{id_cart_shop}', [OrederController::class, 'generateBastPDF']);
 
     // Product
     Route::get('/seller/product/', [ProductController::class, 'index'])->name('seller.product');

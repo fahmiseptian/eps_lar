@@ -3,13 +3,20 @@
 namespace App\Http\Controllers\seller;
 
 use App\Http\Controllers\Controller;
+use App\Libraries\Terbilang;
 use App\Models\Shop;
 use App\Models\Saldo;
 use App\Models\CompleteCartShop;
 use App\Models\CompleteCartAddress;
 use App\Models\Invoice;
+use Barryvdh\DomPDF\Facade as PDF;
+use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
+use Barryvdh\DomPDF\PDF as DomPDFPDF;
+use Dompdf\Adapter\PDFLib;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Nette\Utils\Json;
+use Spatie\MediaLibrary\Conversions\ImageGenerators\Pdf as ImageGeneratorsPdf;
 
 class OrederController extends Controller
 {
@@ -80,66 +87,18 @@ class OrederController extends Controller
 
     public function detailOrder($id_cart_shop){
         $shopId = $this->seller;
-        $detailOrder=DB::table('complete_cart_shop as ccs')
-        ->select(
-            'ccs.*',
-            'ccs.id as id_cart_shop',
-            'm.id', 
-            'm.email', 
-            'm.npwp', 
-            'ma.phone', 
-            'm.nama', 
-            'ma.address', 
-            'ma.address_name',
-            'ma.postal_code', 
-            's.subdistrict_name',
-            'p.province_name', 
-            'c.city_name as city', 
-            'cc.val_ppn',
-            'cc.val_pph',
-            'cc.jml_top',
-            'cc.sum_discount',
-            'cc.invoice',
-            'cc.created_date',
-            'cc.status_pembayaran_top',
-            'pm.name as pembayaran',
-            'sp.deskripsi',
-            'sp.id_courier', 
-            'sp.service', 
-            'sp.etd', 
-            'sp.price as price_ship',
-            'sh.is_top',
-        )
-        ->join('complete_cart as cc', 'cc.id', '=', 'ccs.id_cart')
-        ->join('payment_method as pm', 'pm.id', '=', 'cc.id_payment')
-        ->join('member as m', 'm.id', '=', 'cc.id_user')
-        ->join('member_address as ma', 'm.id', '=', 'ma.member_id')
-        ->join('shipping as sp', 'sp.id', '=', 'ccs.id_shipping')
-        ->join('shop as sh', 'sh.id','=', 'ccs.id_shop')
-        ->join('province as p', 'p.province_id', '=', 'ma.province_id')
-        ->join('city as c', 'ma.city_id', '=', 'c.city_id')
-        ->join('subdistrict as s', 's.subdistrict_id', '=', 'ma.subdistrict_id')
-        ->where('ccs.id', '=', $id_cart_shop)
-        ->where('ccs.id_shop', $shopId)
-        ->first();
-
-        $detailProductorder= DB::table('complete_cart_shop as ccs')
-        ->select(
-            'ccsd.nama as nama_produk',
-            'pi.image50 as gambar_produk',
-            'ccsd.price as harga_satuan_produk',
-            'ccsd.total as harga_total_produk',
-            'ccsd.qty as qty_produk',
-        )
-        ->join('complete_cart_shop_detail as ccsd', 'ccsd.id_cart', '=', 'ccs.id_cart')
-        ->join('product_image as pi', 'pi.id_product', '=', 'ccsd.id_product')
-        ->where('pi.is_default', '=', 'yes')
-        ->where('ccs.id', '=', $id_cart_shop)
-        ->where('ccs.id_shop', $shopId)
-        ->get();
-
+        $detailOrder= CompleteCartShop::getDetailOrderbyId($shopId,$id_cart_shop);
+        $detailProductorder=CompleteCartShop::getDetailProduct($shopId,$id_cart_shop);
 
         return view('seller.order.detail',$this->data,['detailOrder'=>$detailOrder, 'detailProductOrder'=>$detailProductorder]);
+    }
+
+    public function lacakResi(Request $request){
+        $shopId = $this->seller;
+        $id_cart_shop = $request->input('id_cart_shop');
+        $detailOrder= CompleteCartShop::getDetailOrderbyId($shopId,$id_cart_shop);
+
+        return response()->json(['detailOrder'=> $detailOrder]);
     }
 
     public function acceptOrder(Request $request) {
@@ -180,5 +139,128 @@ class OrederController extends Controller
         }
     }
     
+    public function updateResi(Request $request)
+    {
+        // Validasi data
+        $id_cart_shop = $request->input('id');
+        $nomor_resi = $request->input('nomor_resi');
+        $id_shop = $this->seller;
+
+        // Mencari CartShop berdasarkan id
+        $cartShop = CompleteCartShop::where('id', $id_cart_shop)
+                            ->where('id_shop', $id_shop)
+                            ->first();
+
+        if ($cartShop) {
+            // Memperbarui nomor resi
+            $cartShop->no_resi = $nomor_resi;
+            $cartShop->status = 'send_by_seller';
+            $cartShop->delivery_start = now();
+            $cartShop->save();
+
+            return response()->json(['status' => 'success', 'message'=> 'Nomor resi berhasil diperbarui']);
+        } else {
+            // Mengembalikan respons error jika id tidak ditemukan
+            return response()->json(['status' => 'error', 'message'=> 'ID tidak ditemukan']);
+        }
+    }
+
+    public function uploadDo(Request $request){
+        // Validasi data
+        $id_cart_shop = $request->input('id_cart_shop');
+        $id_shop = $this->seller;
+        $file_Do= $request->file('file_Do');
+
+        // Mencari CartShop berdasarkan id
+        $cartShop = CompleteCartShop::where('id', $id_cart_shop)
+                            ->where('id_shop', $id_shop)
+                            ->first();
+
+        $cartShop->addMedia($request->file('file_Do'))
+                ->usingFileName(time())
+                ->toMediaCollection('file_DO', 'file_DO');
+
+        $cartShop->file_do = 1;
+        $cartShop->status = 'complete';
+        $cartShop->delivery_end = now();
+        $cartShop->save();                
+
+        return response()->json(['status' => 'success']);
+    }
+
+    public function test($id_cart_shop) {
+        $ccs = CompleteCartShop::getorderbyidcartshop($this->seller,$id_cart_shop);
+        
+        if ($ccs) {
+            return response()->json(['ccs' => $ccs]);
+        } else {
+            return response()->json(['error' => 'CompleteCartShop not found'], 404);
+        }
+    }
+
+    public function generateResiPDF($id_cart_shop)
+    {
+        $detail_order  = CompleteCartShop::getDetailOrderbyId($this->seller, $id_cart_shop);
+        $detail_order->detail=CompleteCartShop::getDetailProduct($this->seller,$id_cart_shop);
+        $detail_order->seller_address=Shop::getAddressByIdshop($this->seller);
+
+
+        $pdf = FacadePdf::loadView('pdf.resi', ['data' => $detail_order]);
+        
+        return $pdf->stream('informasi_pengiriman.pdf');
+    }
+
+    public function generateINVPDF($id_cart_shop)
+    {
+        $detail_order  = CompleteCartShop::getDetailOrderbyId($this->seller, $id_cart_shop);
+        $detail_order->detail=CompleteCartShop::getDetailProduct($this->seller,$id_cart_shop);
+        $detail_order->seller_address=Shop::getAddressByIdshop($this->seller);
+        $eps = [
+            'nama' => 'PT. Elite Proxy Sistem',
+            'npwp' => ' 73.035.456.0-022.000',
+            'alamat' => 'Rukan Sudirman Park Apartement Jl Kh. Mas Mansyur KAV 35 A/15 Kelurahan Karet Tengsin Kec. Tanah Abang Jakarta Pusat DKI Jakarta'
+        ];
+    
+
+        $pdf = FacadePdf::loadView('pdf.invoice', ['data' => $detail_order,'eps'=>$eps]);
+        
+        return $pdf->stream('informasi_invoice.pdf');
+    }
+
+    public function generateKwantasiPDF($id_cart_shop)
+    {
+        $terbilang = new Terbilang();
+        $detail_order  = CompleteCartShop::getDetailOrderbyId($this->seller, $id_cart_shop);
+        $detail_order->seller_address=Shop::getAddressByIdshop($this->seller);
+        $detail_order->terbilang = $terbilang->terbilang($detail_order->total);
+        $detail_order->tgl_indo = $terbilang->tgl_indo(date('Y-m-d', strtotime($detail_order->created_date)));
+        $eps = [
+            'nama' => 'PT. Elite Proxy Sistem',
+            'npwp' => ' 73.035.456.0-022.000',
+            'alamat' => 'Rukan Sudirman Park Apartement Jl Kh. Mas Mansyur KAV 35 A/15 Kelurahan Karet Tengsin Kec. Tanah Abang Jakarta Pusat DKI Jakarta'
+        ];
+    
+
+        $pdf = FacadePdf::loadView('pdf.kwantasi', ['data' => $detail_order,'eps'=>$eps]);
+        
+        return $pdf->stream('informasi_kwantasi.pdf');
+    }
+
+    public function generateBastPDF($id_cart_shop)
+    {
+       
+        $detail_order  = CompleteCartShop::getDetailOrderbyId($this->seller, $id_cart_shop);
+        $detail_order->seller_address=Shop::getAddressByIdshop($this->seller);
+        $eps = [
+            'nama' => 'PT. Elite Proxy Sistem',
+            'npwp' => ' 73.035.456.0-022.000',
+            'alamat' => 'Rukan Sudirman Park Apartement Jl Kh. Mas Mansyur KAV 35 A/15 Kelurahan Karet Tengsin Kec. Tanah Abang Jakarta Pusat DKI Jakarta'
+        ];
+    
+
+        $pdf = FacadePdf::loadView('pdf.bast', ['data' => $detail_order,'eps'=>$eps]);
+        
+        return $pdf->stream('informasi_bast.pdf');
+    }
 }
 

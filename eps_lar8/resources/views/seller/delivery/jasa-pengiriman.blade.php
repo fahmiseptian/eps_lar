@@ -13,11 +13,11 @@
                     <div class="col-md-1"></div>
                     <div class="col-md-10">
                         <!-- general form elements disabled -->
-                        <div class="box box-warning">
+                        <div class="box-home" style="display: grid; background-color:#fff8ec">
                             <h3 style="margin-left: 15px; margin-bottom:-5px"> <b>Pengaturan Pengiriman</b></h3>
 		                    <small style="margin-left: 15px; "  >Pengaturan yang berhubungan dengan jasa kirim</small>
                             <hr>
-                            <table id="example2" class="table table-bordered table-hover">
+                            <table class="table table-bordered table-hover">
                                 <thead>
                                     <tr>
                                         <th style="width: 15px" rowspan="3">
@@ -37,7 +37,6 @@
                                                     diingat bahwa kamu membutuhkan printer untuk mencetak label
                                                     pengiriman secara otomatis.</small></p>
                                         </td>
-                                        <td></td>
                                     </tr>
                                     @foreach ($datacourier as $item)
                                     <tr>

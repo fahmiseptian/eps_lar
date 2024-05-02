@@ -62,6 +62,14 @@ return [
             'visibility' => 'public',
         ],
 
+        'file_DO' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/file_DO'), // Sesuaikan dengan lokasi penyimpanan yang Anda inginkan
+            'url' => env('APP_URL').'/storage/file_DO', // URL untuk mengakses file
+            'visibility' => 'public',
+        ],
+
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

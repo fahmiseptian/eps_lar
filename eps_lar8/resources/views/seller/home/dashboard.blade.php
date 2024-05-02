@@ -12,13 +12,13 @@
                 <div class="row">
                     <div class="col-md-1"></div>
                     <div class="col-md-10">
-                        <div class="box-home" style=" background-color:#FFF8EC">
+                        <div class="box-home" style=" background-color:#EFF9FF">
                             <h4 class="page-header" style="margin: 2px">
                                 Cek Informasi Toko tentang
                                 <small>Ini merupakan informasi tentang toko mu</small>
                             </h4>
                         </div>
-                        <div class="box-home" style="display: grid; background-color:#FFF0D3">
+                        <div class="box-home" style="display: grid; background-color:#EFF9FF">
                             <!-- Container -->
                             <div class="box-home">
                                 <div class="item" style="text-align: center; flex: 1; padding: 10px;">
