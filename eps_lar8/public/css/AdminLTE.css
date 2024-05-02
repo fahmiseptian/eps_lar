@@ -1366,8 +1366,8 @@ input:checked+.slider:before {
 }
 
 .user-panel>.image>img {
-  width: 45px;
-  height: 45px;
+  width: 60px;
+  height: 60px;
 }
 
 .user-panel>.info {
@@ -1377,8 +1377,13 @@ input:checked+.slider:before {
   line-height: 1;
 }
 
+.user-panel>.info>h4 {
+  margin-top: 0px;
+  margin-bottom: 5px;
+}
+
 .user-panel>.info>p {
-  margin-bottom: 9px;
+  margin-bottom: 5px;
 }
 
 .user-panel>.info>a {

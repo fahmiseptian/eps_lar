@@ -23,12 +23,12 @@
             <section class="content">
                 <div class="row">
                     <div class="col-xs-12">
-                        <div class="box">
+                        <div class="box box-primary">
                             <div class="box-body" id="formula-price" style="cursor: pointer;">
                                 <h4>Formulasi Harga</h4>
                             </div>
                         </div>
-                        <div class="box">
+                        <div class="box box-primary">
                             <div class="box-header">
                                 <h3 class="box-title">List Toko</h3>
                             </div><!-- /.box-header -->
@@ -73,18 +73,21 @@
                                                         </button>
                                                     </td>
                                                     <td>
-                                                        <a onclick="detailDocument('{{ $item->id }}')"
-                                                            class="glyphicon glyphicon-folder-open"></a>
-                                                        <span style="margin-right: 10px;"></span>
-
-                                                        <button type="button" class="btn btn-transparent" onclick="detailProduct('{{ $item->id }}')" title="List Product">
+                                                        <button type="button" class="btn btn-transparent" onclick="detailDocument('{{ $item->id }}')" title="{{ $item->is_top === 1 ? 'Dokumen Belum Diverifikasi' : 'Dokumen Terverifikasi' }}">
+                                                            <span class="material-symbols-outlined" id="{{ $item->is_top === 1 ? 'icon-warning' : 'icon-info' }}">
+                                                                {{ $item->is_top === 1 ? 'bookmark_manager' : 'folder' }}
+                                                            </span>
+                                                        </button>
+                                                        <button type="button" class="btn btn-transparent" onclick="detailProduct('{{ $item->id }}', '{{ $item->name }}')" title="List Product">
                                                             <span class="material-symbols-outlined" id="icon-info">
                                                                 format_list_bulleted
                                                             </span>
                                                         </button>
-                                                        <a onclick="reviewToko('{{ $item->id }}')"
-                                                            class="glyphicon glyphicon-log-in"></a>
-
+                                                        <button type="button" class="btn btn-transparent" onclick="previewToko('{{ $item->id }}')" title="Preview Toko">
+                                                            <span class="material-symbols-outlined" id="icon-info">
+                                                                preview
+                                                            </span>
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             @endforeach

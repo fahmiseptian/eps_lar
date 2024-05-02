@@ -105,6 +105,10 @@ Route::group(['middleware' => ['admin', 'activity']], function () {
     Route::get('/admin/payment/{id}/status', [PaymentController::class, 'status'])->name('admin.payment.status');
     Route::post('/admin/payment/{id}/edit', [PaymentController::class, 'edit'])->name('admin.payment.edit');
     Route::get('/admin/payment/{id}/delete', [PaymentController::class, 'delete'])->name('admin.payment.delete');
+    Route::get('/admin/bank', [PaymentController::class, 'bank'])->name('admin.bank');
+    Route::post('/admin/bank/add', [PaymentController::class, 'addBank'])->name('admin.bank.add');
+    Route::put('/admin/bank/update/{id}', [PaymentController::class, 'updateBank'])->name('admin.bank.update');
+    Route::delete('/admin/bank/delete/{id}', [PaymentController::class, 'deleteBank'])->name('admin.bank.delete');
 
     // Admin Member
     Route::get('/admin/member', [MemberController::class, 'index'])->name('admin.member.index');

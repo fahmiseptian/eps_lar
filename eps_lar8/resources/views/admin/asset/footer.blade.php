@@ -42,5 +42,7 @@
     <script src="{{ asset('/js/app.min.js') }}" type="text/javascript"></script>
     <!-- AdminLTE for demo purposes -->
     <script src="{{ asset('/js/demo.js') }}" type="text/javascript"></script>
+    <!-- Base URL Admin -->
     <script>const baseUrl = "{{ url('/') }}";</script>
-   
+    <!-- Asset JS -->
+    <script src="{{ asset('/js/function/admin/asset.js') }}" type="text/javascript"></script>

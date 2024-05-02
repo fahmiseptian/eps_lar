@@ -1,26 +1,156 @@
-$(function () {
-    $("#example1").dataTable();
-    $("#example2").dataTable({
-        bPaginate: true,
-        bLengthChange: false,
-        bFilter: false,
-        bSort: true,
-        bInfo: true,
-        bAutoWidth: true,
+function editProfile(id) {
+    // Menampilkan loading spinner
+    Swal.fire({
+        title: "Memuat...",
+        html: '<div class="spinner-border" role="status"><span class="sr-only">Memuat...</span></div>',
+        showConfirmButton: false,
+        allowOutsideClick: false,
     });
+    
+    // Mengambil token CSRF dari meta tag
+    var csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
 
-    // Tambahkan event listener untuk menangani klik pada list access
-    $('#accessList').on('click', function() {
-        // Ambil tabel daftar access
-        var accessDiv = $('#accesses');
-        // Toggle visibility tabel
-        accessDiv.slideToggle();
-        // Ambil ikon
-        var icon = $(this).find('i');
-        // Ubah orientasi ikon
-        icon.toggleClass('rotate-icon');
+    // Mengambil data user yang akan diedit melalui permintaan AJAX
+    $.ajax({
+        url: baseUrl + "/admin/user/" + id,
+        method: "GET",
+        success: function (response) {
+            var user = response.user;
+            var profile = response.profile;
+            // Menampilkan SweetAlert dengan formulir edit user
+            Swal.fire({
+                title: 'Edit Profile',
+                width: '50%',
+                html:
+                    `<table border="0" style="width: 100%;">
+                        <tbody>
+                            <tr>
+                                <td style="width: 50%;">
+                                    <table border=0 style="width: 100%;">
+                                        <tbody>
+                                            <tr>
+                                                <td style="width: 30%; text-align: right;"><label for="edit-username">Username</label></td>
+                                                <td style="width: 70%;"><input id="edit-username" class="swal2-input" placeholder="Username" value="${user.username}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width: 30%; text-align: right;"><label for="edit-firstname">First Name</label></td>
+                                                <td style="width: 70%;"><input id="edit-firstname" class="swal2-input" placeholder="First Name" value="${(profile.firstname === null ? '' : profile.firstname)}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width: 30%; text-align: right;"><label for="edit-lastname">Last Name</label></td>
+                                                <td style="width: 70%;"><input id="edit-lastname" class="swal2-input" placeholder="Last Name" value="${(profile.lastname === null ? '' : profile.lastname)}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width: 30%; text-align: right;"><label for="edit-gender">Gender</label></td>
+                                                <td style="width: 70%; text-align: left;">
+                                                    <select id="edit-gender" class="swal2-select">
+                                                        <option value="L" ${(profile.gender === 'L' ? 'selected' : '')}>Male</option>
+                                                        <option value="P" ${(profile.gender === 'P' ? 'selected' : '')}>Female</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                                <td style="width: 50%;">
+                                    <table border=0 style="width: 100%;">
+                                        <tbody>
+                                            <tr>
+                                                <td style="width: 30%; text-align: right;"><label for="edit-pob">Place of Birth</label></td>
+                                                <td style="width: 70%;"><input id="edit-pob" class="swal2-input" placeholder="Place of Birth" value="${(profile.pob === null ? '' : profile.pob)}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width: 30%; text-align: right;"><label for="edit-dob">Date of Birth</label></td>
+                                                <td style="width: 70%; text-align: left;"><input id="edit-dob" class="swal2-input" type="date" placeholder="Date of Birth" value="${(profile.dob === null ? '' : profile.dob)}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width: 30%; text-align: right;"><label for="edit-address">Address</label></td>
+                                                <td style="width: 70%;"><input id="edit-address" class="swal2-input" placeholder="Address" value="${(profile.address === null ? '' : profile.address)}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width: 30%; text-align: right;"><label for="edit-phone">Phone</label></td>
+                                                <td style="width: 70%;"><input id="edit-phone" class="swal2-input" placeholder="Phone" value="${(profile.phone === null ? '' : profile.phone)}"></td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width: 30%; text-align: right;"><label for="edit-access">Access</label></td>
+                                                <td style="width: 70%; text-align: left;">
+                                                    <select id="edit-access" class="swal2-select" disabled>
+                                                        <option value="${user.access_id}">${user.access.name}</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width: 30%; text-align: right;"><label for="edit-password">Change Password</label></td>
+                                                <td style="width: 70%;"><input id="edit-password" class="swal2-input" placeholder="Change Password"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>`,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+                preConfirm: () => {
+                    return {
+                        username: document.getElementById('edit-username').value,
+                        firstname: document.getElementById('edit-firstname').value,
+                        lastname: document.getElementById('edit-lastname').value,
+                        access_id: document.getElementById('edit-access').value,
+                        active: document.getElementById('edit-status').value,
+                        password: document.getElementById('edit-password').value,
+                    };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Mengirimkan permintaan AJAX untuk menyimpan data yang diedit
+                    $.ajax({
+                        url: baseUrl + "/admin/user/" + id + "/edit",
+                        method: "POST",
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken // Mengatur token CSRF dalam header permintaan
+                        },
+                        data: {
+                            username: result.value.username,
+                            firstname: result.value.firstname,
+                            lastname: result.value.lastname,
+                            access_id: result.value.access_id,
+                            active: result.value.active,
+                            password: result.value.password,
+                        },
+                        success: function (response) {
+                            Swal.fire(
+                                'Berhasil!',
+                                'User berhasil diubah.',
+                                'success'
+                            );
+                            // Refresh halaman untuk memperbarui tampilan
+                            location.reload();
+                        },
+                        error: function (xhr, status, error) {
+                            console.log(xhr.responseText);
+                            Swal.fire(
+                                'Error!',
+                                'Terjadi kesalahan saat mengubah user.',
+                                'error'
+                            );
+                        }
+                    });
+                }
+            });
+        },
+        error: function (xhr, status, error) {
+            console.log(xhr.responseText);
+            Swal.fire(
+                'Error!',
+                'Terjadi kesalahan saat mengambil data user.',
+                'error'
+            );
+        }
     });
-});
+}
 
 function addAccess() {
     // Mengambil token CSRF dari meta tag
@@ -297,172 +427,7 @@ function detailUser(id) {
     });
 }
 
-function editUser(id) {
-    // Menampilkan loading spinner
-    Swal.fire({
-        title: "Memuat...",
-        html: '<div class="spinner-border" role="status"><span class="sr-only">Memuat...</span></div>',
-        showConfirmButton: false,
-        allowOutsideClick: false,
-    });
-    
-    // Mengambil token CSRF dari meta tag
-    var csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
 
-    // Mengambil data user yang akan diedit melalui permintaan AJAX
-    $.ajax({
-        url: baseUrl + "/admin/user/" + id,
-        method: "GET",
-        success: function (response) {
-            var user = response.user;
-            var profile = response.profile;
-            var accesses = response.accesses;
-            var SwalContent = "";
-            accesses.forEach(access => {
-                SwalContent += `<option value="${access.id}" ${user.access_id == access.id ? 'selected' : ''}>${access.name}</option>`;
-            });
-            // Menampilkan SweetAlert dengan formulir edit user
-            Swal.fire({
-                title: 'Edit User',
-                width: '50%',
-                html:
-                    `<table border="0" style="width: 100%;">
-                        <tbody>
-                            <tr>
-                                <td style="width: 50%;">
-                                    <table border=0 style="width: 100%;">
-                                        <tbody>
-                                            <tr>
-                                                <td style="width: 30%; text-align: right;"><label for="edit-username">Username</label></td>
-                                                <td style="width: 70%;"><input id="edit-username" class="swal2-input" placeholder="Username" value="${user.username}"></td>
-                                            </tr>
-                                            <tr>
-                                                <td style="width: 30%; text-align: right;"><label for="edit-firstname">First Name</label></td>
-                                                <td style="width: 70%;"><input id="edit-firstname" class="swal2-input" placeholder="First Name" value="${(profile.firstname === null ? '' : profile.firstname)}"></td>
-                                            </tr>
-                                            <tr>
-                                                <td style="width: 30%; text-align: right;"><label for="edit-lastname">Last Name</label></td>
-                                                <td style="width: 70%;"><input id="edit-lastname" class="swal2-input" placeholder="Last Name" value="${(profile.lastname === null ? '' : profile.lastname)}"></td>
-                                            </tr>
-                                            <tr>
-                                                <td style="width: 30%; text-align: right;"><label for="edit-gender">Gender</label></td>
-                                                <td style="width: 70%; text-align: left;">
-                                                    <select id="edit-gender" class="swal2-select">
-                                                        <option value="L" ${(profile.gender === 'L' ? 'selected' : '')}>Male</option>
-                                                        <option value="P" ${(profile.gender === 'P' ? 'selected' : '')}>Female</option>
-                                                    </select>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </td>
-                                <td style="width: 50%;">
-                                    <table border=0 style="width: 100%;">
-                                        <tbody>
-                                            <tr>
-                                                <td style="width: 30%; text-align: right;"><label for="edit-pob">Place of Birth</label></td>
-                                                <td style="width: 70%;"><input id="edit-pob" class="swal2-input" placeholder="Place of Birth" value="${(profile.pob === null ? '' : profile.pob)}"></td>
-                                            </tr>
-                                            <tr>
-                                                <td style="width: 30%; text-align: right;"><label for="edit-dob">Date of Birth</label></td>
-                                                <td style="width: 70%; text-align: left;"><input id="edit-dob" class="swal2-input" type="date" placeholder="Date of Birth" value="${(profile.dob === null ? '' : profile.dob)}"></td>
-                                            </tr>
-                                            <tr>
-                                                <td style="width: 30%; text-align: right;"><label for="edit-address">Address</label></td>
-                                                <td style="width: 70%;"><input id="edit-address" class="swal2-input" placeholder="Address" value="${(profile.address === null ? '' : profile.address)}"></td>
-                                            </tr>
-                                            <tr>
-                                                <td style="width: 30%; text-align: right;"><label for="edit-phone">Phone</label></td>
-                                                <td style="width: 70%;"><input id="edit-phone" class="swal2-input" placeholder="Phone" value="${(profile.phone === null ? '' : profile.phone)}"></td>
-                                            </tr>
-                                            <tr>
-                                                <td style="width: 30%; text-align: right;"><label for="edit-access">Access</label></td>
-                                                <td style="width: 70%; text-align: left;">
-                                                    <select id="edit-access" class="swal2-select">` + SwalContent +
-                                                    `</select>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="width: 30%; text-align: right;"><label for="edit-status">Status</label></td>
-                                                <td style="width: 70%; text-align: left;">
-                                                    <select id="edit-status" class="swal2-select">
-                                                        <option value="1" ${user.active == 1 ? 'selected' : ''}>Aktif</option>
-                                                        <option value="0" ${user.active == 0 ? 'selected' : ''}>Tidak Aktif</option>
-                                                    </select>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="width: 30%; text-align: right;"><label for="edit-password">Change Password</label></td>
-                                                <td style="width: 70%;"><input id="edit-password" class="swal2-input" placeholder="Change Password"></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>`,
-                focusConfirm: false,
-                showCancelButton: true,
-                confirmButtonText: 'Simpan',
-                cancelButtonText: 'Batal',
-                preConfirm: () => {
-                    return {
-                        username: document.getElementById('edit-username').value,
-                        firstname: document.getElementById('edit-firstname').value,
-                        lastname: document.getElementById('edit-lastname').value,
-                        access_id: document.getElementById('edit-access').value,
-                        active: document.getElementById('edit-status').value,
-                        password: document.getElementById('edit-password').value,
-                    };
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Mengirimkan permintaan AJAX untuk menyimpan data yang diedit
-                    $.ajax({
-                        url: baseUrl + "/admin/user/" + id + "/edit",
-                        method: "POST",
-                        headers: {
-                            'X-CSRF-TOKEN': csrfToken // Mengatur token CSRF dalam header permintaan
-                        },
-                        data: {
-                            username: result.value.username,
-                            firstname: result.value.firstname,
-                            lastname: result.value.lastname,
-                            access_id: result.value.access_id,
-                            active: result.value.active,
-                            password: result.value.password,
-                        },
-                        success: function (response) {
-                            Swal.fire(
-                                'Berhasil!',
-                                'User berhasil diubah.',
-                                'success'
-                            );
-                            // Refresh halaman untuk memperbarui tampilan
-                            location.reload();
-                        },
-                        error: function (xhr, status, error) {
-                            console.log(xhr.responseText);
-                            Swal.fire(
-                                'Error!',
-                                'Terjadi kesalahan saat mengubah user.',
-                                'error'
-                            );
-                        }
-                    });
-                }
-            });
-        },
-        error: function (xhr, status, error) {
-            console.log(xhr.responseText);
-            Swal.fire(
-                'Error!',
-                'Terjadi kesalahan saat mengambil data user.',
-                'error'
-            );
-        }
-    });
-}
 
 function deleteUser(id) {
     // Menampilkan pesan konfirmasi SweetAlert

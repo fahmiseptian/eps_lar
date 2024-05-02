@@ -15,6 +15,7 @@ class ShopController extends Controller
 {
     protected $user_id;
     protected $username;
+    protected $name;
     protected $access_id;
     protected $access_name;
     protected $access_code;
@@ -32,6 +33,7 @@ class ShopController extends Controller
         // menagmbil data dari session
         $this->user_id = $request->session()->get('id');
 		$this->username = $request->session()->get('username');
+		$this->name = $request->session()->get('name');
 		$this->access_id 	= $request->session()->get('access_id');
 		$this->access_name 	= $request->session()->get('access_name');
 		$this->access_code 	= $request->session()->get('access_code');
@@ -214,8 +216,7 @@ public function updateTypeDown($id)
 
     public function getProduct(Request $request, $id)
     {
-        $perPage = $request->input('per_page', 10); // Menentukan jumlah produk per halaman, defaultnya adalah 10
-        $products = Product::where('id_shop', $id)->orderBy('status_lpse', 'desc')->orderBy('name', 'asc')->paginate($perPage);
+        $products = Product::where('id_shop', $id)->orderBy('status_lpse', 'desc')->orderBy('name', 'asc')->paginate(10);
     
         if ($products->isEmpty()) {
             return response()->json(['message' => 'Tidak ada produk yang ditemukan untuk toko dengan ID yang diberikan'], 404);

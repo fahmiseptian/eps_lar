@@ -269,166 +269,226 @@ document.getElementById("formula-price").addEventListener("click", function () {
     loading();
 
     $.ajax({
-        url: "/admin/formula-lpse",
+        url: baseUrl + "/admin/formula-lpse",
         method: "GET",
         success: function (response) {
             var formula = response.formula;
             if (formula) {
-                Swal.fire({
-                    title: "Detail Formula",
-                    html: `
-        <div style="text-align: justify;">
-            <table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd;">
-                <thead>
-                    <tr>
-                        <th style="padding: 8px; border-bottom: 1px solid #ddd;">PPH (%)</th>
-                        <th style="padding: 8px; border-bottom: 1px solid #ddd;">PPN (%)</th>
-                        <th style="padding: 8px; border-bottom: 1px solid #ddd;">Fee Marketplace (%)</th>
-                        <th style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">
-                            <input type="text" class="form-control" id="inputPPHPercent" value="${formula.pph}" required>   
-                        </td>
-                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">
-                            <input type="text" class="form-control" id="inputPPNPercent" value="${formula.ppn}" required>
-                        </td>
-                        <td style="padding: 8px; border-bottom: 1px solid #ddd;">
-                            <input type="text" class="form-control" id="inputFeeMPPercent" value="${formula.fee_mp_percent}" required>
-                        </td>
-                        <th style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">
-                            <a id="formula-saved" style="cursor: pointer;"><i class="fa fa-floppy-o"></i> Simpan</a>
-                        </th>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <hr>
-        <div style="margin-top: 20px;">
-            <h4>Formulir Perhitungan</h4>
-            <form id="calculation-form">
-                <div class="form-group">
-                    <label for="inputValue">Harga Seller:</label>
-                    <input type="text" class="form-control" id="inputValue" placeholder="Rp Masukkan Nominal" required inputmode="numeric" pattern="[0-9]*">
-                </div>
-                <button type="button" class="btn btn-primary" id="calculate-button">Hitung</button>
-            </form>
-        </div>
-        <div style="margin-top: 20px;" id="calculation-results"></div>
-    `,
-                    confirmButtonText: "Tutup",
-                    width: "50%",
-                    // Logika perhitungan saat tombol "Hitung" ditekan
-                    didOpen: function () {
-                        var originalValue = "";
-                        var inputElement =
-                            document.getElementById("inputValue");
+                // Konversi nilai formula PPH, PPN, dan Fee Marketplace ke format dengan koma
+                var pphValue = parseFloat(formula.pph).toLocaleString('id-ID');
+                var ppnValue = parseFloat(formula.ppn).toLocaleString('id-ID');
+                var feeMPValue = parseFloat(formula.fee_mp_percent).toLocaleString('id-ID');
 
-                        inputElement.addEventListener(
-                            "input",
-                            function (event) {
-                                var value = event.target.value.replace(
-                                    /\D/g,
-                                    ""
-                                );
-                                var formattedValue = value.replace(
-                                    /\B(?=(\d{3})+(?!\d))/g,
-                                    ","
-                                );
-                                event.target.value = formattedValue;
-                                originalValue = value;
-                            }
-                        );
-
-                        // Tambahkan event listener untuk tombol Simpan
-                        $(document).on("click", "#formula-saved", function () {
-                            var $row = $(this).closest("tr");
-                            var newData = {};
-                            $row.find("td:not(:last-child)").each(function (
-                                index
-                            ) {
-                                var key = ["pph", "ppn", "fee_mp_percent"][
-                                    index
-                                ];
-                                newData[key] = $(this)
-                                    .find("input")
-                                    .val()
-                                    .trim();
-                            });
-                            var csrfToken = document
-                                .querySelector('meta[name="csrf-token"]')
-                                .getAttribute("content");
-                            $.ajax({
-                                url: "/admin/update-formula",
-                                method: "POST",
-                                data: { ...newData, _token: csrfToken },
-                                success: function (response) {
-                                    // Tampilkan pesan sukses atau gagal
-                                    Swal.fire({
-                                        icon: "success",
-                                        title: "Your work has been saved",
-                                        showConfirmButton: false,
-                                        timer: 1500
-                                      });
-
-                                    // Tampilkan kembali input fields dengan nilai yang baru disimpan
-                                    $row.find("td:not(:last-child)").each(
-                                        function (index) {
-                                            var key = [
-                                                "pph",
-                                                "ppn",
-                                                "fee_mp_percent",
-                                            ][index];
-                                            $(this).html(
-                                                '<input type="text" class="form-control" value="' +
-                                                    newData[key] +
-                                                    '">'
-                                            );
-                                        }
-                                    );
-                                },
-                                error: function (xhr, status, error) {
-                                    // Tampilkan pesan kesalahan jika terjadi kesalahan saat mengirim permintaan
-                                    alert("Terjadi kesalahan: " + error);
-                                },
-                            });
-                        });
-
-                        document.getElementById("calculate-button").onclick =
-                            function () {
-                                // Gunakan nilai asli untuk perhitungan
-                                calculate(formula, originalValue);
-                            };
-                    },
-                });
+                // Memuat dialog "Formula Price" dengan nilai yang diperbarui
+                showFormulaDialog(pphValue, ppnValue, feeMPValue);
             } else {
                 // Menampilkan pesan jika data anggota tidak ditemukan
-                Swal.fire({
-                    title: "Detail Formula",
-                    text: "Formula Price Eror.",
-                    icon: "error",
-                    confirmButtonText: "Tutup",
-                });
+                showErrorDialog("Formula Price Error");
             }
         },
         error: function (xhr, status, error) {
             // Menampilkan pesan kesalahan
-            Swal.fire({
-                title: "Terjadi Kesalahan",
-                text: "Terjadi kesalahan saat memuat detail formula.",
-                icon: "error",
-                confirmButtonText: "Tutup",
-            });
+            showErrorDialog("An error occurred while loading the formula details.");
         },
     });
 });
 
-function calculate(formula, originalValue) {
+// Fungsi untuk menampilkan dialog "Formula Price"
+function showFormulaDialog(pphValue, ppnValue, feeMPValue) {
+    Swal.fire({
+        title: "Detail Formula",
+        html: `
+<div style="text-align: justify;">
+    <table style="width: 100%; border-collapse: collapse; border: 1px solid #ddd;">
+        <thead>
+            <tr>
+                <th style="padding: 8px; border-bottom: 1px solid #ddd;">PPH (%)</th>
+                <th style="padding: 8px; border-bottom: 1px solid #ddd;">PPN (%)</th>
+                <th style="padding: 8px; border-bottom: 1px solid #ddd;">Fee Marketplace (%)</th>
+                <th style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">
+                    <input type="text" class="form-control decimal" id="inputPPHPercent" value="${pphValue}" required inputmode="numeric" pattern="^[0-9]+([,][0-9]+)?$">
+                </td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">
+                    <input type="text" class="form-control decimal" id="inputPPNPercent" value="${ppnValue}" required inputmode="numeric" pattern="^[0-9]+([,][0-9]+)?$">
+                </td>
+                <td style="padding: 8px; border-bottom: 1px solid #ddd;">
+                    <input type="text" class="form-control decimal" id="inputFeeMPPercent" value="${feeMPValue}" required inputmode="numeric" pattern="^[0-9]+([,][0-9]+)?$">
+                </td>
+                <th style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">
+                    <button type="button" id="formula-saved" class="btn btn-transparent" title="Simpan Formula">
+                        <span class="material-symbols-outlined" id="icon-active">
+                            save
+                        </span>
+                    </button>
+                </th>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<hr>
+<div style="margin-top: 20px;">
+    <h4><strong>Formulir Perhitungan</strong></h4>
+    <form id="calculation-form">
+        <div class="form-group">
+            <label for="inputValue">Harga Seller:</label>
+            <input type="text" class="form-control" id="inputValue" placeholder="Rp Masukkan Nominal" required inputmode="numeric" pattern="[0-9]*">
+        </div>
+        <button type="button" class="btn btn-primary" id="calculate-button">Hitung</button>
+    </form>
+</div>
+<div style="margin-top: 20px;" id="calculation-results"></div>
+`,
+        showCancelButton: false, // Sembunyikan tombol cancel
+        showConfirmButton: false, // Sembunyikan tombol confirm
+        width: "50%",
+        // Logika perhitungan saat tombol "Hitung" ditekan
+        didOpen: function () {
+            var originalValue = "";
+            var inputElement = document.getElementById("inputValue");
+
+            inputElement.addEventListener(
+                "input",
+                function (event) {
+                    var value = event.target.value.replace(
+                        /\D/g,
+                        ""
+                    );
+                    var formattedValue = value.replace(
+                        /\B(?=(\d{3})+(?!\d))/g,
+                        "."
+                    );
+                    event.target.value = formattedValue;
+                    originalValue = value;
+                }
+            );
+
+            // Mendapatkan semua elemen input dengan kelas "decimal"
+            var decimalInputs = document.querySelectorAll('.decimal');
+
+            // Loop melalui setiap elemen input
+            decimalInputs.forEach(function(input) {
+                // Tambahkan event listener untuk event input
+                input.addEventListener('input', function(event) {
+                    // Ambil nilai input saat ini
+                    var value = event.target.value;
+                    
+                    // Hilangkan karakter yang bukan angka atau koma dari nilai input
+                    var sanitizedValue = value.replace(/[^0-9,]/g, '');
+                    
+                    // Update nilai input dengan nilai yang sudah disaring
+                    event.target.value = sanitizedValue;
+                });
+            });
+
+            // Tambahkan event listener untuk tombol "Hitung"
+            document.getElementById("calculate-button").addEventListener("click", function () {
+                // Gunakan nilai asli untuk perhitungan
+                calculate(originalValue);
+            });
+        },
+    });
+}
+
+// Fungsi untuk menampilkan pesan kesalahan
+function showErrorDialog(errorMessage) {
+    Swal.fire({
+        title: "Error",
+        text: errorMessage,
+        icon: "error",
+        confirmButtonText: "Tutup",
+    });
+}
+
+// Tambahkan event listener untuk tombol "Simpan Formula" di luar event listener untuk tombol "Formula Price"
+$(document).on("click", "#formula-saved", function () {
+    loading();
+
+    var $row = $(this).closest("tr");
+    var newData = {};
+    $row.find("td:not(:last-child)").each(function (
+        index
+    ) {
+        var key = ["pph", "ppn", "fee_mp_percent"][index];
+        var newValue = $(this)
+            .find("input")
+            .val()
+            .trim();
+        // Mengganti koma dengan titik
+        newValue = newValue.replace(",", ".");
+        newData[key] = newValue;
+    });
+    var csrfToken = document
+        .querySelector('meta[name="csrf-token"]')
+        .getAttribute("content");
     $.ajax({
-        url: "/admin/formula-lpse",
+        url: baseUrl + "/admin/update-formula",
+        method: "POST",
+        data: { ...newData, _token: csrfToken },
+        success: function (response) {
+            // Tampilkan pesan sukses atau gagal
+            Swal.fire({
+                icon: "success",
+                title: "Formula berhasil diupdate",
+                showConfirmButton: false,
+                timer: 1500
+            });
+
+            // Tampilkan kembali input fields dengan nilai yang baru disimpan
+            $row.find("td:not(:last-child)").each(
+                function (index) {
+                    var key = [
+                        "pph",
+                        "ppn",
+                        "fee_mp_percent",
+                    ][index];
+                    $(this).html(
+                        '<input type="text" class="form-control" value="' +
+                        newData[key] +
+                        '">'
+                    );
+                }
+            );
+
+            $.ajax({
+                url: baseUrl + "/admin/formula-lpse",
+                method: "GET",
+                success: function (response) {
+                    var formula = response.formula;
+                    if (formula) {
+                        // Konversi nilai formula PPH, PPN, dan Fee Marketplace ke format dengan koma
+                        var pphValue = parseFloat(formula.pph).toLocaleString('id-ID');
+                        var ppnValue = parseFloat(formula.ppn).toLocaleString('id-ID');
+                        var feeMPValue = parseFloat(formula.fee_mp_percent).toLocaleString('id-ID');
+        
+                        // Memuat dialog "Formula Price" dengan nilai yang diperbarui
+                        showFormulaDialog(pphValue, ppnValue, feeMPValue);
+                    } else {
+                        // Menampilkan pesan jika data anggota tidak ditemukan
+                        showErrorDialog("Formula Price Error");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    // Menampilkan pesan kesalahan
+                    showErrorDialog("An error occurred while loading the formula details.");
+                },
+            });
+        },
+        error: function (xhr, status, error) {
+            // Tampilkan pesan kesalahan jika terjadi kesalahan saat mengirim permintaan
+            alert("Terjadi kesalahan: " + error);
+        },
+    });
+});
+
+function calculate(originalValue) {
+    $.ajax({
+        url: baseUrl + "/admin/formula-lpse",
         method: "GET",
         success: function (response) {
             var formula = response.formula;
@@ -523,7 +583,7 @@ function calculate(formula, originalValue) {
     });
 }
 
-function detailProduct(id) {
+function detailProduct(id, name) {
     loading();
     var currentPage = 1; // Halaman saat ini
 
@@ -568,22 +628,22 @@ function detailProduct(id) {
                         '<td align="left">' +
                         product.stock +
                         "</td>" +
-                        '<td align="center"> <a class="glyphicon ' +
-                        (product.status_lpse == 1
-                            ? "glyphicon-eye-open"
-                            : "glyphicon-eye-close") +
-                        '" id="update-status" data-product-id="' +
+                        '<td align="center"><button type="button" id="update-status-product" class="btn btn-transparent" title="Ubah Status Product LPSE" data-product-id="' +
                         product.id +
                         '"data-product-status="' +
                         product.status_lpse +
-                        '"></a></td>' +
-                        '<td align="center"> <a class="glyphicon glyphicon-log-in" id="review-product"></a></td>' +
+                        '"><span class="material-symbols-outlined" style="font-size: 14pt;" id="' +
+                        (product.status_lpse == 1 ? 'icon-active' : 'icon-disable') + '">' +
+                        (product.status_lpse == 1 ? 'visibility' : 'visibility_off') +
+                        "</span></button></td>" +
+                        '<td align="center"><button type="button" class="btn btn-transparent" onclick="previewProduct(' + product.id + ')" title="Preview Product">' +
+                        '<span class="material-symbols-outlined" id="icon-info" style="font-size: 14pt;">preview</span></button></td>' +
                         "</tr>";
                 });
                 htmlContent += "</tbody></table>";
     
                 Swal.fire({
-                    title: "Detail Produk",
+                    title: "Detail Produk - " + name,
                     html: htmlContent,
                     showConfirmButton: false, // Tidak menampilkan tombol konfirmasi
                     width: "50%",

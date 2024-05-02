@@ -7,13 +7,16 @@ use App\Models\Menu;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Payment;
+use App\Models\Bank;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
 
 class PaymentController extends Controller
 {
     protected $user_id;
     protected $username;
+    protected $name;
     protected $access_id;
     protected $access_name;
     protected $access_code;
@@ -31,6 +34,7 @@ class PaymentController extends Controller
         // menagmbil data dari session
         $this->user_id = $request->session()->get('id');
 		$this->username = $request->session()->get('username');
+		$this->name = $request->session()->get('name');
 		$this->access_id = $request->session()->get('access_id');
 		$this->access_name 	= $request->session()->get('access_name');
 		$this->access_code 	= $request->session()->get('access_code');
@@ -176,5 +180,73 @@ class PaymentController extends Controller
             'updated_date' => Carbon::now(),
         ]);
         return redirect()->back()->with('success', 'Payment berhasil dihapus.');
+    }
+
+    public function bank()
+    {
+        $bank = Bank::orderBy('name', 'asc')->paginate(10);
+
+        return response()->json(['listbank' => $bank]);
+    }
+
+    public function addBank(Request $request)
+    {
+        // Validasi input
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255|unique:bank',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Buat bank baru
+        $bank = new Bank();
+        $bank->name = $request->name;
+        $bank->save();
+
+        return response()->json(['message' => 'Bank added successfully', 'bank' => $bank], 201);
+    }
+
+    // Fungsi untuk mengupdate bank
+    public function updateBank(Request $request, $id)
+    {
+        // Validasi input
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255|unique:bank,name,'.$id,
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Temukan bank berdasarkan ID
+        $bank = Bank::find($id);
+
+        if (!$bank) {
+            return response()->json(['message' => 'Bank not found'], 404);
+        }
+
+        // Update nama bank
+        $bank->name = $request->name;
+        $bank->save();
+
+        return response()->json(['message' => 'Bank updated successfully', 'bank' => $bank], 200);
+    }
+
+    // Fungsi untuk menghapus bank
+    public function deleteBank($id)
+    {
+        // Temukan bank berdasarkan ID
+        $bank = Bank::find($id);
+
+        if (!$bank) {
+            return response()->json(['message' => 'Bank not found'], 404);
+        }
+
+        // Hapus bank
+        $bank->delete();
+
+        return response()->json(['message' => 'Bank deleted successfully'], 200);
     }
 }

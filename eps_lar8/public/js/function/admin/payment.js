@@ -499,3 +499,307 @@ function isNumberKey(evt) {
         return false;
     return true;
 }
+
+document.getElementById("list-bank").addEventListener("click", function () {
+    // Panggil fungsi showBankList hanya ketika elemen dengan ID list-bank diklik
+    listBank(1); // Mulai dari halaman pertama
+});
+
+function listBank(page) {
+    loading();
+    showBankList(page);
+}
+
+// Fungsi untuk menampilkan daftar bank
+function showBankList(page) {
+    // Request data bank dari server
+    $.ajax({
+        url: "/admin/bank",
+        method: "GET",
+        data: { page: page },
+        success: function (response) {
+            // Menghentikan SweetAlert loading setelah menerima respons dari server
+            Swal.close();
+
+            var bankList = response.listbank.data; // Akses data bank dari respons
+            var currentPage = response.listbank.current_page; // Halaman saat ini
+            var lastPage = response.listbank.last_page; // Halaman terakhir
+
+            // Buat konten HTML untuk tabel daftar bank
+            var htmlContent = `
+                <div class="text-right mb-3">
+                    <button type="button" class="btn btn-primary" onclick="addBank()">Add Bank</button>
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nama Bank</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            // Iterasi melalui setiap bank dalam daftar
+            bankList.forEach(function (bank) {
+                htmlContent +=
+                    "<tr>" +
+                    '<td align="left">' +
+                    bank.name +
+                    "</td>" +
+                    '<td align="center">' +
+                    '<button type="button" class="btn btn-transparent" onclick="editBank(' + bank.id + ', \'' + bank.name + '\')" title="Edit Bank">' +
+                    '<span class="material-symbols-outlined" id="icon-warning" style="font-size: 14pt;">edit</span></button>' +
+                    '<button type="button" class="btn btn-transparent" onclick="deleteBank(' + bank.id + ')" title="Delete Bank">' +
+                    '<span class="material-symbols-outlined" id="icon-delete" style="font-size: 14pt;">delete</span></button>' +
+                    "</td>" +
+                    "</tr>";
+            });
+
+            htmlContent += `</tbody></table>`;
+
+            // Tampilkan daftar bank menggunakan SweetAlert
+            Swal.fire({
+                title: "List Bank",
+                html: htmlContent,
+                showConfirmButton: false, // Sembunyikan tombol konfirmasi
+                width: "30%",
+            }).then((result) => {
+                if (!result.isConfirmed) {
+                    // Jika tombol close di SweetAlert diklik, muat ulang daftar bank
+                    // showBankList(currentPage); // Komentari ini agar tidak otomatis memuat saat menutup
+                }
+            });
+
+            // Tambahkan pagination number ke SweetAlert setelah ditampilkan
+            addPagination(currentPage, lastPage);
+        },
+        error: function (xhr, status, error) {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Terjadi kesalahan saat memuat daftar bank.",
+            });
+        },
+    });
+}
+
+function addPagination(currentPage, lastPage, totalRecords) {
+    // Batasi jumlah halaman yang ditampilkan menjadi maksimal lima
+    // Membuat tombol navigasi paginasi
+    var paginationHtml = '<div class="pagination">';
+    if (currentPage > 1) {
+        paginationHtml += '<button onclick="listBank(' + (currentPage - 1) + ')">Prev</button>';
+    } else {
+        paginationHtml += '<button class="disabled">Prev</button>';
+    }
+
+    var startPage = Math.max(1, currentPage - 2);
+    var endPage = Math.min(startPage + 4, lastPage);
+    if (lastPage - currentPage < 2) {
+        startPage = Math.max(1, lastPage - 4);
+    }
+    for (var i = startPage; i <= endPage; i++) {
+        if (i === currentPage) {
+            paginationHtml += '<button class="current">' + i + '</button>';
+        } else {
+            paginationHtml += '<button onclick="listBank(' + i + ')">' + i + '</button>';
+        }
+    }
+
+    if (currentPage < lastPage) {
+        paginationHtml += '<button onclick="listBank(' + (currentPage + 1) + ')">Next</button>';
+    } else {
+        paginationHtml += '<button class="disabled">Next</button>';
+    }
+    paginationHtml += '<p>Showing ' + ((currentPage - 1) * 10 + 1) + ' to ' + Math.min(currentPage * 10, totalRecords) + ' of ' + totalRecords + ' entries</p>';
+    paginationHtml += '</div>';
+    
+    // Menambahkan tombol paginasi ke dalam SweetAlert
+    $(".swal2-html-container").append(paginationHtml);
+}
+
+// Fungsi untuk menambahkan bank baru
+function addBank() {
+    loading();
+    // Logika untuk menambahkan bank baru
+    Swal.fire({
+        title: "Add Bank",
+        html: `
+            <!-- Form untuk menambahkan bank baru -->
+            <form id="addBankForm">
+                <div class="form-group">
+                    <label for="bankName">Nama Bank:</label>
+                    <input type="text" class="form-control" id="bankName" required>
+                </div>
+            </form>
+        `,
+        showCancelButton: true, // Menampilkan tombol cancel
+        showConfirmButton: true, // Sembunyikan tombol confirm
+        focusConfirm: false, // Jangan fokuskan ke tombol confirm
+        cancelButtonText: "Batal", // Tekst tombol cancel
+        confirmButtonText: "Tambah", // Tekst tombol cancel
+        cancelButtonColor: "#d33", // Warna tombol cancel
+        preConfirm: () => {
+            // Logika untuk menyimpan bank baru
+            var token = document.head.querySelector('meta[name="csrf-token"]').content;
+            var bankName = document.getElementById("bankName").value;
+            saveNewBank(bankName, token);
+        }
+    });
+}
+
+// Fungsi untuk menyimpan bank baru ke server
+function saveNewBank(name, token) {
+    // Kirim permintaan AJAX untuk menyimpan bank baru
+    $.ajax({
+        url: "/admin/bank/add",
+        method: "POST",
+        data: { name: name, _token: token },
+        success: function (response) {
+            console.log("Success: ", response); // Tambahkan log di sini
+            Swal.fire({
+                icon: "success",
+                title: "Bank added successfully!",
+                showConfirmButton: false,
+                timer: 1500
+            });
+            // Muat ulang daftar bank setelah menambahkan bank baru
+            showBankList(1);
+        },
+        error: function (xhr, status, error) {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Failed to add bank. Please try again.",
+            });
+        },
+    });
+}
+
+// Fungsi untuk menampilkan form edit bank
+function editBank(id, name) {
+    Swal.fire({
+        title: "Edit Bank",
+        html: `
+            <form id="editBankForm">
+                <div class="form-group">
+                    <label for="editedBankName">Nama Bank:</label>
+                    <input type="text" class="form-control" id="editedBankName" value="${name}" required>
+                </div>
+            </form>
+        `,
+        showCancelButton: true,
+        showConfirmButton: true,
+        focusConfirm: false,
+        cancelButtonText: "Batal",
+        confirmButtonText: "Simpan",
+        cancelButtonColor: "#d33",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Jika user menekan tombol Yes
+            var token = document.head.querySelector('meta[name="csrf-token"]').content;
+            var newName = document.getElementById("editedBankName").value;
+            updateBank(id, newName, token);
+        // } else if (result.dismiss === Swal.DismissReason.cancel) {
+        //     // Jika user membatalkan
+        //     // Lakukan sesuatu, misalnya, tampilkan pesan
+        //     Swal.fire({
+        //         icon: "info",
+        //         title: "Edit Bank dibatalkan!",
+        //         showConfirmButton: false,
+        //         timer: 1500
+        //     });
+        //     showBankList(1); // Muat ulang daftar bank setelah mengedit
+        }
+    });
+}
+
+// Fungsi untuk mengirim permintaan update bank ke server
+function updateBank(id, newName, token) {
+    $.ajax({
+        url: "/admin/bank/update/" + id,
+        method: "PUT",
+        data: { name: newName, _token: token },
+        success: function (response) {
+            Swal.fire({
+                icon: "success",
+                title: "Bank updated successfully!",
+                showConfirmButton: false,
+                timer: 1500
+            });
+            showBankList(1); // Muat ulang daftar bank setelah mengedit
+        },
+        error: function (xhr, status, error) {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Failed to update bank. Please try again.",
+            });
+        },
+    });
+}
+
+// Fungsi untuk mengkonfirmasi dan menghapus bank
+function deleteBank(id) {
+    Swal.fire({
+        title: "Apakah Anda yakin?",
+        text: "Anda akan menghapus bank ini!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Ya, Hapus!",
+        cancelButtonText: "Batal",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Jika user menekan tombol Yes
+            var token = document.head.querySelector('meta[name="csrf-token"]').content;
+            removeBank(id, token);
+        // }  else if (result.dismiss === Swal.DismissReason.cancel) {
+        //     // Jika user membatalkan
+        //     // Lakukan sesuatu, misalnya, tampilkan pesan
+        //     Swal.fire({
+        //         icon: "info",
+        //         title: "Delete Bank dibatalkan!",
+        //         showConfirmButton: false,
+        //         timer: 1500
+        //     });
+        //     showBankList(1); // Muat ulang daftar bank setelah mengedit
+        }
+    });
+}
+
+// Fungsi untuk mengirim permintaan penghapusan bank ke server
+function removeBank(id, token) {
+    $.ajax({
+        url: "/admin/bank/delete/" + id,
+        method: "DELETE",
+        data: { _token: token },
+        success: function (response) {
+            Swal.fire({
+                icon: "success",
+                title: "Bank deleted successfully!",
+                showConfirmButton: false,
+                timer: 1500
+            });
+            showBankList(1); // Muat ulang daftar bank setelah menghapus
+        },
+        error: function (xhr, status, error) {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Failed to delete bank. Please try again.",
+            });
+        },
+    });
+}
+
+function loading() {
+    Swal.fire({
+        title: "Memuat...",
+        html: '<div class="spinner-border" role="status"><span class="sr-only">Memuat...</span></div>',
+        showConfirmButton: false,
+        allowOutsideClick: false,
+    });
+}

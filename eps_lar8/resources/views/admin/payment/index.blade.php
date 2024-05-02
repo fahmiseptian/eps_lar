@@ -22,7 +22,11 @@
             <section class="content">
                 <div class="row">
                     <div class="col-xs-12">
-
+                        <div class="box box-primary">
+                            <div class="box-body" id="list-bank" style="cursor: pointer;">
+                                <h4>List Bank</h4>
+                            </div>
+                        </div>
                         <!-- general form elements -->
                         <div class="box box-primary">
                             <div class="box-header">

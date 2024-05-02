@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\User_profile;
 use App\Models\Access;
 
 class AuthController extends Controller
@@ -46,11 +47,14 @@ class AuthController extends Controller
             $access = Access::where('id', $access_id)->first();
             $access_name = $access->name;
             $access_code = $access->code;
+            $profile = User_profile::where('user_id', $user_id)->first();
+            $full_name = $profile->firstname . ' ' . $profile->lastname;
             if ($user->active == 1) {
                 if ($user->decryptPassword($user->password) == $password) {
                     $request->session()->put('is_admin', true);
                     $request->session()->put('user_id', $user_id);
                     $request->session()->put('username', $username);
+                    $request->session()->put('name', $full_name);
                     $request->session()->put('access_name', $access_name);
                     $request->session()->put('access_code', $access_code);
                     return redirect()->intended('/admin');
@@ -70,6 +74,7 @@ class AuthController extends Controller
         $request->session()->forget('is_admin');
         $request->session()->forget('user_id');
         $request->session()->forget('username');
+        $request->session()->forget('name');
         $request->session()->forget('access_name');
         $request->session()->forget('access_code');
 

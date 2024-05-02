@@ -17,6 +17,7 @@ class UserController extends Controller
 {
     protected $user_id;
     protected $username;
+    protected $name;
     protected $access_id;
     protected $access_name;
     protected $access_code;
@@ -34,6 +35,7 @@ class UserController extends Controller
         // menagmbil data dari session
         $this->user_id = $request->session()->get('id');
 		$this->username = $request->session()->get('username');
+		$this->name = $request->session()->get('name');
 		$this->access_id = $request->session()->get('access_id');
 		$this->access_name 	= $request->session()->get('access_name');
 		$this->access_code 	= $request->session()->get('access_code');
