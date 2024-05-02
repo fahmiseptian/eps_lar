@@ -26,7 +26,7 @@
                     <div class="col-xs-12">
                         <div class="box">
                             <div class="box-header">
-                                <h3 class="box-title">List Invoice</h3>
+                                <h3 class="box-title">List Cancelled Invoice</h3>
                             </div><!-- /.box-header -->
                             <div class="box-body">
 
@@ -47,19 +47,17 @@
                                             <tr>
                                                 <td>{{ $i++ }}</td>
                                                 <td>{{ $invoice->invoice }}</td>
-                                                <td>{{ str_replace(',', '.', number_format($invoice->total)) }}</td>
+                                                <td>Rp{{ number_format($invoice->total, 0, ',', '.') }}</td>
                                                 <td>
-                                                    <?php
-                                                    if ($invoice->completeCartShop->status == 'cancel_by_seller') {
-                                                        echo 'Dibatalkan oleh Penjual';
-                                                    } elseif ($invoice->completeCartShop->status == 'cancel_by_marketplace') {
-                                                        echo 'Dibatalkan oleh Admin';
-                                                    } elseif ($invoice->completeCartShop->status == 'cancel_manual_by_user') {
-                                                        echo 'Dibatalkan oleh User';
-                                                    } else {
-                                                        echo $invoice->completeCartShop->status;
-                                                    }
-                                                    ?>
+                                                    @if ($invoice->completeCartShop->status == 'cancel_by_seller')
+                                                        Dibatalkan oleh Penjual
+                                                    @elseif ($invoice->completeCartShop->status == 'cancel_by_marketplace')
+                                                        Dibatalkan oleh Admin
+                                                    @elseif ($invoice->completeCartShop->status == 'cancel_manual_by_user')
+                                                        Dibatalkan oleh User
+                                                    @else
+                                                        {{ $invoice->completeCartShop->status }}
+                                                    @endif
                                                 </td>
                                                 <td>
                                                     @if ($invoice->completeCartShop->note)
@@ -69,9 +67,29 @@
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    <a style="font-size: larger" onclick="detail('{{ $invoice->id }}')" class="glyphicon glyphicon-info-sign"></a> &nbsp;
-                                                    <a style="font-size: larger" onclick="upload('{{ $invoice->id }}')" class="glyphicon glyphicon-upload"></a> &nbsp;
-                                                    <a style="font-size: larger" onclick="view('{{ $invoice->id }}')" class="glyphicon glyphicon-file"></a>
+                                                    <button type="button" class="btn btn-transparent" onclick="detail('{{ $invoice->id }}')" title="Info Detail">
+                                                        <span class="material-symbols-outlined" id="icon-info">
+                                                            info
+                                                        </span>
+                                                    </button>
+                                                    @if (!$invoice->file_cancel)
+                                                        <button type="button" class="btn btn-transparent" onclick="upload_cancel('{{ $invoice->id }}')" title="Upload File Pembatalan">
+                                                            <span class="material-symbols-outlined" id="icon-active">
+                                                                upload_file
+                                                            </span>
+                                                        </button>
+                                                    @else
+                                                        <button type="button" class="btn btn-transparent" onclick="reupload_cancel('{{ $invoice->id }}')" title="Ganti File Pembatalan">
+                                                            <span class="material-symbols-outlined" id="icon-warning">
+                                                                edit_document
+                                                            </span>
+                                                        </button>
+                                                        <button type="button" class="btn btn-transparent" onclick="view_cancel('{{ $invoice->id }}')" title="Lihat File Pembatalan">
+                                                            <span class="material-symbols-outlined" id="icon-disable">
+                                                                file_open
+                                                            </span>
+                                                        </button>
+                                                    @endif
                                                 </td>
                                             </tr>
                                         @endforeach

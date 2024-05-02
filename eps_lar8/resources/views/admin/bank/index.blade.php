@@ -27,10 +27,10 @@
                         <div class="box box-primary">
                             <div class="box-header">
                                 <div class="col-md-10" style="padding-left: 0;">
-                                    <h3 class="box-title">List Menu</h3>
+                                    <h3 class="box-title">List Bank</h3>
                                 </div>
                                 <!-- Daftar Parent Menu -->
-                                <div class="col-md-2">
+                                <div class="col-md-2" style="padding-right: 0;">
                                     <a href="javascript:;" id="parentMenuList" class="pull-right">
                                         <h2 class="box-title" id="parentMenuList">List Parent ID</h2>
                                         <i class="fa fa-angle-left"></i>
@@ -91,9 +91,12 @@
                                                 </td>
                                                 <td>{{ $menu->parent_id }}</td>
                                                 <td>
-                                                    @foreach($accesses as $access)
-                                                        <input type="checkbox" name="access_{{ $access->code }}" value="1" {{ $menu->{$access->code} == 1 ? 'checked' : '' }} disabled> {{ $access->name }}<br>
-                                                    @endforeach
+                                                    <input type="checkbox" name="access[]" value="developer" {{ $menu->developer == 1 ? 'checked' : '' }} disabled> Developer<br>
+                                                    <input type="checkbox" name="access[]" value="superadmin" {{ $menu->superadmin == 1 ? 'checked' : '' }} disabled> Superadmin<br>
+                                                    <input type="checkbox" name="access[]" value="webadmin" {{ $menu->web_admin == 1 ? 'checked' : '' }} disabled> Web Admin<br>
+                                                    <input type="checkbox" name="access[]" value="finance" {{ $menu->finance == 1 ? 'checked' : '' }} disabled> Finance<br>
+                                                    <input type="checkbox" name="access[]" value="pajak" {{ $menu->pajak == 1 ? 'checked' : '' }} disabled> Pajak<br>
+                                                    <input type="checkbox" name="access[]" value="admin" {{ $menu->administration == 1 ? 'checked' : '' }} disabled> Administration<br>
                                                 </td>
                                                 <td>
                                                     <button type="button" class="btn btn-transparent" onclick="editMenu('{{ $menu->id }}')" title="Edit Menu">

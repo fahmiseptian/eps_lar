@@ -56,7 +56,7 @@
                             btn-info 
                           @elseif($item->type === 'trusted_seller') 
                             btn-success @endif">
-                                                                    {{ ucfirst($item->type) }}
+                                                                    {{ $item->type == 'trusted_seller' ? 'Trusted Seller' : ucfirst($item->type) }}
                                                                 </button>
                                                             </td>
                                                             <td>
@@ -77,14 +77,21 @@
                                                     </table>
                                                 </td>
                                                 <td>
-                                                    <button onclick="detail('{{ $item->id }}')"
-                                                        class="btn btn-info">Detail Toko</button>
-                                                    <button onclick="updateStatus('{{ $item->id }}')"
-                                                        class="btn {{ $item->status === 'active' ? 'btn-success' : 'btn-secondary' }}">
-                                                        {{ $item->status === 'active' ? 'Aktif' : 'Tidak aktif' }}
+                                                    <button type="button" class="btn btn-transparent" onclick="detail('{{ $item->id }}')" title="Info Detail">
+                                                        <span class="material-symbols-outlined" id="icon-info">
+                                                            info
+                                                        </span>
                                                     </button>
-                                                    <button onclick="deleteShop('{{ $item->id }}')"
-                                                        class="btn btn-danger">Hapus</button>
+                                                    <button type="button" class="btn btn-transparent" onclick="updateStatus('{{ $item->id }}')" title="Ubah Status Toko">
+                                                        <span class="material-symbols-outlined" id="{{ $item->status === 'active' ? 'icon-active' : 'icon-disable' }}">
+                                                            {{ $item->status === 'active' ? 'toggle_on' : 'toggle_off' }}
+                                                        </span>
+                                                    </button>
+                                                    <button type="button" class="btn btn-transparent" onclick="deleteShop('{{ $item->id }}')" title="Hapus Toko">
+                                                        <span class="material-symbols-outlined" id="icon-delete">
+                                                            delete
+                                                        </span>
+                                                    </button>
                                                 </td>
                                             </tr>
                                         @endforeach

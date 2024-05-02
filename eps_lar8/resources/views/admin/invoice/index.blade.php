@@ -59,14 +59,14 @@
                                                 </td>
 
                                                 <td>{{ $item->invoice }}</td>
-                                                <td>Rp. {{ number_format($item->total, 0, ',', '.') }}</td>
+                                                <td>Rp{{ number_format($item->total, 0, ',', '.') }}</td>
 
                                                 <td>
 
                                                     <?php
                                                     if ($item->status == 'complete_payment') {
                                                         echo 'Selesai';
-                                                    } elseif ($item->status == 'cencel') {
+                                                    } elseif ($item->status == 'cancel') {
                                                         echo 'Batal';
                                                     } elseif ($item->status == 'pending') {
                                                         echo 'Belum Dibayar';
@@ -84,8 +84,8 @@
                                                     ?>
                                                 </td>
                                                 <td>
-                                                    @if ($item->user)
-                                                        {{ $item->user->username }}
+                                                    @if ($item->finance)
+                                                        {{ $item->finance->username }}
                                                     @else
                                                         {{-- Ini Kalau data kosong --}}
                                                     @endif
@@ -106,11 +106,24 @@
                                                     }
                                                     ?>
                                                 </td>
-                                                <td>{{ $item->pelapor_pajak }}</td>
                                                 <td>
-                                                    <button class="btn btn-primary btn-xs" onclick="#">Lapor</button>
-                                                    <button class="btn btn-success btn-xs" onclick="#">Update
-                                                        Status</button>
+                                                    @if ($item->pajak)
+                                                        {{ $item->pajak->username }}
+                                                    @else
+                                                        {{-- Ini Kalau data kosong --}}
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-transparent" onclick="#" title="Lapor Pajak">
+                                                        <span class="material-symbols-outlined" id="icon-warning">
+                                                            forward_to_inbox
+                                                        </span>
+                                                    </button>
+                                                    <button type="button" class="btn btn-transparent" onclick="#" title="Ubah Status Pembayaran">
+                                                        <span class="material-symbols-outlined" id="icon-active">
+                                                            currency_exchange
+                                                        </span>
+                                                    </button>
                                                 </td>
                                             </tr>
                                         @endforeach

@@ -463,7 +463,6 @@ body {
     /* Hilangkan margin kanan */
   }
 
-
   .dataTables_filter input {
     width: 100%;
     /* Atur lebar kolom pencarian menjadi 100% */
@@ -644,6 +643,69 @@ body {
     -o-transform: translate(230px, 0);
     transform: translate(230px, 0);
   }
+}
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 1,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24;
+}
+#icon-info {
+  font-size: 30px;
+  color: deepskyblue;
+}
+#icon-delete {
+  font-size: 30px;
+  color: red;
+}
+#icon-active {
+  font-size: 30px;
+  color: forestgreen;
+}
+#icon-disable {
+  font-size: 30px;
+  color: grey;
+}
+#icon-warning {
+  font-size: 30px;
+  color: greenyellow;
+}
+.btn-transparent {
+background-color: transparent;
+border: 2px;
+padding: 0;
+}
+
+.pagination {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.pagination button {
+  margin: 0px;
+  padding: 5px 10px;
+  background-color: #f0f0f0;
+  border: 0.5px solid #ddd;
+  cursor: pointer;
+}
+
+.pagination button.current {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+  cursor: not-allowed;
+}
+
+.pagination button.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.pagination p {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #666;
 }
 
 .content-wrapper,
@@ -1311,8 +1373,8 @@ input:checked+.slider:before {
 }
 
 .user-panel>.image>img {
-  width: 45px;
-  height: 45px;
+  width: 60px;
+  height: 60px;
 }
 
 .user-panel>.info {
@@ -1322,8 +1384,13 @@ input:checked+.slider:before {
   line-height: 1;
 }
 
+.user-panel>.info>h4 {
+  margin-top: 0px;
+  margin-bottom: 5px;
+}
+
 .user-panel>.info>p {
-  margin-bottom: 9px;
+  margin-bottom: 5px;
 }
 
 .user-panel>.info>a {
@@ -1424,6 +1491,14 @@ input:checked+.slider:before {
 .sidebar-menu .treeview-menu>li>a>.fa-angle-left,
 .sidebar-menu .treeview-menu>li>a>.fa-angle-down {
   width: auto;
+}
+
+.rotate-icon {
+  -webkit-transition: all 0.3s ease-in-out; /* Safari */
+  transition: all 0.3s ease-in-out;
+  -ms-transform: rotate(-90deg); /* IE 9 */
+  -webkit-transform: rotate(-90deg); /* Chrome, Safari, Opera */
+  transform: rotate(-90deg);
 }
 
 /*

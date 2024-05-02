@@ -48,7 +48,7 @@
                     type: 'GET', // Menggunakan metode GET
                     success: function(response) {
                         // Redirect ke halaman logout atau lakukan tindakan lain sesuai respons dari controller
-                        window.location.href = "/seller/logout";
+                        window.location.href = "{{ route('seller.login') }}";
                     },
                     error: function(xhr, status, error) {
                         // Tangani kesalahan jika terjadi

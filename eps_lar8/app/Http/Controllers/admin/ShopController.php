@@ -15,23 +15,33 @@ class ShopController extends Controller
 {
     protected $user_id;
     protected $username;
+    protected $name;
     protected $access_id;
+    protected $access_name;
+    protected $access_code;
     protected $data;
     protected $menu;
 
     public function __construct(Request $request)
     {
+        if ($request->session()->get('access_code') == null) {
+            return redirect()->route('admin.logout');
+        }
+
         // Login
-        $this->middleware('admin');
+        $this->middleware(['admin', 'activity']);
         // menagmbil data dari session
         $this->user_id = $request->session()->get('id');
 		$this->username = $request->session()->get('username');
+		$this->name = $request->session()->get('name');
 		$this->access_id 	= $request->session()->get('access_id');
+		$this->access_name 	= $request->session()->get('access_name');
+		$this->access_code 	= $request->session()->get('access_code');
         // Membuat $this->data
         $this->data['title'] = 'Shop';
         $this->data['profile'] = User::find($this->access_id);
 
-        $this->menu = Menu::where('status', 1)->orderBy('urutan')->get();
+        $this->menu = Menu::where('status', 1)->where($this->access_code, 1)->orderBy('urutan')->get();
     }
     
     public function shop()
@@ -150,7 +160,7 @@ public function updateTypeDown($id)
         $shop->update(['status' => 'delete']);
         $member = Member::where('id', $shop->id_user)->firstOrFail();
         $member->update(['member_status' => 'delete', 'registered_member' => 0]);
-        return redirect()->back()->with('success', 'Anggota berhasil dihapus.');
+        return redirect()->back()->with('success', 'Toko berhasil dihapus.');
     }
 
     public function lpse_config()
@@ -165,7 +175,7 @@ public function updateTypeDown($id)
     public function updateIsTop($id) {
         try {
             $shop = Shop::findOrFail($id);
-            $newTOP = $shop->is_top === '1' ? '0' : '1';
+            $newTOP = $shop->is_top === 1 ? 0 : 1;
             $shop->update(['is_top' => $newTOP]);
 
             return response()->json(['is_top' => $shop->is_top]);
@@ -204,13 +214,14 @@ public function updateTypeDown($id)
     }
 
 
-    // Mengambil produk dengan id shop
-    public function getProduct($id)
+    public function getProduct(Request $request, $id)
     {
-        $products = Product::where('id_shop', $id)->get();
+        $products = Product::where('id_shop', $id)->orderBy('status_lpse', 'desc')->orderBy('name', 'asc')->paginate(10);
+    
         if ($products->isEmpty()) {
             return response()->json(['message' => 'Tidak ada produk yang ditemukan untuk toko dengan ID yang diberikan'], 404);
         }
+    
         return response()->json(['products' => $products]);
     }
 

@@ -25,7 +25,7 @@
                     <div class="col-xs-12">
                         <div class="box">
                             <div class="box-header">
-                                <h3 class="box-title">List Invoice</h3>
+                                <h3 class="box-title">List Member</h3>
                             </div><!-- /.box-header -->
                             <div class="box-body">
                                 <table id="example2" class="table table-bordered table-hover">
@@ -47,14 +47,21 @@
                                                 <td>{{ $member->nama }}</td>
                                                 <td>{{ $member->no_hp }}</td>
                                                 <td>
-                                                    <button onclick="showDetail('{{ $member->id }}')"
-                                                        class="btn btn-info">Detail</button>
-                                                    <button onclick="toggleStatus('{{ $member->id }}')"
-                                                        class="toggle-status btn {{ $member->member_status === 'active' ? 'btn-success' : 'btn-secondary' }}">
-                                                        {{ $member->member_status === 'active' ? 'Aktif' : 'Suspend' }}
+                                                    <button type="button" class="btn btn-transparent" onclick="showDetail('{{ $member->id }}')" title="Info Detail">
+                                                        <span class="material-symbols-outlined" id="icon-info">
+                                                            info
+                                                        </span>
                                                     </button>
-                                                    <button onclick="deleteMember('{{ $member->id }}')"
-                                                        class="btn btn-danger">Delete</button>
+                                                    <button type="button" class="btn btn-transparent" onclick="toggleStatus('{{ $member->id }}')" title="Ubah Status Anggota">
+                                                        <span class="material-symbols-outlined" id="{{ $member->member_status === 'active' ? 'icon-active' : 'icon-disable' }}">
+                                                            {{ $member->member_status === 'active' ? 'toggle_on' : 'toggle_off' }}
+                                                        </span>
+                                                    </button>
+                                                    <button type="button" class="btn btn-transparent" onclick="deleteMember('{{ $member->id }}')" title="Hapus Anggota">
+                                                        <span class="material-symbols-outlined" id="icon-delete">
+                                                            delete
+                                                        </span>
+                                                    </button>
                                                 </td>
                                             </tr>
                                         @endforeach

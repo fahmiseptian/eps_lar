@@ -41,25 +41,28 @@ $(document).ready(function(){
         //     return;
         // }
 
-        var loginUrl = $(this).attr('action');
-        var formData = $(this).serialize();
+        // Form submission
+        this.submit();
 
-        $.ajax({
-            type: "POST",
-            url: loginUrl,
-            data: formData,
-            success: function(response){
-                window.location.href = "/seller";
-            },
-            error: function(xhr, status, error){
-                var err = JSON.parse(xhr.responseText);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: err.error
-                });
-            }
-        });
+        // var loginUrl = $(this).attr('action');
+        // var formData = $(this).serialize();
+
+        // $.ajax({
+        //     type: "POST",
+        //     url: loginUrl,
+        //     data: formData,
+        //     success: function(response){
+        //         window.location.href = "{{ route('seller') }}";
+        //     },
+        //     error: function(xhr, status, error){
+        //         var err = JSON.parse(xhr.responseText);
+        //         Swal.fire({
+        //             icon: 'error',
+        //             title: 'Oops...',
+        //             text: err.error
+        //         });
+        //     }
+        // });
     });
 });
 

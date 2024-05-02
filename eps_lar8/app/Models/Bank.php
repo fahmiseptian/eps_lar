@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Bank extends Model
 {
-    protected $visible = ['name'];
+    protected $visible = ['id' ,'name'];
+    protected $fillable = ['name'];
     protected $table = 'bank';
-    protected $primaryKey = 'id'; 
+    protected $primaryKey = 'id';
+    public $timestamps = false;
 }

@@ -3,19 +3,34 @@
 @include('admin.asset.header')
 
 <body class="login-page">
+    @if(session('error_admin'))
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: "{{ session('error_admin') }}",
+                showConfirmButton: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Hapus session error_admin
+                    <?php session()->forget('error_admin'); ?>
+                }
+            });
+        </script>
+    @endif
     <div class="login-box">
         <div class="login-logo">
             <a href="{{ route('admin.login') }}"><b>EPS </b>Admin</a>
         </div><!-- /.login-logo -->
         <div class="login-box-body">
             <p class="login-box-msg">Sign in to start your session</p>
-            @if ($errors->any())
+            <!-- @if (session('error_admin'))
                 <div style="color: red;">
-                    @foreach ($errors->all() as $error)
-                        <p>{{ $error }}</p>
-                    @endforeach
+                    <p>{{ session('error_admin') }}</p>
                 </div>
-            @endif
+                // Hapus session error_admin
+                <?php //session()->forget('error_admin'); ?>
+            @endif -->
             <form action="{{ route('admin.login') }}" method="POST">
                 @csrf
                 <div class="form-group has-feedback">

@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Invoice;
 use App\Models\Member;
 use App\Models\User;
 use App\Models\Menu;
+use App\Models\Access;
 use Illuminate\Http\Request;
 
-class MemberController extends Controller
+class AccessController extends Controller
 {
     protected $user_id;
     protected $username;
@@ -36,18 +36,16 @@ class MemberController extends Controller
 		$this->access_name 	= $request->session()->get('access_name');
 		$this->access_code 	= $request->session()->get('access_code');
         // Membuat $this->data
-        $this->data['title'] = 'Member';
+        $this->data['title'] = 'Access';
         $this->data['profile'] = User::find($this->access_id);
 
         $this->menu = Menu::where('status', 1)->where($this->access_code, 1)->orderBy('urutan')->get();
     }
     
-    public function index()
+    public function access()
     {
-        $members = Member::where('member_status', '!=', 'delete')
-                        ->orderBy('id', 'desc')
-                        ->get();
-        return view('admin.member.index', ['members' => $members, 'menus' => $this->menu], $this->data);
+        $accesses = Access::where('active', '!=', '2')->get();
+        return view('admin.access.index', ['accesses' => $accesses, 'menus' => $this->menu], $this->data);
     }
 
     public function show($id)

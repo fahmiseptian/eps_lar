@@ -80,6 +80,20 @@ return [
             'endpoint' => env('AWS_ENDPOINT'),
         ],
 
+        'products' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/products'),
+            'url' => env('APP_URL').'/storage/products',
+            'visibility' => 'public',
+        ],
+
+        'assets' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public'),
+            'url' => env('APP_URL'),
+            'visibility' => 'public',
+        ],
+
     ],
 
     /*
