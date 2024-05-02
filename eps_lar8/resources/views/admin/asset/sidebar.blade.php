@@ -8,6 +8,7 @@
             </div>
             <div class="pull-left info">
                 <p><?= session()->get('username') ?></p>
+                <p><?= session()->get('access_name') ?></p>
 
                 <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
             </div>
