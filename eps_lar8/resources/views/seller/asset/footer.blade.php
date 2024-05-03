@@ -1,4 +1,3 @@
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- jQuery -->
 {{-- <script src="{{ asset('/plugins/jQuery/jQuery-2.1.3.min.js') }}"></script> --}}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\seller;
 
 use App\Http\Controllers\Controller;
 use App\Libraries\Terbilang;
+use App\Models\Bast;
+use App\Models\BastDetail;
 use App\Models\Shop;
 use App\Models\Saldo;
 use App\Models\CompleteCartShop;
@@ -248,18 +250,26 @@ class OrederController extends Controller
 
     public function generateBastPDF($id_cart_shop)
     {
-       
         $detail_order  = CompleteCartShop::getDetailOrderbyId($this->seller, $id_cart_shop);
         $detail_order->seller_address=Shop::getAddressByIdshop($this->seller);
+        $bast = Bast::getBast($id_cart_shop);
+        $data = BastDetail::getBAstbyIdBast($bast->id);
         $eps = [
             'nama' => 'PT. Elite Proxy Sistem',
             'npwp' => ' 73.035.456.0-022.000',
             'alamat' => 'Rukan Sudirman Park Apartement Jl Kh. Mas Mansyur KAV 35 A/15 Kelurahan Karet Tengsin Kec. Tanah Abang Jakarta Pusat DKI Jakarta'
         ];
-    
 
-        $pdf = FacadePdf::loadView('pdf.bast', ['data' => $detail_order,'eps'=>$eps]);
-        
+        $pdf = FacadePdf::loadView('pdf.bast', ['data' => $detail_order,'eps'=>$eps,'bast'=>$bast, 'data_qty'=>$data]);
+        $pdf->getDomPDF()->setHttpContext(
+            stream_context_create([
+                'ssl' => [
+                    'allow_self_signed'=> TRUE,
+                    'verify_peer' => TRUE,
+                    'verify_peer_name' => FALSE,
+                ]
+            ])
+        );
         return $pdf->stream('informasi_bast.pdf');
     }
 }

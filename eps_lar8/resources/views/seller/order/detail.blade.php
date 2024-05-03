@@ -27,6 +27,13 @@
                             $proforma = true;
                         }
                         
+                        $list_payment = [22, 23, 30];
+                        $list_payment_direct = [21];
+
+                        $payment_id = $detailOrder->id_payment;
+
+                        $cek_payment = in_array($payment_id, $list_payment);
+
                         // pembayaran
                         $pembayaran = false;
                         if ($detailOrder->status_pembayaran_top == '1') {
@@ -217,7 +224,7 @@
                                     <tr>
                                         @if ($detailOrder->is_bast == 1)
                                             <td>
-                                                <a style="width: 100%" class="btn btn-info fa fa-plus" data-id="<?= $detailOrder->id_cart_shop ?>"
+                                                <a style="width: 100%" class="btn btn-info fa fa-file-o" data-id="<?= $detailOrder->id_cart_shop ?>"
                                                     id="cetakBast">&nbsp;Bast</a>
                                             </td>
                                         @endif

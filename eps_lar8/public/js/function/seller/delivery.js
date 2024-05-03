@@ -1,7 +1,5 @@
 var csrfToken = $('meta[name="csrf-token"]').attr('content');
 
-
-
 $(function () {
     $("#example1").dataTable();
     $("#example2").dataTable({

@@ -49,6 +49,8 @@ class Shop extends Model
 
     public function getAddressByIdshop($id_shop) {
         return self::select(
+            'shop.nama_pt',
+            'shop.nama_pemilik',
             'shop.name',
             'shop.npwp',
             'mm.email',

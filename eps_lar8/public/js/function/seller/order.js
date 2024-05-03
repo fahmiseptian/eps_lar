@@ -309,7 +309,7 @@ $(document).on("click", "#uploadDO", function () {
     Swal.fire({
         title: "Unggah Dokumen",
         html: `
-            <input type="file" id="fileInput" class="swal2-input" accept=".pdf,.doc,.docx" />
+            <input type="file" id="fileInput" class="swal2-input" accept=".pdf,.doc,.docx,.jpg,.png,.jpeg" />
         `,
         showCancelButton: true,
         confirmButtonText: "Unggah",
