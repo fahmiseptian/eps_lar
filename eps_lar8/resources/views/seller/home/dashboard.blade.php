@@ -34,7 +34,7 @@
                                     <b>Pengiriman Diproses</b>
                                 </div>
                                 <div class="item">
-                                    <p style="font-size: 20px">{{$product_habis}}</p>
+                                    <p style="font-size: 20px">{{$product_habis ?? ''}}</p>
                                     <b>Produk Habis</b>
                                 </div>
                             </div>

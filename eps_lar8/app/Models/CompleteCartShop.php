@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -146,4 +147,41 @@ class CompleteCartShop extends Model implements HasMedia
         ->first();
     }
     
+
+    public function filterorder($id_shop, $data) {
+        $orders = DB::table('complete_cart_shop as ccs')
+        ->select(
+            'ccs.id',
+            'cc.invoice',
+            'cc.status_pembayaran_top',
+            'cc.created_date',
+            'm.instansi as member_instansi',
+            'c.city_name as city',
+            'ccs.total',
+            'ccs.qty',
+            'ccs.status',
+        )
+        ->join('complete_cart as cc', 'ccs.id_cart', '=', 'cc.id')
+        ->join('complete_cart_address as cca', 'ccs.id_cart', '=', 'cca.id_cart')
+        ->join('member as m', 'cc.id_user', '=', 'm.id')
+        ->join('member_address as ma', 'm.id', '=', 'ma.member_id')
+        ->join('city as c', 'cca.city_id', '=', 'c.city_id')
+        ->where('ccs.id_shop', '=', $id_shop)
+        ->where('cca.id_billing_address','!=',null)
+        ->where($data)
+        ->groupBy(
+            'ccs.id',
+            'cc.invoice',
+            'cc.status_pembayaran_top',
+            'cc.created_date',
+            'm.instansi',
+            'c.city_name',
+            'ccs.total',
+            'ccs.qty',
+            'ccs.status',
+        )
+        ->get();
+
+        return $orders;
+    }
 }

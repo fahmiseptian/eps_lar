@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Member\HomememberController;
 use App\Http\Controllers\Seller\LoginSellerController;
 use App\Http\Controllers\Seller\HomesellerController;
 use App\Http\Controllers\Seller\DeliveryController;
@@ -30,11 +31,16 @@ use Illuminate\Support\Facades\Artisan;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');});
+// Route::get('/', function () {
+//     return view('welcome');});
     
 // Route::get('/foo', function () {
 //     Artisan::call('storage:link');
+// });
+
+// Route::get('/artisan', function () {
+//     Artisan::call('composer require barryvdh/laravel-dompdf');
+//     return response()->json(['status' => 'success']);
 // });
 
 // login Admin
@@ -46,6 +52,11 @@ Route::get('/admin/logout', [AuthController::class, 'logout'])->name('admin.logo
 Route::get('/seller/login', [LoginSellerController::class, 'showLoginForm'])->name('seller.login');
 Route::post('/seller/login', [LoginSellerController::class, 'login']);
 Route::get('/seller/logout', [LoginSellerController::class, 'logout'])->name('seller.logout');
+
+
+// Routes Milik Member
+Route::get('/', [HomememberController::class, 'index'])->name('');
+Route::get('/product/pl/', [HomememberController::class, 'getDetailproduct'])->name('product');
 
 // Routes Milik Admin
 Route::group(['middleware' => ['admin', 'activity']], function () {
@@ -105,10 +116,6 @@ Route::group(['middleware' => ['admin', 'activity']], function () {
     Route::get('/admin/payment/{id}/status', [PaymentController::class, 'status'])->name('admin.payment.status');
     Route::post('/admin/payment/{id}/edit', [PaymentController::class, 'edit'])->name('admin.payment.edit');
     Route::get('/admin/payment/{id}/delete', [PaymentController::class, 'delete'])->name('admin.payment.delete');
-    Route::get('/admin/bank', [PaymentController::class, 'bank'])->name('admin.bank');
-    Route::post('/admin/bank/add', [PaymentController::class, 'addBank'])->name('admin.bank.add');
-    Route::put('/admin/bank/update/{id}', [PaymentController::class, 'updateBank'])->name('admin.bank.update');
-    Route::delete('/admin/bank/delete/{id}', [PaymentController::class, 'deleteBank'])->name('admin.bank.delete');
 
     // Admin Member
     Route::get('/admin/member', [MemberController::class, 'index'])->name('admin.member.index');

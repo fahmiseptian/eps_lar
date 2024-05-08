@@ -31,7 +31,7 @@ function toggleFilterorder(element) {
         url: appUrl + "/seller/order/filter/" + status_order,
         success: function (data) {
             console.log("berhasil ");
-            window.location.href = "/seller/order/filter/" + status_order;
+            window.location.href = appUrl + "/seller/order/filter/" + status_order;
         },
         error: function (xhr, status, error) {
             console.error("Gagal:", error);
@@ -41,13 +41,13 @@ function toggleFilterorder(element) {
 
 function viewDetail(element) {
     var id_cart_shop = element.getAttribute("data-id-order");
-
+    console.log(appUrl);
     $.ajax({
         type: "GET",
         url: appUrl + "/seller/order/detail/" + id_cart_shop,
         success: function (data) {
             console.log("berhasil");
-            window.location.href = "/seller/order/detail/" + id_cart_shop;
+            window.location.href = appUrl + "/seller/order/detail/" + id_cart_shop;
         },
         error: function (xhr, status, error) {
             console.error("Gagal:", error);

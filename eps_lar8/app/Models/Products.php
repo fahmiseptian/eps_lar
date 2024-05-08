@@ -12,7 +12,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 class Products extends Model implements HasMedia
 {
     use HasFactory, Notifiable, InteractsWithMedia;
-    protected $appends = ['artwork_url_lg'];
+    protected $appends = ['artwork_url_lg','artwork_url_md','artwork_url_sm'];
 
     protected $table = 'products';
     protected $hidden = ['media'];
@@ -63,9 +63,57 @@ class Products extends Model implements HasMedia
 
         foreach ($media as $item) {
             if ($item->disk != 'products') {
+                $artworkUrls[] = $item->getTemporaryUrl(Carbon::now()->addMinutes(intval(1140)), 'lg');
+            } else {
+                $artworkUrls[] = $item->getFullUrl('lg');
+            }
+        }
+
+        // Jika tidak ada media, kembalikan URL default
+        if (empty($artworkUrls)) {
+            if (isset($this->log) && isset($this->log->artwork_url)) {
+                return $this->log->artwork_url;
+            } else {
+                return asset('common/default/profile.png');
+            }
+        }
+
+        return $artworkUrls;
+    }
+    public function getArtworkUrlMdAttribute($value)
+    {
+        $media = $this->getMedia('artwork'); // Mengambil semua media dengan nama koleksi 'artwork'
+        $artworkUrls = [];
+
+        foreach ($media as $item) {
+            if ($item->disk != 'products') {
                 $artworkUrls[] = $item->getTemporaryUrl(Carbon::now()->addMinutes(intval(1140)), 'md');
             } else {
                 $artworkUrls[] = $item->getFullUrl('md');
+            }
+        }
+
+        // Jika tidak ada media, kembalikan URL default
+        if (empty($artworkUrls)) {
+            if (isset($this->log) && isset($this->log->artwork_url)) {
+                return $this->log->artwork_url;
+            } else {
+                return asset('common/default/profile.png');
+            }
+        }
+
+        return $artworkUrls;
+    }
+    public function getArtworkUrlsmAttribute($value)
+    {
+        $media = $this->getMedia('artwork'); // Mengambil semua media dengan nama koleksi 'artwork'
+        $artworkUrls = [];
+
+        foreach ($media as $item) {
+            if ($item->disk != 'products') {
+                $artworkUrls[] = $item->getTemporaryUrl(Carbon::now()->addMinutes(intval(1140)), 'sm');
+            } else {
+                $artworkUrls[] = $item->getFullUrl('sm');
             }
         }
 
@@ -89,5 +137,22 @@ class Products extends Model implements HasMedia
                    ->select('id')
                    ->count();
 	}
+
+    public function getproduct() {
+        return self::select(
+            'products.*',
+            'lp.price_lpse as hargaTayang',
+            's.name as namaToko',
+            'p.province_name'
+        )
+        ->join('lpse_price as lp', 'products.id', '=', 'lp.id_product')
+        ->join('shop as s', 'products.id_shop', '=', 's.id')
+        ->join('member_address as ma', 's.id_address', '=', 'ma.member_address_id')
+        ->join('province as p', 'ma.province_id', '=', 'p.province_id')
+        ->where('products.status_display','Y')
+        ->where('products.status_delete','N')
+        ->where('s.status','active')
+        ->get();
+    }
 
 }

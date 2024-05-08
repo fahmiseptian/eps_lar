@@ -1,0 +1,620 @@
+/* Gaya umum */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+main {
+    max-width: 1000px; /* Batas lebar maksimal konten utama */
+    margin: 0 auto; /* Pusatkan konten utama secara horizontal */
+    padding: 20px; /* Beri jarak di dalam konten utama */
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: grey;
+    color: white;
+}
+
+.navbar .logo img {
+    height: 40px;
+}
+
+.navbar .logo-mobile img{
+    display: none;
+}
+
+/* Banner section */
+.banner-section {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+/* Banner section */
+.banner-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* Banner besar */
+.banner-carousel {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.banner-item {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
+.banner-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Banner kecil */
+.banner-small {
+    display: flex;
+    justify-content: space-between;
+}
+
+.banner-small img {
+    width: 49%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+
+
+
+/* Gaya untuk search bar */
+.search-bar {
+    display: flex; /* Menggunakan flexbox untuk tata letak */
+    width: 75%; /* Lebar search bar */
+    height: 40px; /* Tinggi search bar */
+    padding: 5px; /* Beri jarak di dalam search bar */
+    border-radius: 4px; /* Membulatkan sudut search bar */
+}
+
+.search-bar input {
+    flex: 1;
+    height: 50%;
+    padding: 10px;
+    border: none;
+    border-radius: 4px 0 0 4px; 
+    outline: none;
+    font-size: 16px;
+}
+
+.search-bar button {
+    width: 100px; /* Lebar button */
+    height: 100%;
+    background-color: #00cec9; /* Warna latar belakang button */
+    color: white; /* Warna teks button */
+    border: none; /* Hapus garis batas */
+    border-radius: 0 4px 4px 0; /* Membulatkan sudut kanan */
+    cursor: pointer; /* Ubah cursor saat hover */
+    font-size: 16px; /* Ukuran font button */
+}
+
+
+.account a {
+    margin: 0 10px;
+    color: white;
+    text-decoration: none;
+}
+
+/* Kategori */
+.categories {
+    padding: 20px;
+}
+
+.category-carousel {
+    display: flex;
+    overflow-x: auto; /* Mengaktifkan scroll horizontal */
+    padding: 10px 0;
+}
+
+.category-item {
+    display: flex;
+    flex-direction: column; /* Mengatur elemen sebagai kolom */
+    align-items: center; /* Menyelaraskan item secara horizontal */
+    padding: 10px;
+    width: 100px;
+    margin-right: 10px;
+    background-color: #dfe6e9;
+    border-radius: 4px;
+}
+
+.category-item img {
+    width: 50px;
+    height: 50px; /* Sesuaikan tinggi gambar sesuai kebutuhan */
+    object-fit: cover; /* Menjaga gambar agar sesuai dengan wadah */
+    border-radius: 4px; /* Menambahkan efek tepi melengkung */
+}
+
+.category-item p {
+    margin-top: 5px; /* Memberi jarak antara gambar dan teks */
+}
+
+/* Produk */
+.products {
+    margin-bottom: 20px;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.product-item {
+    flex: 0 0 auto; /* Biarkan item memiliki lebar tetap */
+    padding: 10px;
+    text-align: center;
+    background-color: #f0f0f0; /* Warna latar belakang */
+    border-radius: 4px; /* Membulatkan sudut item */
+    display: none;
+}
+
+.product-link {
+    text-decoration: none; /* Hilangkan garis di bawah link */
+    color: inherit; /* Pertahankan warna teks dari item produk */
+}
+
+/* Gaya gambar produk */
+.product-item img {
+    width: 140px; /* Lebar gambar */
+    height: 140px; /* Tinggi gambar */
+    object-fit: cover; /* Sesuaikan gambar dengan ukuran wadah */
+    border-radius: 4px; /* Membulatkan sudut gambar */
+}
+
+.product-info {
+    display: grid;
+    justify-content: space-between;
+    font-size: 12px;
+    color: gray;
+}
+
+/* Efek hover pada item produk */
+.product-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.load-more-button {
+    margin-top: 20px;
+    padding: 10px;
+    border: none;
+    background-color: #007BFF;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.load-more-button:hover {
+    background-color: #0056b3;
+}
+
+.button-container {
+    text-align: center; /* Memusatkan konten di tengah */
+    margin-top: 20px; /* Jarak dari atas untuk memberi jarak antara produk dan tombol */
+}
+
+.product-info h4{
+    font-size: large;
+}
+
+/* Promos */
+.promos {
+    padding: 20px;
+}
+
+.promo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    overflow-x: auto; 
+    max-height: 160px;
+}
+
+.promo-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+}
+
+.promo-item img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    margin-right: 5px; 
+    margin-left: 10px; 
+}
+
+.promo-item p {
+    margin: 5px; 
+}
+
+/* Flash Sale */
+.flash-sale {
+    display: flex;
+    align-items: center;
+    margin: 10px;
+    justify-content: space-between; 
+    width: 100%;
+    background-color: rgb(155, 145, 145); 
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Flash Sale countdown styling */
+.flash-sale-countdown {
+    display: flex;
+    justify-content: center;
+    font-size: 24px;
+    color: #575656;
+    margin-right: 20px; 
+}
+
+.flash-sale p{
+    margin: 25px;
+}
+
+/* Pencarian Terpopuler */
+.popular-searches {
+    padding: 20px; /* Jarak sekitar bagian */
+}
+
+.searches-grid {
+    gap: 10px; /* Jarak antara item */
+    display: flex;
+    overflow-x: auto; /* Mengaktifkan scroll horizontal */
+    padding: 10px 0;
+    justify-content: center;
+}
+
+.search-item {
+    display: flex; /* Menggunakan flexbox untuk tata letak dalam item */
+    align-items: center; /* Menyelaraskan teks ke tengah */
+    padding: 10px; /* Memberi jarak dalam item */
+    background-color: #dfe6e9; /* Latar belakang abu-abu terang */
+    border-radius: 4px; /* Membulatkan sudut item */
+}
+
+.search-item p {
+    margin: 10px;
+}
+
+
+
+/* CSS untuk footer */
+.footer-content {
+    background-color: #f0f0f0; /* Warna latar belakang footer */
+    padding: 20px 40px; /* Padding di sekitar footer (atas/bawah, kiri/kanan) */
+    display: flex; /* Tata letak flex untuk mengatur kolom */
+    justify-content: space-between; /* Jarak antara kolom */
+    box-sizing: border-box; /* Pastikan padding diukur secara konsisten */
+}
+
+/* Setiap kolom dalam footer */
+.footer-column {
+    width: 23%; /* Lebar kolom */
+    margin-right: 20px; /* Jarak antara kolom */
+}
+
+/* Setiap judul kolom */
+.footer-column h3 {
+    font-size: 16px; /* Ukuran font judul kolom */
+    margin-bottom: 10px; /* Jarak antara judul dan daftar */
+}
+
+/* Daftar dalam kolom */
+.footer-column ul {
+    list-style-type: none; /* Hapus tanda list */
+    padding: 0; /* Hapus padding default */
+}
+
+/* Setiap item dalam daftar */
+.footer-column ul li {
+    display: flex; /* Tata letak flex untuk mengatur gambar dan teks */
+    align-items: center; /* Rata tengah gambar dan teks */
+    margin-bottom: 5px; /* Jarak antar item */
+    color: #666; /* Warna teks abu-abu */
+    font-size: 14px; /* Ukuran font teks */
+}
+
+/* Gambar dalam item daftar */
+.footer-column ul li img {
+    width: 50px; /* Lebar gambar */
+    height: 30px; /* Tinggi gambar */
+}
+
+.detaiProduct{
+    display: flex;
+}
+
+.gambarProduct {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Gambar besar */
+.product-carousel {
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    width: 100%;
+}
+
+.product-image-large {
+    width: 100%;
+    height: auto;
+    max-width: 300px; /* Batasi lebar maksimal gambar besar */
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+/* Gambar kecil */
+.product-small {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    justify-content: center;
+}
+
+.product-image-small {
+    width: 100%;
+    height: auto;
+    max-width: 100px; /* Batasi lebar maksimal gambar kecil */
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.namaProduct h4{
+    margin-bottom: 4px;
+}
+
+/* Style untuk komponen */
+.product-detail {
+    display: grid;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    width: 45%;
+}
+
+.product-info h4 {
+    margin-bottom: 8px;
+}
+
+.rate-product ul {
+    display: flex;
+    gap: 8px;
+    list-style: none;
+}
+
+.discount {
+    display: flex;
+    gap: 8px;
+}
+
+.quantity-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.quantity-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.quantity-btn {
+    padding: 8px;
+    border: none;
+    background-color: #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Gaya untuk tombol aksi */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.action-buttons button {
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+}
+
+.cart-btn, .buy-btn, .nego-btn {
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: white;
+}
+
+.cart-btn {
+    background-color: #4caf50;
+}
+
+.buy-btn {
+    background-color: #2196f3;
+}
+
+.nego-btn {
+    background-color: #ff9800;
+}
+
+
+.discount {
+    display: flex;
+    gap: 8px;
+}
+
+
+/* Mengatur tampilan harga lama agar dicoret */
+.discounted-price {
+    text-decoration: line-through; /* Memberikan efek coret pada teks */
+    color: gray; /* Mengatur warna teks */
+    margin-left: 5px; /* Memberikan jarak antara box diskon dan harga lama */
+}
+
+/* Mengatur tampilan box diskon */
+.box {
+    background-color: #ff0000; /* Warna latar belakang box diskon */
+    color: white; /* Warna teks box diskon */
+    padding: 3px 6px; /* Padding di sekitar teks */
+    border-radius: 4px; /* Membulatkan sudut box diskon */
+    margin-right: 5px; /* Memberikan jarak antara box diskon dan harga lama */
+}
+
+.seller-detail {
+    display: grid;
+    flex-direction: column;
+    padding: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-left: 10px;
+    background-color: #f9f9f9;
+    width: auto;
+    height: 10%;
+}
+.seller-detail img{
+    width: 50px;
+    height: 50px;
+}
+
+/* Gaya untuk container produk lainnya */
+.product-seller {
+    display: flex; /* Menggunakan flexbox untuk tata letak */
+    overflow-x: auto; /* Mengaktifkan scroll horizontal */
+    margin-top: 8px; /* Memberikan jarak antara teks "Produk lainnya" dan gambar produk lain */
+    gap: 8px; /* Memberikan jarak antara gambar produk lain */
+}
+
+/* Gaya untuk gambar produk lain */
+.product-seller img {
+    width: 50px; /* Lebar gambar */
+    height: 50px; /* Tinggi gambar */
+    object-fit: cover; /* Sesuaikan gambar dengan wadah */
+    border-radius: 4px; /* Membulatkan sudut gambar */
+}
+
+/* mobile */
+@media (max-width: 767px) {
+    .navbar .logo img {
+        display: none;
+    }
+    
+    .navbar .logo-mobile img{
+        height: 40px;
+        margin-left: -10px;
+        margin-right: 10px;
+        display: block;
+    }
+
+    /* Atur tinggi banner besar */
+    .banner-carousel {
+        height: 200px;
+    }
+
+    /* Atur tinggi banner kecil */
+    .banner-small img {
+        height: 150px;
+    }
+
+    .search-bar {
+        margin-right: 10px;
+        margin-left: -5px;
+    }
+
+    .search-bar {
+        display: flex; /* Menggunakan flexbox untuk tata letak */
+        width: 45%; /* Lebar search bar */
+        margin-right: 10px;
+        margin-left: -5px;
+        width: 60%;
+    }
+    
+    .search-bar input {
+        width: 100%;
+    }
+
+    .search-bar button {
+        width: 30px; /* Lebar button */
+        height: 100%;
+        background-color: #00cec9; /* Warna latar belakang button */
+        color: white; /* Warna teks button */
+        border: none; /* Hapus garis batas */
+        border-radius: 0 4px 4px 0; /* Membulatkan sudut kanan */
+        cursor: pointer; /* Ubah cursor saat hover */
+        font-size: 16px; /* Ukuran font button */
+    }
+
+    .account a {
+        display: inline;
+    }
+
+    .product-info {
+        flex: 1;
+        margin-right: 20px;
+    }
+
+    .seller-detail {
+        margin-left: 5px;
+    }
+
+    .product-small{
+        display: none;
+    }
+
+    .product-carousel{
+        margin: 5;
+        padding: 0;
+        margin-left: -10px;
+    }
+
+    .productdetail-item img{
+        height: 70px;
+        width: 70px;
+    }
+
+    .product-detail{
+        margin-left: -20px;
+    }
+}
+
