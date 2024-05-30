@@ -4,13 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
-class Courier extends Model
+class JneLog extends Model
 {
-    protected $table = 'courier';
+    protected $table = 'jne_log';
     protected $primaryKey = 'id'; 
+    public $timestamps = false;
+    protected $fillable = ['payload', 'response', 'action'];
 
-
-    
 }

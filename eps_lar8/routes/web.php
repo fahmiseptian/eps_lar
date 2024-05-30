@@ -10,7 +10,11 @@ use App\Http\Controllers\Admin\MenuController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\PaymentController;
+use App\Http\Controllers\Member\CartController;
+use App\Http\Controllers\Member\DashboardmemberController;
 use App\Http\Controllers\Member\HomememberController;
+use App\Http\Controllers\Member\LoginmemberController;
+use App\Http\Controllers\Member\ProfilememberController;
 use App\Http\Controllers\Seller\LoginSellerController;
 use App\Http\Controllers\Seller\HomesellerController;
 use App\Http\Controllers\Seller\DeliveryController;
@@ -53,10 +57,19 @@ Route::get('/seller/login', [LoginSellerController::class, 'showLoginForm'])->na
 Route::post('/seller/login', [LoginSellerController::class, 'login']);
 Route::get('/seller/logout', [LoginSellerController::class, 'logout'])->name('seller.logout');
 
+// Login Member
+Route::get('/login', [LoginmemberController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginmemberController::class, 'authmember'])->name('login');
+Route::post('/login/submitStep2', [LoginmemberController::class, 'submitStep2']);
+Route::get('/logout', [LoginmemberController::class, 'logout'])->name('logout');
+
 
 // Routes Milik Member
-Route::get('/', [HomememberController::class, 'index'])->name('');
-Route::get('/product/pl/', [HomememberController::class, 'getDetailproduct'])->name('product');
+Route::get('/', [HomememberController::class, 'index'])->name('home');
+Route::get('/product/{id}', [HomememberController::class, 'getDetailproduct'])->name('product.show');
+Route::get('/getProductsByEtalase/{etalase_id}', [HomememberController::class, 'getProductsByEtalase']);
+Route::get('/getProductsByIdshop/{id}', [HomememberController::class, 'getProductsByIdshop']);
+Route::get('/toko/detail/{id}', [HomememberController::class, 'ShowSeller'])->name('seller.detail');
 
 // Routes Milik Admin
 Route::group(['middleware' => ['admin', 'activity']], function () {
@@ -182,3 +195,15 @@ Route::group(['middleware' => 'seller'], function () {
     Route::get('/seller/product/get/product/{id}', [ProductController::class, 'addOldProduct']); //ngambil Data Product di table yang lama
 });
 
+
+Route::group(['middleware' => 'member'], function () {
+    Route::get('/cart', [CartController::class, 'index'])->name('cart');
+    Route::get('/profile/{id}', [ProfilememberController::class, 'index'])->name('profile');
+    Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
+
+});
+
+
+Route::get('test/{id}/{id_cs}', [CartController::class, 'getOngkir']);
+Route::get('fetch-products/', [HomememberController::class, 'fetchProducts'])->name('fetch-products');
+Route::get('tester/', [HomememberController::class, 'fetchCompleteCartShop']);

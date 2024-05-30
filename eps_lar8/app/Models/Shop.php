@@ -4,14 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Libraries\Encryption; 
+use App\Libraries\Encryption;
+use Illuminate\Support\Facades\DB;
 
 class Shop extends Model
 {
     use HasFactory;
     protected $table = 'shop';
     public $timestamps = false;
-    protected $visible = ['nama_pt','name','nik_pemilik','npwp','phone','password', 'nama_pemilik'];
+    protected $visible = ['nama_pt','name','nik_pemilik','npwp','phone','password', 'nama_pemilik','avatar'];
     protected $fillable = [
         'status','type','is_top',
     ];
@@ -81,6 +82,19 @@ class Shop extends Model
         ->where('shop.id', $id_shop)
         ->get();
     }
-    
-    
+
+    public function  getShopById($id_shop) {
+        $dataShop = DB::table('shop')
+        ->join('member as m', 'shop.id_user', '=', 'm.id')
+        ->join('member_address as ma', 'm.id', '=', 'ma.member_id')
+        ->join('city as c', 'ma.city_id', '=', 'c.city_id')
+        ->where('shop.id', $id_shop)
+        ->select(
+            'shop.*',
+            'c.city_name'
+            )
+        ->first();
+
+        return $dataShop;
+    }
 }

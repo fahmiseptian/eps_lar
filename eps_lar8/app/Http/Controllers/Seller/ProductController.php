@@ -196,10 +196,10 @@ class ProductController extends Controller
     // Ambil Data Product lama
     public function productAll($id)
     {
-        $idAkhir=$id + 18;
+        $idAkhir=$id + 1999;
 
         // Gambar rusak
-        // id= 631,632,634,
+        // id= 630,631,632,634,
 
 
 
@@ -241,7 +241,7 @@ class ProductController extends Controller
     // memsukan data dari API product lama ke product baru
     public function addOldProduct($id)
     {
-        $idAkhir=$id + 19;
+        $idAkhir=$id + 1999;
 
         // Panggil metode productAll() untuk mendapatkan data produk dalam format JSON
         $jsonResponse = $this->productAll($id);

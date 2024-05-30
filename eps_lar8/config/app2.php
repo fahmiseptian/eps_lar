@@ -52,8 +52,7 @@ return [
     |
     */
 
-    // 'url' => env('APP_URL', 'http://localhost:8000'),
-    'url' => env('APP_URL'),
+    'url' => env('APP_URL', 'https://alphagc.proyek.web.id/v2/'),
 
     'asset_url' => env('ASSET_URL', null),
 
@@ -176,8 +175,6 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
-        Barryvdh\DomPDF\ServiceProvider::class,
-
     ],
 
     /*
@@ -232,7 +229,6 @@ return [
 
         // Libraries
         'Encryption' => App\Libraries\Encryption::class,
-        'PDF' => Barryvdh\DomPDF\Facade::class,
     ],
 
 ];

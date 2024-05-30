@@ -185,7 +185,7 @@
             <div class="product-grid" id="productGrid">
                 @foreach ($products as $product)
                     <div class="product-item">
-                        <a href="#" class="product-link">
+                        <a href="{{ route('product.show', ['id' => $product->id]) }}" class="product-link">
                             <img src="{{ $product->artwork_url_md[0] }}" alt="Produk">
                             <p title="{{ $product->name }}">{{ substr($product->name, 0, 20) }}...</p>
                             <p>Rp {{ number_format($product->hargaTayang, 0, ',', '.') }}</p>
@@ -208,6 +208,7 @@
     @include('member.asset.footer')
 
     <script src="{{ asset('/js/function/member/home.js') }}" type="text/javascript"></script>
+    {{-- <script src="{{ secure_asset('/js/function/member/home.js') }}" type="text/javascript"></script> --}}
 </body>
 
 </html>

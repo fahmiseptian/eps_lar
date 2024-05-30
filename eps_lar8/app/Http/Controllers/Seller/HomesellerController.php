@@ -27,7 +27,7 @@ class HomesellerController extends Controller
 
         $sellerType     = Shop::getTypeById($this->seller);
         $saldoPending   = Saldo::calculatePendingSaldo($this->seller);
-        $p_habis   = Products::getProductByIdShop($this->seller,['stock' => '0']);
+        $p_habis   = Products::countProductByIdShop($this->seller,['stock' => '0']);
         
         // Membuat $this->data
         $this->data['title'] = 'Dashboard';

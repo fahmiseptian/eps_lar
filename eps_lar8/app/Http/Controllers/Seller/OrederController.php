@@ -71,28 +71,30 @@ class OrederController extends Controller
         // return response()->json(['orders' => $orders]);
     }
 
-    public function filterOrder($status_order){
+    public function filterOrder($status_order)
+    {
         $status = $status_order;
         $id_seller = $this->seller;
 
-        if ($status=='done') {
-            $data = [
-                'ccs.status' => 'complete',
-            ];
-            $filterorders = CompleteCartShop::filterorder($id_seller,$data);
-        }elseif($status=='complete'){
+        if ($status == 'done') {
+            $data = ['ccs.status' => 'complete'];
+            $filterorders = CompleteCartShop::filterorder($id_seller, $data);
+        } elseif ($status == 'complete') {
             $data = [
                 'ccs.status' => 'complete',
                 'cc.status_pembayaran_top' => 0,
             ];
-            $filterorders = CompleteCartShop::filterorder($id_seller,$data);
-        }else {
-            $data = [
-                'ccs.status' => $status
-            ];
-            $filterorders = CompleteCartShop::filterorder($id_seller,$data);
+            $filterorders = CompleteCartShop::filterorder($id_seller, $data);
+        } else {
+            $data = ['ccs.status' => $status];
+            $filterorders = CompleteCartShop::filterorder($id_seller, $data);
         }
-        return view('seller.order.index',$this->data,['orders' => $filterorders]);
+
+        if (request()->ajax()) {
+            return response()->json($filterorders);
+        }
+
+        return view('seller.order.index', $this->data, ['orders' => $filterorders]);
     }
 
     public function detailOrder($id_cart_shop){

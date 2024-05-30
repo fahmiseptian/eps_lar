@@ -54,45 +54,32 @@
                                                 <th>Aksi</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody id="order-table-body">
                                             @foreach ($orders as $order)
                                                 <tr>
-                                                    <td><a href="javascript:;"
-                                                            onclick="viewOrderDetail('{{ $order->invoice }}', '{{ $order->created_date }}', '{{ $order->member_instansi }}', '{{ $order->city }}', '{{ $order->total }}', '{{ $order->qty }}')">{{ $order->invoice }}-{{ $order->id }}</a>
-                                                    </td>
-                                                    <td class="detail-full">
-                                                        {{ date('Y-m-d', strtotime($order->created_date)) }}</td>
+                                                    <td><a href="javascript:;" onclick="viewOrderDetail('{{ $order->invoice }}', '{{ $order->created_date }}', '{{ $order->member_instansi }}', '{{ $order->city }}', '{{ $order->total }}', '{{ $order->qty }}')">{{ $order->invoice }}-{{ $order->id }}</a></td>
+                                                    <td class="detail-full">{{ date('Y-m-d', strtotime($order->created_date)) }}</td>
                                                     <td class="detail-full">{{ $order->member_instansi }}</td>
                                                     <td class="detail-full">{{ $order->city }}</td>
-                                                    <td class="detail-full">Rp.
-                                                        {{ str_replace(',', '.', number_format($order->total)) }} </td>
+                                                    <td class="detail-full">Rp. {{ str_replace(',', '.', number_format($order->total)) }}</td>
                                                     <td class="detail-full">{{ $order->qty }}</td>
-
                                                     <td>
                                                         @if ($order->status == 'send_by_seller')
-                                                            <span style="width:100%" class="badge btn-primary">Dalam
-                                                                pengiriman</span>
+                                                            <span style="width:100%" class="badge btn-primary">Dalam pengiriman</span>
                                                         @elseif ($order->status == 'complete')
-                                                            <span style="width:100%" class="badge  btn-warning">Barang
-                                                                Diterima</span>
+                                                            <span style="width:100%" class="badge btn-warning">Barang Diterima</span>
                                                         @elseif ($order->status == 'waiting_accept_order')
-                                                            <span style="width:100%" class="badge  btn-info">Pesanan
-                                                                Baru</span>
+                                                            <span style="width:100%" class="badge btn-info">Pesanan Baru</span>
                                                         @elseif ($order->status == 'complete' && $order->status_pembayaran_top == 1)
-                                                            <span style="width:100%" class="badge  btn-success">Pesanan
-                                                                Selesai</span>
+                                                            <span style="width:100%" class="badge btn-success">Pesanan Selesai</span>
                                                         @elseif ($order->status == 'on_packing_process')
-                                                            <span style="width:100%; background-color:purple;"
-                                                                class="badge">Pesanan Diproses</span>
+                                                            <span style="width:100%; background-color:purple;" class="badge">Pesanan Diproses</span>
                                                         @else
-                                                            <span style="width:100%" class="badge  btn-danger">Pesanan
-                                                                Dibatalkan</span>
+                                                            <span style="width:100%" class="badge btn-danger">Pesanan Dibatalkan</span>
                                                         @endif
                                                     </td>
                                                     <td>
-                                                        <a href="javascript:;" class="fa fa-eye"
-                                                            onclick="viewDetail(this)"
-                                                            data-id-order={{ $order->id }}>Detail</a>
+                                                        <a href="javascript:;" class="fa fa-eye" onclick="viewDetail(this)" data-id-order={{ $order->id }}>Detail</a>
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -108,7 +95,7 @@
                                                 <th>Status</th>
                                                 <th>Aksi</th>
                                             </tr>
-                                        </tfoot>
+                                        </tfoot>                                        
                                     </table>
                                 </div>
                             </div>

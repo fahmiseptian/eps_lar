@@ -184,4 +184,18 @@ class CompleteCartShop extends Model implements HasMedia
 
         return $orders;
     }
+
+
+    function getorderbyIdCart($idcart) {
+        $orders = DB::table('complete_cart_shop as ccs')
+                ->select(
+                    's.nama_pt',
+                    'ccs.id',
+                    'ccs.id_shop'
+                )
+                ->where('id_cart',$idcart)
+                ->join('shop as s','ccs.id_shop', '=','s.id')
+                ->get();
+        return $orders;
+    }
 }
