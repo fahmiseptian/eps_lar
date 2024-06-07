@@ -11,7 +11,4 @@ class Bank extends Model
     protected $table = 'bank';
     protected $primaryKey = 'id';
     public $timestamps = false;
-    function sdas() {
-
-    }
 }
