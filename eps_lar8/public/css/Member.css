@@ -572,10 +572,152 @@ main {
     background-color: #ff9800;
 }
 
+.detail-transaksi{
+    display: flex;
+    justify-content: space-between;
+}
+
+#nomor-inv{
+    text-align: left;
+}
+
+#status-payment{
+    color: red;
+    text-align: right;
+}
+
+.alamat-penerima {
+    border-top: 1px dashed blue; /* Garis putus-putus merah di bagian atas */
+    border-bottom: 1px dashed red; /* Garis putus-putus biru di bagian bawah */
+    padding: 10px; /* Tambahkan padding untuk memberi ruang di sekitar konten */
+}
+
+
+#header-alamat-penerima {
+    color: red;
+    margin-bottom: 10px; /* Tambahkan margin bawah untuk memisahkan header dari detail alamat */
+}
+
+.detail-alamat-penerima {
+    display: grid;
+    grid-template-columns: auto auto; /* Atur grid untuk menampilkan dua item dalam satu baris */
+    gap: 10px; /* Tambahkan jarak antara item */
+}
+
+.item-alamat-penerima {
+    display: flex;
+    flex-direction: column; /* Susun item secara vertikal */
+}
+
 
 .discount {
     display: flex;
     gap: 8px;
+}
+
+.data-transaksi-penjual {
+    display: flex;
+}
+
+.item-transaksi-penjual {
+    flex: 1;
+    padding: 10px;
+}
+
+.row {
+    display: flex;
+    margin-bottom: 5px;
+}
+
+.label, .separator, .value {
+    padding: 5px;
+    margin: 0; /* Menghilangkan margin default */
+}
+
+.label {
+    flex: 2;
+    font-weight: bold;
+}
+
+.pemisah{
+    padding: 0 10px;
+    flex: 0;
+}
+
+.value {
+    flex: 2;
+}
+
+.data-transaksi-penjual {
+    border-bottom: 1px dashed blue; /* Garis putus-putus biru di bagian bawah */
+    padding: 10px; /* Tambahkan padding untuk memberi ruang di sekitar konten */
+}
+
+.detail-product-transaksi {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.toko-info {
+    display: flex;
+    align-items: center;
+}
+
+.toko-info p {
+    margin-right: 10px;
+}
+
+.btn-group {
+    display: flex;
+}
+
+.file-transaksi{
+background-color: #2196f3;
+}
+
+.product-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.product-item {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.product-number,
+.product-image,
+.product-name,
+.product-price,
+.product-quantity,
+.product-total {
+    margin-right: 15px;
+}
+
+.product-number {
+    font-weight: bold;
+}
+
+.product-name {
+    flex-grow: 1;
+}
+
+.product-image img {
+    border-radius: 50%;
+}
+
+/* Menghilangkan garis bawah */
+.separator p, .label p, .value p {
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
 }
 
 

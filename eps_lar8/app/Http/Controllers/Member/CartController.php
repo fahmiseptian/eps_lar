@@ -7,7 +7,10 @@ use App\Libraries\Calculation;
 use App\Models\Cart;
 use App\Models\CartShop;
 use App\Models\CartShopTemporary;
+use App\Models\Invoice;
+use App\Models\Lpse_config;
 use App\Models\Member;
+use App\Models\Payment;
 use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -26,15 +29,20 @@ class CartController extends Controller
     public function index() {
         $id_member=$this->data['id_user'];
         $cart = Cart::where('id_user',$id_member)->select('id','total','qty')->first();
-        $cart->detail = CartShop::getdetailcartByIdcart($cart->id);
 
-        foreach ($cart->detail as $detail ) {
-            $products =CartShopTemporary::getDetailCartByIdShop($detail->id_shop,$cart->id);
-            $detail->products= $products;
+        if ($cart) {
+            $cart->detail = CartShop::getdetailcartByIdcart($cart->id);
+
+            foreach ($cart->detail as $detail ) {
+                $products =CartShopTemporary::getDetailCartByIdShop($detail->id_shop,$cart->id);
+                $detail->products= $products;
+            }
+
+            // return response()->json(["cart"=>$cart]);
+            return view('member.cart.index',$this->data,["cart"=>$cart]);
+        } else{
+            return view('member.cart.empty-cart',$this->data);
         }
-
-        // return response()->json(["cart"=>$cart]);
-        return view('member.cart.index',$this->data,["cart"=>$cart]);
     }
 
     public function updateQuantity(Request $request)
@@ -84,10 +92,10 @@ class CartController extends Controller
     }
 
     function addCart(Request $request){
-        
+
         $id_member=$this->data['id_user'];
-        $id_product = $request->id_product; 
-        $qty = $request->qty; 
+        $id_product = $request->id_product;
+        $qty = $request->qty;
         $id_shop= 0;
 
         $addcart =$this->data['carts']->updateTemporary($id_member,$id_product,$id_shop,$qty) ;
@@ -102,19 +110,53 @@ class CartController extends Controller
 
     function checkout(){
         $carts = new Cart();
-    
-        $id_member=$this->data['id_user'];
+        $cf = Lpse_config::first();
+        $payment = Payment::getpaymentActive();
+        $id_member = $this->data['id_user'];
         $cart = $carts->getCart($id_member);
+        $insert_handling_cost =$carts->insertHandlingCost($id_member);
+
         $this->data['cartAddress']  = $carts->getaddressCart($cart->id_address_user);
         $cart->detail = CartShop::getdetailcartByIdcart($cart->id);
 
+        $total_barang_dengan_PPN = 0;
+        $total_barang_tanpa_PPN = 0;
+        $total_shipping = 0;
+        $total_insurance = 0;
+        $total_ppn_product = 0;
+        $total_ppn_shipping = 0;
+        $total_diskon = 0;
+
         foreach ($cart->detail as $detail ) {
             $pengiriman = $carts->getRates($cart->id,$detail->id_shop);
-            $products =CartShopTemporary::getCartSelectedByIdShop($detail->id_shop,$cart->id);
-            $detail->products= $products;
-            $detail->pengiriman= $pengiriman;
-        }
+            $products = CartShopTemporary::getCartSelectedByIdShop($detail->id_shop,$cart->id);
 
+            // Gabungkan pengiriman dan detail produk ke dalam satu objek
+            $detail->pengiriman = $pengiriman;
+            $detail->products = $products['carts'];
+            $detail->total_barang_dengan_PPN = $products['total_barang_dengan_PPN'];
+            $detail->total_barang_tanpa_PPN = $products['total_barang_tanpa_PPN'];
+
+            // Tambahkan jumlah total barang dengan PPN dan tanpa PPN
+            $total_barang_dengan_PPN += $detail->total_barang_dengan_PPN;
+            $total_barang_tanpa_PPN += $detail->total_barang_tanpa_PPN;
+            $total_shipping += $detail->sum_shipping;
+            $total_insurance += $detail->insurance_nominal;
+            $total_ppn_product += $detail->ppn_price;
+            $total_ppn_shipping += $detail->ppn_shipping;
+            $total_diskon += $detail->discount;
+        }
+        $cart->total_diskon = $total_diskon;
+        $cart->total_barang_dengan_PPN = $total_barang_dengan_PPN;
+        $cart->total_barang_tanpa_PPN = $total_barang_tanpa_PPN;
+        $cart->total_shipping = $total_shipping;
+        $cart->total_insurance = $total_insurance;
+        $cart->total_ppn = $total_ppn_product + $total_ppn_shipping;
+        $cart->ppn = $cf->ppn / 100;
+        $cart->pph = $cf->pph / 100;
+        $cart->payment = $payment;
+
+        // Mengembalikan data cart yang sudah digabung
         // return response()->json(["cart"=>$cart]);
         return view('member.cart.checkout',$this->data,["cart"=>$cart]);
     }
@@ -133,8 +175,9 @@ class CartController extends Controller
 
     function getOngkir($id_shipping,$id) {
         $calculation = new Calculation();
+        $cartShop = new CartShop();
         $priceRecord = DB::table('shipping')->where('id', $id_shipping)->first('price');
-    
+
         // Pastikan bahwa $priceRecord tidak null dan memiliki properti price
         if ($priceRecord && isset($priceRecord->price)) {
             $price = $priceRecord->price;
@@ -146,11 +189,18 @@ class CartController extends Controller
                 'ppn_shipping' => $ongkir_akhir['ppn_ongkir'],
                 'pph_shipping' => $ongkir_akhir['pph_ongkir'],
                 'base_price_shipping' => $ongkir_akhir['base_price'],
+                // 'base_rate' => $ongkir_akhir['base_price'],
             ]);
 
+            $shop = DB::table('cart_shop')->where('id', $id)->first('id_shop');
+            $id_shop =$shop->id_shop;
+            $cart = Cart::getCart($this->data['id_user']);
+            $id_cart = $cart->id;
 
+            $cartShop->refreshCartShop($id_cart, $id_shop);
+            $cartShop->refreshCart($id_cart);
 
-            return response()->json(["ongkir" => $ongkir_akhir]);
+            return response()->json(["ongkir" => $id_cart]);
         } else {
             return response()->json(["error" => "Shipping price not found."], 404);
         }
@@ -169,5 +219,52 @@ class CartController extends Controller
         $is_insurance =  $cart->insurance($id_user,$id_shop,$id_courier,$status,$idcs);
         return response()->json([$is_insurance]);
     }
-    
+
+    function updatePayment(Request $request){
+        $carts = new Cart();
+        $id_member = $this->data['id_user'];
+        $cart = $carts->getCart($id_member);
+        $id_cart = $cart->id;
+        $id_payment = $request->id_payment;
+        $updatecart = $carts->where('id', $id_cart)->update([
+            'id_payment' => $id_payment,
+            'jml_top' => 0
+        ]);
+        if ($updatecart) {
+            $insert_handling_cost =$carts->insertHandlingCost($id_member);
+            $detail = $carts->where('id',$id_cart)->first();
+            return response()->json(['payment' => $detail]);
+        }else {
+            return response()->json(['payment' => 'tidak ditemukan']);
+        }
+    }
+
+    function updateTOP($top){
+        $carts = new Cart();
+        $cart = $carts->getCart($this->data['id_user']);
+        $id_cart = $cart->id;
+        $top = $top;
+        $updatecart = $carts->where('id', $id_cart)->update([
+            'jml_top' => $top
+        ]);
+    }
+
+    function finish_checkout(Request $request){
+        $complete_cart = new Invoice();
+        $id_user = $this->data['id_user'];
+        // $data_user = Member::getDataMember($id_user);
+        $id_cart = $request->id_cart;
+
+        $data 		= array('id_user' => $id_user, 'id' => $id_cart);
+        // $migrate_checkout =$carts->migrate_checkout($data);
+        $migrate_checkout = $complete_cart->migrate_cart_checkout_cond($id_user, $id_cart);
+
+
+        if ($migrate_checkout) {
+            return response()->json(['status' => 'success', 'id_cart' => $id_cart]);
+		} else {
+            return response()->json(['status' => 'failed', 'id_cart' => $id_cart]);
+		}
+    }
+
 }

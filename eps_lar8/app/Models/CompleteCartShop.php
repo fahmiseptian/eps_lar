@@ -20,12 +20,12 @@ class CompleteCartShop extends Model implements HasMedia
     protected $hidden = ['media'];
     public $timestamps = false;
     protected $table = 'complete_cart_shop';
-    protected $primaryKey = 'id'; 
+    protected $primaryKey = 'id';
 
 
     public function getFilePdfUrlAttribute()
         {
-            $pdfMedia = $this->getFirstMedia('file_DO'); // Ganti 'pdfs' dengan nama koleksi Anda
+            $pdfMedia = $this->getFirstMedia('file_DO');
             if (!$pdfMedia) {
                 // Jika tidak ada file PDF, kembalikan URL default atau pesan error
                 return null; // Misalnya, return asset('path/to/default/pdf.png');
@@ -115,7 +115,7 @@ class CompleteCartShop extends Model implements HasMedia
         ->where('complete_cart_shop.id_shop', $shopId)
         ->first();
     }
-    
+
 
     public function getDetailProduct($shopId,$id_cart_shop){
         return self::select(
@@ -146,7 +146,7 @@ class CompleteCartShop extends Model implements HasMedia
         ->where('complete_cart_shop.id_shop', $shopId)
         ->first();
     }
-    
+
 
     public function filterorder($id_shop, $data) {
         $orders = DB::table('complete_cart_shop as ccs')
@@ -190,10 +190,24 @@ class CompleteCartShop extends Model implements HasMedia
         $orders = DB::table('complete_cart_shop as ccs')
                 ->select(
                     's.nama_pt',
+                    's.npwp',
                     'ccs.id',
-                    'ccs.id_shop'
+                    'ccs.id_shop',
+                    'ccs.keperluan',
+                    'ccs.pesan_seller',
+                    'ccs.sum_shipping',
+                    'ccs.insurance_nominal',
+                    'ccs.handling_cost_non_ppn',
+                    'ccs.ppn_price',
+                    'ccs.ppn_shipping',
+                    'ccs.total',
+                    'ccs.discount',
+                    'sh.service',
+                    'sh.deskripsi',
+                    'sh.etd'
                 )
                 ->where('id_cart',$idcart)
+                ->join('shipping as sh','sh.id','ccs.id_shipping')
                 ->join('shop as s','ccs.id_shop', '=','s.id')
                 ->get();
         return $orders;

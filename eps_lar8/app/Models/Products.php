@@ -205,8 +205,8 @@ class Products extends Model implements HasMedia
         ->inRandomOrder() // Urutkan hasil secara acak
         ->take(5) // Ambil 5 data
         ->get();
-    } 
-    
+    }
+
     public function countproductTerjualbyId($id_shop)
     {
         return self::where('id_shop', $id_shop)
@@ -265,33 +265,33 @@ class Products extends Model implements HasMedia
             ->join('product_category as pc', 'products.id_category', '=', 'pc.id')
             ->where('products.id_shop', $id_shop)
             ->where('pc.level', 1)
-            ->distinct() 
+            ->distinct()
             ->get(); // Retrieve the result set
-        
+
         return $categories;
     }
-    
+
     public function GetKategoryProductByIdshoplavel2($id_shop) {
         $categories = DB::table('products')
             ->select('pc.id', 'pc.name')
             ->join('product_category as pc', 'products.id_category', '=', 'pc.id')
             ->where('products.id_shop', $id_shop)
             ->where('pc.level', 2)
-            ->distinct() 
+            ->distinct()
             ->get(); // Retrieve the result set
-        
+
         return $categories;
     }
-    
+
     public function GetKategoryProductByIdshoplavel3($id_shop) {
         $categories = DB::table('products')
             ->select('pc.id', 'pc.name')
             ->join('product_category as pc', 'products.id_category', '=', 'pc.id')
             ->where('products.id_shop', $id_shop)
             ->where('pc.level', 3)
-            ->distinct() 
+            ->distinct()
             ->get(); // Retrieve the result set
-        
+
         return $categories;
     }
 
@@ -316,6 +316,21 @@ class Products extends Model implements HasMedia
 
         return $products;
     }
-    
+
+    function getProductDetail($id_product){
+        $query = self::select(
+            'products.*',
+            'pc.barang_kena_ppn'
+        )
+        ->leftJoin('product_category as pc', 'pc.id', '=', 'products.id_category')
+        ->where('products.id', $id_product)
+        ->first();
+
+        $image = $query->artwork_url_sm['0'];
+        $query->image =$image;
+
+        return $query ;
+    }
+
 
 }

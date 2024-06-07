@@ -40,7 +40,7 @@ class CartShopTemporary extends Model
                 'cst.image as gambar_product',
                 'cst.id as id_cst',
                 'cst.*',
-                'p.stock'
+                'p.stock',
             )
             ->join('shop as s', 'cst.id_shop', '=', 's.id')
             ->join('product as p', 'cst.id_product', '=', 'p.id')
@@ -48,8 +48,30 @@ class CartShopTemporary extends Model
             ->where('cst.id_cart', $id_cart)
             ->where('cst.is_selected', 'Y')
             ->get();
-        return $carts;
+
+        // Hitung jumlah total barang dengan PPN dan tanpa PPN
+        $total_barang_dengan_PPN = 0;
+        $total_barang_tanpa_PPN = 0;
+
+        foreach ($carts as $cart) {
+            if ($cart->val_ppn != 0) {
+                $total_barang_dengan_PPN += $cart->total_non_ppn;
+            } else {
+                $total_barang_tanpa_PPN += $cart->total_non_ppn;
+            }
+        }
+
+        // Tambahkan total barang dengan dan tanpa PPN ke hasil
+        $result = [
+            'carts' => $carts,
+            'total_barang_dengan_PPN' => $total_barang_dengan_PPN,
+            'total_barang_tanpa_PPN' => $total_barang_tanpa_PPN,
+        ];
+
+        return $result;
     }
+
+
 
     public function updateTemporary($id_user, $id_product, $id_shop, $qty = null)
     {
@@ -89,7 +111,7 @@ class CartShopTemporary extends Model
 		}
 
         if (($sum_qty < $p->stock +1) && ($p->id_shop != $id_shop)) {
-            
+
             // cek nego
             $nego = $this->getDataNego($id_user, $id_product, $qty);
             if ($nego && ($nego->n_id_product == $id_product) && ($nego->n_qty == $qty)) {
@@ -180,7 +202,7 @@ class CartShopTemporary extends Model
                 $fee_pg_nominal		= $getLpse->fee_pg_nominal;
                 $tot_fee_perc		= $fee_mp_percent + $fee_pg_percent;
                 $tot_fee_nom		= $fee_mp_nominal + $fee_pg_nominal;
-                
+
                 // $tot_fee             = round($input_price * ($tot_fee_perc/100)) + ($tot_fee_nom + $tot_fee_nom * ($ppn / 100));
                 $harga_dasar_lpse 	= round($lpse_price / (1 + ($ppn / 100)));
                 // $ppn_nom        	= $harga_dasar_lpse * ($ppn / 100);
@@ -196,7 +218,7 @@ class CartShopTemporary extends Model
                     // NOTE jika ada nego
                     $harga_dasar_lpse = 0;
                     $harga_dasar_lpse_satuan = 0;
-    
+
                     if ($qty >= 1) {
                         $harga_dasar_lpse_satuan = round($nego->harga_nego / $nego->qty);
                         $harga_dasar_lpse_exc 	= round($harga_dasar_lpse_satuan / (1 + ($ppn / 100)));
@@ -205,12 +227,12 @@ class CartShopTemporary extends Model
                         $harga_dasar_lpse_satuan = $nego->harga_nego;
                         $harga_dasar_lpse 	= round($nego->harga_nego / (1 + ($ppn / 100)));
                     }
-    
+
                     $input_price 		= $nego->nominal_didapat / $nego->qty;
                     $harga_tayang 		= $nego->base_price;
                     // $ppn_nom 			= $nego->harga_nego - $harga_dasar_lpse;
                     // $pph_nom 			= ($pph / 100) * $harga_dasar_lpse;
-    
+
                     $ppn_nom        	= round($harga_dasar_lpse * ($ppn / 100));
                     $pph_nom        	= round($harga_dasar_lpse * ($pph / 100));
 
@@ -384,7 +406,7 @@ class CartShopTemporary extends Model
 				// $pph_nom 			= ($pph / 100) * $harga_dasar_lpse;
 				$ppn_nom        	= round($harga_dasar_lpse * ($ppn / 100));
 				$pph_nom        	= round($harga_dasar_lpse * ($pph / 100));
-            
+
                 $insertData = [
                     'id_nego' => $nego->id_nego,
                     'input_price' => $input_price,
@@ -398,7 +420,7 @@ class CartShopTemporary extends Model
                     'harga_dasar_lpse' => DB::raw('ROUND(total_non_ppn / qty)'),
                     'total' => $nego->harga_nego
                 ];
-                
+
             }else {
 				// echo "p2-"; exit();
 				if ($flash_price > 0) { //
@@ -453,16 +475,16 @@ class CartShopTemporary extends Model
                     'id_nego' => null
                 ];
             }
-            
+
             $insertData = [
                 'id_cart' => $id_cart,
-                'id_product' => $id_product, 
-                'price'=> $price_non_ppn, 
+                'id_product' => $id_product,
+                'price'=> $price_non_ppn,
                 'qty' => $qty,
                 'nominal_ppn' => DB::raw("$ppn_nom * qty"),
-                'total' => DB::raw("price * qty"), 
+                'total' => DB::raw("price * qty"),
                 'total_non_ppn' => DB::raw("total-nominal_ppn"),
-                'input_price' => $input_price, 
+                'input_price' => $input_price,
                 'harga_dasar_lpse' =>  $harga_dasar_lpse,
                 'nama' => $nama,
                 'image' => $image,
@@ -476,9 +498,9 @@ class CartShopTemporary extends Model
                 'weight' => $weight,
                 'total_weight' => DB::raw("weight * qty"),
                 'id_shop' => $id_shop,
-                
+
             ];
-            
+
             $insert_temporary = DB::table('cart_shop_temporary')->insertGetId($insertData);
             if ($insert_temporary) {
 				return true;
@@ -563,8 +585,8 @@ class CartShopTemporary extends Model
             'discount' => 0, // muncul saat checkout
             'subtotal' => 0, // muncul saat checkout
             'total' => 0, // muncul saat checkout
-            'note' => 0, // muncul saat checkout
-            'note_seller' => 0, // muncul saat checkout
+            // 'note' => 0, // muncul saat checkout
+            // 'note_seller' => 0, // muncul saat checkout
             'no_resi' => 0, // muncul saat checkout
             'is_seller_readed' => 0, // muncul saat checkout
             'pin' => 0, // tidak diketahui
@@ -605,7 +627,7 @@ class CartShopTemporary extends Model
         $getLpse = $this->getlpseConfig();
         $ppn = $getLpse->ppn;
         $pph = $getLpse->pph;
-    
+
         $shop = DB::table('cart_shop')
             ->select(
                 DB::raw('SUM(sum_price) as total'),
@@ -622,7 +644,7 @@ class CartShopTemporary extends Model
             )
             ->where('id_cart', $id_cart)
             ->first();
-    
+
         // NOTE sum_non_ppn = val_ppn = o
         $sum_price = isset($shop->total) ? $shop->total : 0;
         $sum_shipping_non_ppn = isset($shop->total_shipping) ? $shop->total_shipping : 0;
@@ -647,12 +669,12 @@ class CartShopTemporary extends Model
             'val_pph' => $pph,
             // 'handling_cost_non_ppn' => $shop->handling_cost_non_ppn,
         ];
-        
-    
+
+
         $cart = $this->_updateCart($id_cart, $data_cart);
     }
-    
-    private function _updateCart($id_cart, $data_cart) {
+
+    public function _updateCart($id_cart, $data_cart) {
         DB::table('cart')
             ->where('id', $id_cart)
             ->update($data_cart);
@@ -662,10 +684,10 @@ class CartShopTemporary extends Model
             ->update([
                 'total' => DB::raw('sum_price_non_ppn + sum_shipping_non_ppn + total_ppn + handling_cost_non_ppn - sum_discount - discount')
             ]);
-    
+
         return true;
     }
-    
+
 
     public function getProductDetail($id_product)
     {
@@ -783,7 +805,7 @@ class CartShopTemporary extends Model
             return '0';
         }
     }
-    
+
     // GET ID ADDRESS SHOP
     function _getShopAddressId($id_shop) {
         $query = DB::table('shop')
@@ -846,16 +868,16 @@ class CartShopTemporary extends Model
         // $total = DB::raw('sum_price_non_ppn + ppn_price + sum_shipping + ppn_shipping - discount');
         DB::table('cart_shop')->update(['total' => $total]);
     }
-    
+
     public function _updateShop($id_shop, $data_shop) {
         $sum_price = $data_shop['sum_price'];
         $voucher = $this->getCartVoucherById($data_shop['id_coupon'], $sum_price);
         $cf = Lpse_config::first();
         $ppn = $cf->ppn / 100;
         $pph = $cf->pph / 100;
-    
+
         $discount = '0';
-    
+
         if ($voucher) {
             foreach ($voucher as $v) {
                 $type = $v->discount_type;
@@ -872,12 +894,12 @@ class CartShopTemporary extends Model
                 }
             }
         }
-    
+
         $id_coupon = ($sum_price == null || $sum_price == '0') ? null : $data_shop['id_coupon'];
-    
+
         // $total = DB::raw("sum_price_non_ppn + ppn_price + sum_shipping + insurance_nominal + ppn_shipping  + handling_cost_non_ppn - $discount");
         $total = 0; // dihitung saat cekout
-    
+
         $insertData = [
             'subtotal' => 0, // dihitung saat cekout
             'id_coupon' => $id_coupon,
@@ -887,20 +909,20 @@ class CartShopTemporary extends Model
             // 'subtotal' => DB::raw("sum_shipping + insurance_nominal + sum_price_non_ppn + handling_cost_non_ppn"),
             'total' => $total
         ];
-    
+
         DB::table('cart_shop')
             ->where('id', $id_shop)
             ->update($insertData);
-    
+
         $shippingData = DB::table('cart_shop')
             ->select('sum_shipping', 'insurance_nominal')
             ->where('id', $id_shop)
             ->first();
-    
+
         if ($shippingData) {
             $ppn_shipping = round(($shippingData->sum_shipping + $shippingData->insurance_nominal) * $ppn);
             $pph_shipping = round(($shippingData->sum_shipping + $shippingData->insurance_nominal) * $pph);
-    
+
             DB::table('cart_shop')
                 ->where('id', $id_shop)
                 ->update([
@@ -909,7 +931,7 @@ class CartShopTemporary extends Model
                 ]);
         }
     }
-    
+
 
     public function getCartVoucherById($id_coupon, $sum_price) {
         if (empty($sum_price)) {
@@ -920,7 +942,7 @@ class CartShopTemporary extends Model
             ->where('id', $id_coupon)
             ->whereRaw("min_limit_purchase <= $sum_price")
             ->get();
-    
+
         if ($voucher->count() > 0) {
             return $voucher;
         } else {
@@ -953,7 +975,7 @@ class CartShopTemporary extends Model
                 DB::table('nego')
                     ->where('id', $data['id_nego'])
                     ->delete();
-    
+
                 DB::table('product_nego')
                     ->where('id_nego', $data['id_nego'])
                     ->delete();
@@ -1003,25 +1025,25 @@ class CartShopTemporary extends Model
             ->where('sc.id_shop', $id_shop)
             ->limit(1)
             ->first();
-    
+
         $cs = DB::table('cart_shop')
             ->select('id_shipping')
             ->where('id_cart', $id_cart)
             ->where('id_shop', $id_shop)
             ->first();
-    
+
         if ($d->id_subdistrict_dest != 0) {
             $ship = $this->cekShipping($d->courier_id, $d->id_city_origin, $d->id_subdistrict_dest, '1', $id_shop);
             $data = $ship->first();
         } else {
             $data = null;
         }
-    
+
         if ($data != null) {
             $cf = $this->getLpseConfig();
             $ppn = $cf->ppn / 100;
             $pph = $cf->pph / 100;
-    
+
             // Memperbarui nilai di tabel cart_shop
             DB::table('cart_shop')
                 ->where('id_shop', $id_shop)
@@ -1032,7 +1054,7 @@ class CartShopTemporary extends Model
                     'subtotal' => DB::raw('sum_shipping + insurance_nominal + sum_price_non_ppn'),
                     'total' => DB::raw('sum_price_non_ppn + ppn_price + sum_shipping + ppn_shipping - discount')
                 ]);
-    
+
             $this->updateCart($id_cart);
             return $data;
         }
@@ -1046,18 +1068,18 @@ class CartShopTemporary extends Model
             ->where('id_subdistrict_dest', $id_subdistrict_dest)
             ->orderBy('last_updated_dt', 'DESC')
             ->orderBy('price', 'ASC');
-            
+
         if ($limit != null) {
             $query->limit($limit);
         }
-        
+
         $ship = $query->get();
-        
+
         return $ship;
     }
 
     // function getcourierCart($id_cart,$id_shop) {
-    //     $       
+    //     $
     // }
 
 }

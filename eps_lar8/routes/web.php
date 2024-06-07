@@ -37,7 +37,7 @@ use Illuminate\Support\Facades\Artisan;
 
 // Route::get('/', function () {
 //     return view('welcome');});
-    
+
 // Route::get('/foo', function () {
 //     Artisan::call('storage:link');
 // });
@@ -119,10 +119,10 @@ Route::group(['middleware' => ['admin', 'activity']], function () {
     Route::get('/admin/shop/{id}/update-type-up', [ShopController::class, 'updateTypeUp'])->name('admin.shop.update-type-up');
     Route::get('/admin/shop/{id}/update-type-down', [ShopController::class, 'updateTypeDown'])->name('admin.shop.update-type-down');
 
-    //Admin Brand 
+    //Admin Brand
     Route::get('/admin/brand', [BrandController::class, 'index'])->name('admin.brand');
 
-    //Admin Payment 
+    //Admin Payment
     Route::get('/admin/payment', [PaymentController::class, 'payment'])->name('admin.payment');
     Route::post('/admin/payment/add', [PaymentController::class, 'add'])->name('admin.payment.add');
     Route::get('/admin/payment/{id}', [PaymentController::class, 'detail'])->name('admin.payment.detail');
@@ -204,6 +204,6 @@ Route::group(['middleware' => 'member'], function () {
 });
 
 
-Route::get('test/{id}/{id_cs}', [CartController::class, 'getOngkir']);
-Route::get('fetch-products/', [HomememberController::class, 'fetchProducts'])->name('fetch-products');
+Route::get('test/', [HomememberController::class, 'tampil']);
+Route::get('test1/{id}', [CartController::class, 'finish_checkout']);
 Route::get('tester/', [HomememberController::class, 'fetchCompleteCartShop']);

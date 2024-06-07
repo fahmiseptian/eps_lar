@@ -66,12 +66,16 @@
                                     <option value="{{ $ongkir->id }}"
                                         {{ $ongkir->id == $detail->id_shipping ? 'selected' : '' }}>
                                         {{ $ongkir->deskripsi }}-({{ $ongkir->etd }} Hari) Rp.
-                                        {{ number_format($ongkir->price, 0, ',', '.') }}
+                                        {{ number_format($ongkir->sum_shipping, 0, ',', '.') }}
                                     </option>
                                 @endforeach
                             </select>
+                            <?php
+                                $ppn_shipping = $cart->ppn * $detail->sum_shipping;
+                                $total_ongkir = $detail->sum_shipping + $ppn_shipping;
+                            ?>
                             <p id="ongkir-akhir">Rp.
-                                {{ number_format($detail->sum_shipping + $detail->ppn_shipping, 0, ',', '.') }}</p>
+                                {{ number_format($total_ongkir, 0, ',', '.') }}</p>
                         </div>
 
                         <div class="checkout-item" id="asuransi-pengirimans">
@@ -82,8 +86,6 @@
                             @endif
                             <p>Rp. {{ number_format($detail->sum_asuransi, 0, ',', '.') }}</p>
                         </div>
-                        
-                                             
                         {{-- end Product --}}
                         <hr>
                     </div>
@@ -100,16 +102,21 @@
             <div class="pembayaran-checkout">
                 <div class="payment-checkout">
                     <p>Pilihan Pembayaran :</p>
-                    <p><span class="material-icons">radio_button_unchecked</span>KKP</p>
-                    <p><span class="material-icons">radio_button_checked</span>Transfer Bank</p>
+                    @foreach ($cart->payment as $pay )
+                        <p id="paymend_method" data-id_pay="{{$pay->id}}"><span class="material-icons">{{ $pay->id == $cart->id_payment ? 'radio_button_checked' : 'radio_button_unchecked' }}</span>{{$pay->name}}</p>
+                    @endforeach
                 </div>
                 <hr>
-                <div class="payment-checkout">
-                    <p>Pilihan TOP :</p>
-                    <p><span class="material-icons">radio_button_unchecked</span>7 hari</p>
-                    <p><span class="material-icons">radio_button_checked</span>14 hari</p>
-                </div>
-                <hr>
+                @if ($cart->id_payment == 23 || $cart->id_payment == 30)
+                    <div class="payment-checkout">
+                        <p>Pilihan TOP :</p>
+                        <p id="updateTOP" data-top="7"><span class="material-icons">{{ 7 == $cart->jml_top ? 'radio_button_checked' : 'radio_button_unchecked' }}</span>7 hari</p>
+                        <p id="updateTOP" data-top="14"><span class="material-icons">{{ 14 == $cart->jml_top ? 'radio_button_checked' : 'radio_button_unchecked' }}</span>14 hari</p>
+                        <p id="updateTOP" data-top="30"><span class="material-icons">{{ 30 == $cart->jml_top ? 'radio_button_checked' : 'radio_button_unchecked' }}</span>30 hari</p>
+                    </div>
+                    <hr>
+                @endif
+
                 <div class="container">
                     <div class="row">
                         <div class="col-md-5"></div>
@@ -117,34 +124,40 @@
                             <p class="total-pembayaran">Detail Pembayaran</p>
                             <div class="detail-pembayaran">
                                 <p>Subtotal Product tanpa PPN</p>
-                                <p>Rp. 0</p>
+                                <p>Rp. {{ number_format($cart->total_barang_tanpa_PPN, 0, ',', '.') }}</p>
                             </div>
                             <div class="detail-pembayaran">
                                 <p>Subtotal produk sebelum PPN</p>
-                                <p>Rp. 189.000</p>
+                                <p>Rp. {{ number_format($cart->total_barang_dengan_PPN, 0, ',', '.') }}</p>
                             </div>
                             <div class="detail-pembayaran">
                                 <p>Subtotal Ongkos Kirim sebelum PPN</p>
-                                <p>Rp. 0</p>
+                                <p>Rp. {{ number_format($cart->total_shipping, 0, ',', '.') }}</p>
                             </div>
                             <div class="detail-pembayaran">
                                 <p>Subtotal Asuransi Pengiriman sebelum PPN</p>
-                                <p>Rp. 0</p>
+                                <p>Rp. {{ number_format($cart->total_insurance, 0, ',', '.') }}</p>
                             </div>
+                            @if ($cart->id_payment == 30 || $cart->id_payment == 22)
+                            <div class="detail-pembayaran">
+                                <p>Biaya Penanganan sebelum PPN</p>
+                                <p>Rp. {{ number_format($cart->handling_cost_non_ppn, 0, ',', '.') }}</p>
+                            </div>
+                            @endif
                             <div class="detail-pembayaran">
                                 <p>PPN</p>
-                                <p>Rp. 20.790</p>
+                                <p>Rp. {{ number_format($cart->total_ppn, 0, ',', '.') }}</p>
                             </div>
                             <div class="detail-pembayaran">
                                 <p>Total Discount</p>
-                                <p>Rp. 0</p>
+                                <p>Rp. {{ number_format($cart->total_diskon, 0, ',', '.') }}</p>
                             </div>
                             <div class="total-pembayaran">
                                 <p>Total Pembayaran</p>
-                                <p>Rp. 209.790</p>
+                                <p>Rp. {{ number_format($cart->total, 0, ',', '.') }}</p>
                             </div>
                             &nbsp;
-                            <button class="btn" id="request-checkout">Buat Pesanan</button>
+                            <button class="btn" id="request-checkout" data-id_cart="{{$cart->id}}">Buat Pesanan</button>
                         </div>
                     </div>
                 </div>

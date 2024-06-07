@@ -57,7 +57,7 @@ return [
 
         'products' => [
             'driver' => 'local',
-            'root' => storage_path('app/public/products'), 
+            'root' => storage_path('app/public/products'),
             'url' => env('APP_URL').'/storage/products',
             'visibility' => 'public',
         ],
@@ -68,7 +68,14 @@ return [
             'url' => env('APP_URL').'/storage/file_DO', // URL untuk mengakses file
             'visibility' => 'public',
         ],
-        
+
+        'upload_payment' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/payments'), // Sesuaikan dengan lokasi penyimpanan yang Anda inginkan
+            'url' => env('APP_URL').'/storage/payments', // URL untuk mengakses file
+            'visibility' => 'public',
+        ],
+
 
         's3' => [
             'driver' => 's3',
@@ -97,7 +104,14 @@ return [
         'file_DO' => [
             'driver' => 'local',
             'root' => storage_path('app/public/file_DO'),
-            'url' => env('APP_URL').'/storage/file_DO', 
+            'url' => env('APP_URL').'/storage/file_DO',
+            'visibility' => 'public',
+        ],
+
+        'upload_payment' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/payments'), // Sesuaikan dengan lokasi penyimpanan yang Anda inginkan
+            'url' => env('APP_URL').'/storage/payments', // URL untuk mengakses file
             'visibility' => 'public',
         ],
 

@@ -46,7 +46,7 @@ class HomememberController extends Controller
         $produkToko = Products::get5ProductByIdShop($this->data->idToko);
         $gambarProductlain = [];
         $productlain = [];
-        
+
 
         foreach ($produkToko as $produk) {
             // Check if $produk is an object, artwork_url_sm exists, is an array, and is not empty
@@ -152,30 +152,30 @@ class HomememberController extends Controller
         }
 
         $transaksi = Invoice::getOrderByIdmember($this->user_id,$status);
-        
+
         foreach ($transaksi as $trans) {
             $detail = CompleteCartShop::getorderbyIdCart($trans->id_transaksi);
-            
+
             foreach ($detail as $product) {
                 $products = CompleteCartShop::getDetailProduct($product->id_shop,$product->id);
-                $product->products = $products; 
+                $product->products = $products;
             }
-            
-            $trans->detail = $detail; 
+
+            $trans->detail = $detail;
         }
-        
+
         return response()->json(["transaksi" => $transaksi]);
     }
-    
-    
-    
 
 
-    // tester 
+
+
+
+    // tester
     public function tampil()
     {
         $carts = new Cart();
-        $cart = $carts->getOngkir(1005);
+        $cart =$carts->getProductDetail(284);
         return response()->json(["test" =>$cart ]);
     }
 
@@ -183,21 +183,26 @@ class HomememberController extends Controller
     public function fetchProducts()
     {
         $carts = new Cart();
-        $cart =$carts->_sap_get_rates('SS0521','JB1209',1);
+        $cart =$carts->insertHandlingCost(702);
         return response()->json(["test" =>$cart ]);
     }
 
 
-public function fetchCompleteCartShop()
-{
-    // $cart = Cart::getCartDetails($id_cart,$id_shop);
-    $tess = new Calculation;
-    $dataArr = array(
-        'id_courier' => 1,
-        'sum_price' => 82880,
-    );
-    $test = $tess->calcShippingInsuranceCost($dataArr,true);
-    return response()->json($test);
+    public function fetchCompleteCartShop(){
+        $carts = new Calculation();
+        $dataArr = [
+            'fee_nominal' => 3500,
+            'fee_percent' => 0,
+            'ppn' => 11,
 
-}
+            'sum_price' => 935000,
+            'sum_price_ppn_only' => 935000,
+            'sum_shipping' => 15900,
+            // 'total_ppn' => $dcart->total_ppn,
+            // 'total_non_ppn' => $dcart->total_non_ppn,
+        ];
+        $cart = $carts->calc_handling_cost($dataArr);
+        return response()->json(["test" =>$cart ]);
+
+    }
 }

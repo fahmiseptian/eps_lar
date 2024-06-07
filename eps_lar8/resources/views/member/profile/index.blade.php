@@ -35,50 +35,221 @@
             </div>
             <div class="pengaturan-profile">
                 <div class="judul-pengaturan" id="judul-pengaturan">
-                    <div class="list-menu-transaksi">
-                        <ul>
-                            <li class="active">Semua</li>
-                            <li>Butuh Persetujuan</li>
-                            <li>Disetujui</li>
-                            <li>Ditolak</li>
-                            <li>Dikirim</li>
-                        </ul>
+                    <div class="detail-transaksi">
+                        <div id="nomor-inv">
+                            <p>INV-2232323232-222</p>
+                        </div>
+                        <div id="status-payment">
+                            <p>Belum Bayar</p>
+                        </div>
                     </div>
-                </div>
-                <div class="main-pengaturan" id="main-pengaturan">
-                    <div class="list-transaksi">
-                        {{-- Transaksi --}}
-                        <div class="item-transaksi">
-                            <p style="text-align: right; color:red">Pembayaran</p>
-                            {{-- Seller --}}
-                            <p style="font-size: 18px"><b>INV 2310011232</b></p>
-                            <div class="item-product-transaksi">
-                                <div style="display: flex; justify-content: space-between;">
-                                    <p>PT. Elite Proxy Sistem</p>
-                                    <p>Menunggu konfirmasi penjual</p>
-                                </div>
-                                {{-- Product --}}
-                                <div style="display: flex; align-items: center;">
-                                    <p style="margin-right: 10px;">1.</p>
-                                    <img src="http://127.0.0.1:8001/seller_center/upload/product/300-product_0_800-product0WhatsAppImage2024-02-29at154128_.jpeg" style="width:50px; height:50px; margin-right: 10px;" alt="product">
-                                        <p>nama Barang <br> 2 x Rp. 129.870</p>
-                                    <p style="margin-left: auto; text-align: right;"><b>Total </b> <br> Rp254.000</p>
-                                </div>
-                                {{-- end Product --}}
+                    {{-- alamat --}}
+                    <div class="alamat-penerima">
+                        <div id="header-alamat-penerima">
+                            <p><span class="material-icons">location_on</span> Alamat Pengiriman</p>
+                        </div>
+                        <div class="detail-alamat-penerima">
+                            <div class="item-alamat-penerima">
+                                <p>Instansi</p>
+                                <p>Test &nbsp;| 0927218282</p>
                             </div>
-                            {{-- end Seller --}}
-                            <div style="display: flex; justify-content: space-between;">
-                                <div>
-                                    <p>Total Pesanan</p>
-                                    <p>Pesanan dibuat <br> 2024-05-15</p>
+                            <div class="item-alamat-penerima">
+                                <p>Nama</p>
+                                <p>alamat</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="data-transaksi-penjual">
+                        <div class="item-transaksi-penjual">
+                            <div class="row">
+                                <div class="label"><b>Penjual</b></div>
+                                <div class="pemisah">:</div>
+                                <div class="value">Toko</div>
+                            </div>
+                            <div class="row">
+                                <div class="label"><b>NPWP</b></div>
+                                <div class="pemisah">:</div>
+                                <div class="value">Toko</div>
+                            </div>
+                            <div class="row">
+                                <div class="label"><b>Tanggal Dibuat</b></div>
+                                <div class="pemisah">:</div>
+                                <div class="value">Toko</div>
+                            </div>
+                            <div class="row">
+                                <div class="label"><b>Pemohon</b></div>
+                                <div class="pemisah">:</div>
+                                <div class="value">Toko</div>
+                            </div>
+                            <div class="row">
+                                <div class="label"><b>Departemen</b></div>
+                                <div class="pemisah">:</div>
+                                <div class="value">Toko</div>
+                            </div>
+                            <div class="row">
+                                <div class="label"><b>Tipe Pembayaran</b></div>
+                                <div class="pemisah">:</div>
+                                <div class="value">Toko</div>
+                            </div>
+                            <div class="row">
+                                <div class="label"><b>TOP</b></div>
+                                <div class="pemisah">:</div>
+                                <div class="value">Toko</div>
+                            </div>
+                        </div>
+                        <div class="item-transaksi-penjual">
+                            <div class="row">
+                                <div class="label"><b>Untuk Keperluan</b></div>
+                                <div class="pemisah">:</div>
+                                <div class="value">Toko</div>
+                            </div>
+                            <div class="row">
+                                <div class="label"><b>Alamat Pengiriman</b></div>
+                                <div class="pemisah">:</div>
+                                <div class="value">Toko</div>
+                            </div>
+                            <div class="row">
+                                <div class="label"><b>Alamat Penagihan</b></div>
+                                <div class="pemisah">:</div>
+                                <div class="value">Toko</div>
+                            </div>
+                            <div class="row">
+                                <div class="label"><b>Penerima</b></div>
+                                <div class="pemisah">:</div>
+                                <div class="value">Toko</div>
+                            </div>
+                            <div class="row">
+                                <div class="label"><b>No Telpon Penerima</b></div>
+                                <div class="pemisah">:</div>
+                                <div class="value">Toko</div>
+                            </div>
+                            <div class="row">
+                                <div class="label"><b>Pesan ke Penjual</b></div>
+                                <div class="pemisah">:</div>
+                                <div class="value">Toko</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-5"></div>
+                            <div class="col-md-7">
+                                <div class="detail-pembayaran">
+                                    <p>Subtotal Product tanpa PPN</p>
+                                    <p>Rp. {{ number_format(10000, 0, ',', '.') }}</p>
                                 </div>
-                                <div>
-                                    <p style="text-align: right">Total Harga <b>Rp.300.000</b></p>
-                                    <p><button class="btn btn-primary" style="width:100%">Detail</button></p>
+                                <div class="detail-pembayaran">
+                                    <p>Subtotal produk sebelum PPN</p>
+                                    <p>Rp. {{ number_format(10000, 0, ',', '.') }}</p>
+                                </div>
+                                <div class="detail-pembayaran">
+                                    <p>Subtotal Ongkos Kirim sebelum PPN</p>
+                                    <p>Rp. {{ number_format(10000, 0, ',', '.') }}</p>
+                                </div>
+                                <div class="detail-pembayaran">
+                                    <p>Subtotal Asuransi Pengiriman sebelum PPN</p>
+                                    <p>Rp. {{ number_format(10000, 0, ',', '.') }}</p>
+                                </div>
+                                <div class="detail-pembayaran">
+                                    <p>Biaya Penanganan sebelum PPN</p>
+                                    <p>Rp. {{ number_format(10000, 0, ',', '.') }}</p>
+                                </div>
+                                <div class="detail-pembayaran">
+                                    <p>PPN</p>
+                                    <p>Rp. {{ number_format(10000, 0, ',', '.') }}</p>
+                                </div>
+                                <div class="total-pembayaran">
+                                    <p>Grand Total</p>
+                                    <p>Rp. {{ number_format(10000, 0, ',', '.') }}</p>
+                                </div>
+                                &nbsp;
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-product-transaksi">
+                        <div class="toko-info">
+                            <p>Nama Toko</p>
+                        </div>
+                        <div class="btn-group">
+                            <p class="btn"><span class="material-icons">content_copy</span>Lacak Pesanan</p>
+                            <p class="btn"><span class="material-icons">content_copy</span>Kwitansi</p>
+                            <p class="btn"><span class="material-icons">content_copy</span>Invoice</p>
+                            <p class="btn"><span class="material-icons">content_copy</span>Kontrak</p>
+                        </div>
+                    </div>
+                    <div class="product-transaksi">
+                        <div class="product-list">
+                            <div class="product-item">
+                                <div class="product-number">1.</div>
+                                <div class="product-image">
+                                    <img src="#gambar" alt="product" width="50" height="50">
+                                </div>
+                                <div class="product-name">Nama Barang</div>
+                                <div class="product-price">Rp 80.000</div>
+                                <div class="product-quantity">1</div>
+                                <div class="product-total">Rp 80.000</div>
+                            </div>
+                            <!-- Tambahkan item produk lainnya dengan pola yang sama -->
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+
+
+                <div class="main-pengaturan" id="main-pengaturan">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-5">
+                                <p>Metode Pembayaran : <b>Transfer Bank</b> <br> <b> Bank BNI </b> <br> <br> No Rekening <b>03975-60583</b> a/n <br> <b>PT. Elite Proxy Sistem</b> </p>
+                            </div>
+                            <div class="col-md-7">
+                                <div class="detail-pembayaran">
+                                    <p>Subtotal Product tanpa PPN</p>
+                                    <p>Rp. {{ number_format(10000, 0, ',', '.') }}</p>
+                                </div>
+                                <div class="detail-pembayaran">
+                                    <p>Subtotal produk sebelum PPN</p>
+                                    <p>Rp. {{ number_format(10000, 0, ',', '.') }}</p>
+                                </div>
+                                <div class="detail-pembayaran">
+                                    <p>Subtotal Ongkos Kirim sebelum PPN</p>
+                                    <p>Rp. {{ number_format(10000, 0, ',', '.') }}</p>
+                                </div>
+                                <div class="detail-pembayaran">
+                                    <p>Subtotal Asuransi Pengiriman sebelum PPN</p>
+                                    <p>Rp. {{ number_format(10000, 0, ',', '.') }}</p>
+                                </div>
+                                <div class="detail-pembayaran">
+                                    <p>Biaya Penanganan sebelum PPN</p>
+                                    <p>Rp. {{ number_format(10000, 0, ',', '.') }}</p>
+                                </div>
+                                <div class="detail-pembayaran">
+                                    <p>PPN</p>
+                                    <p>Rp. {{ number_format(10000, 0, ',', '.') }}</p>
+                                </div>
+                                <div class="total-pembayaran">
+                                    <p>Total</p>
+                                    <p>Rp. {{ number_format(10000, 0, ',', '.') }}</p>
+                                </div>
+                                &nbsp;
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-5">
+                                </div>
+                                <div class="col-md-7">
+                                    <p class="btn btn-primary">Kembali</p>
+                                    <p class="btn btn-success">Upload Pembayaran</p>
                                 </div>
                             </div>
                         </div>
-                        {{-- end Transaksi --}}
                     </div>
                 </div>
             </div>

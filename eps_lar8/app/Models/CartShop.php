@@ -22,24 +22,35 @@ class CartShop extends Model
 
     function getdetailcartByIdcart($id_cart){
         $detailCart = DB::table('cart_shop as cs')
-                    ->select(
-                        'cs.id as id_cs',
-                        'cs.id_shop',
-                        'cs.id_shipping',
-                        'cs.sum_shipping',
-                        'cs.ppn_shipping',
-                        'cs.is_insurance',
-                        'cs.insurance_nominal',
-                        'cs.base_price_asuransi',
-                        'cs.sum_asuransi',
-                        's.nama_pt as nama_seller',
-                        'shipping.id_courier'
-                    )
-                    ->join('shop as s','cs.id_shop','=','s.id')
-                    ->join('shipping','cs.id_shipping', 'shipping.id')
-                    ->where('cs.id_cart',$id_cart)
-                    ->get();
+            ->select(
+                'cs.id as id_cs',
+                'cs.id_shop',
+                'cs.id_shipping',
+                'cs.sum_shipping',
+                'cs.ppn_shipping',
+                'cs.is_insurance',
+                'cs.insurance_nominal',
+                'cs.base_price_asuransi',
+                'cs.sum_asuransi',
+                'cs.ppn_price',
+                'cs.total',
+                'cs.discount',
+                's.nama_pt as nama_seller',
+                'shipping.id_courier',
+            )
+            ->join('shop as s', 'cs.id_shop', '=', 's.id')
+            ->leftJoin('shipping', 'cs.id_shipping', '=', 'shipping.id')
+            ->where('cs.id_cart', $id_cart)
+            ->get();
+
+        foreach ($detailCart as $detail) {
+            if ($detail->id_shipping == '0' || $detail->id_shipping === null) {
+                $detail->id_courier = '0';
+            }
+        }
+
         return $detailCart;
+
     }
 
     public function insurance($id_user, $id_shop, $id_courier, $status, $idcs)
@@ -126,7 +137,7 @@ class CartShop extends Model
         $cf 	= Lpse_config::first();
         $ppn = $cf->ppn / 100;
         $pph = $cf->pph / 100;
-    
+
         $shop = DB::table('cart_shop')
             ->select(
                 DB::raw('SUM(sum_price) as total'),
@@ -143,7 +154,7 @@ class CartShop extends Model
             )
             ->where('id_cart', $id_cart)
             ->first();
-    
+
         $data_cart = [
             'sum_price' => $shop->total,
             'sum_price_ppn_only' => $shop->sum_price_product_ppn_only,
@@ -155,14 +166,14 @@ class CartShop extends Model
             'total_non_ppn' => $shop->total_non_ppn + $shop->total_shipping,
             'total_ppn' => $shop->total_ppn + $shop->total_ppn_shipping,
             'total_pph' => $shop->total_pph,
-            'val_ppn' => $ppn,
-            'val_pph' => $pph,
+            'val_ppn' => ($ppn*100),
+            'val_pph' => ($pph*100),
             'handling_cost_non_ppn' => $shop->handling_cost_non_ppn,
         ];
-    
+
         $this->_refreshCart($id_cart, $data_cart);
     }
-    
+
     private function _refreshCart($id_cart, $data_cart) {
         $update_data = [
             'sum_price' => $data_cart['sum_price'],
@@ -179,17 +190,17 @@ class CartShop extends Model
             'val_pph' => $data_cart['val_pph'],
             'handling_cost_non_ppn' => $data_cart['handling_cost_non_ppn'],
         ];
-    
+
         DB::table('cart')
             ->where('id', $id_cart)
             ->update($update_data);
-    
+
         DB::table('cart')
             ->where('id', $id_cart)
             ->update([
                 'total' => DB::raw('sum_price_non_ppn + sum_shipping_non_ppn + total_ppn + handling_cost_non_ppn - sum_discount - discount')
             ]);
-    
+
         return true;
     }
 
@@ -199,7 +210,7 @@ class CartShop extends Model
         $pph = $cf->pph / 100;
 
         $id_address_shop = $this->CartShopTemporary->_getShopAddressId($id_shop);
-    
+
         $shop = DB::table('cart_shop')
             ->select(
                 'id',
@@ -214,9 +225,9 @@ class CartShop extends Model
             ->where('id_cart', $id_cart)
             ->where('id_shop', $id_shop)
             ->first();
-    
+
         $id_shipping = $shop->id_shipping ?? 0;
-    
+
         $data = DB::table('cart_shop_temporary')
             ->select(
                 DB::raw('SUM(total) as sum_price'),
@@ -231,21 +242,21 @@ class CartShop extends Model
             ->where('id_shop', $id_shop)
             ->where('is_selected', 'Y')
             ->first();
-    
+
         $data_shipping = DB::table('shipping')
             ->select('price')
             ->where('id', $id_shipping)
             ->first();
-    
+
         if ($data->total_weight == 0) {
             $data->total_weight = ($data->sum_qty * $this->config_default_weight);
         }
-    
+
         $handling_cost_exlude_ppn = $shop->handling_cost_non_ppn ?? 0;
-    
+
         $ppn_price = round($data->sum_ppn);
         $pph_price = round($data->sum_pph);
-    
+
         if ($handling_cost_exlude_ppn > 0) {
             $ppn_price = round(($data->sum_price_ppn + $handling_cost_exlude_ppn) * $ppn);
             $pph_price = round(($data->sum_price_non_ppn + $handling_cost_exlude_ppn) * $pph);
@@ -253,21 +264,21 @@ class CartShop extends Model
             $ppn_price = round(($data->sum_price_ppn) * $ppn);
             $pph_price = round(($data->sum_price_non_ppn) * $pph);
         }
-    
+
         $base_price_shipping = $data_shipping->price ?? 0;
         $total_weight = $data->total_weight;
-    
+
         $dataArr_ship = [
             'total_weight' => $total_weight,
             'base_price' => $base_price_shipping,
         ];
-    
+
         $base_price_shipping_ = ceil($total_weight / 1000) * $base_price_shipping;
-    
+
         $result_calc_shipping = $this->CartShopTemporary->calc_shipping_cost($dataArr_ship);
-    
+
         $sum_shipping = $result_calc_shipping['price'] ?? 0;
-    
+
         $data_shop = [
             'id_address_shop' => $id_address_shop,
             'total_weight' => $data->total_weight,
@@ -280,19 +291,21 @@ class CartShop extends Model
             'pph_price' => $pph_price,
             'qty' => $data->sum_qty,
             'insurance_nominal' => $shop->insurance_nominal,
+            'handling_cost_non_ppn' => $handling_cost_exlude_ppn,
+            // 'handling_cost' => $shop->handling_cost,
         ];
-    
+
         if (!$shop) {
             $data_shop['id_cart'] = $id_cart;
             $data_shop['id_shop'] = $id_shop;
-    
+
             $shop = $this->CartShopTemporary->_insertShop($data_shop);
         } else {
             $data_shop['id_coupon'] = $shop->id_coupon;
-    
+
             $shop = $this->_refreshCartShop($shop->id, $data_shop);
         }
-        return true;
+        return TRUE;
     }
 
     public function _refreshCartShop($id_shop, $data_shop) {
@@ -301,7 +314,7 @@ class CartShop extends Model
         $cf 	= Lpse_config::first();
 		$ppn 	= $cf->ppn / 100;
 		$pph 	= $cf->pph / 100;
-    
+
         if ($voucher) {
             foreach ($voucher as $v) {
                 $type = $v->discount_type;
@@ -320,11 +333,11 @@ class CartShop extends Model
         } else {
             $discount = '0';
         }
-    
+
         if ($sum_price == null || $sum_price == '0') {
             $data_shop['id_coupon'] = null;
         }
-    
+
         DB::table('cart_shop')
             ->where('id', $id_shop)
             ->update([
@@ -334,32 +347,33 @@ class CartShop extends Model
                 'sum_shipping' => $data_shop['sum_shipping'],
                 'insurance_nominal' => $data_shop['insurance_nominal'],
                 // 'handling_cost' => $data_shop['handling_cost'],
-                // 'handling_cost_non_ppn' => $data_shop['handling_cost_non_ppn'],
+                'handling_cost_non_ppn' => $data_shop['handling_cost_non_ppn'],
                 'ppn_shipping' => DB::raw('ROUND((sum_shipping + insurance_nominal) * ' . $ppn . ')'),
                 'pph_shipping' => DB::raw('ROUND((sum_shipping + insurance_nominal) * ' . $pph . ')'),
                 'subtotal' => DB::raw('sum_shipping + insurance_nominal + sum_price_non_ppn + handling_cost_non_ppn'),
-                'total' => DB::raw('sum_price_non_ppn + ppn_price + sum_shipping + insurance_nominal + ppn_shipping  + handling_cost_non_ppn - discount')
+                // 'total' => DB::raw('sum_price_non_ppn + ppn_price + sum_shipping + insurance_nominal + ppn_shipping  + handling_cost_non_ppn - discount')
             ]);
-    
+
         // Manual update ppn & pph shipping
         $data_shop = DB::table('cart_shop')
             ->select('sum_shipping', 'insurance_nominal')
             ->where('id', $id_shop)
             ->first();
-    
+
         if ($data_shop) {
             $ppn_shipping = round(($data_shop->sum_shipping + $data_shop->insurance_nominal) * $ppn);
             $pph_shipping = round(($data_shop->sum_shipping + $data_shop->insurance_nominal) * $pph);
-    
+
             DB::table('cart_shop')
                 ->where('id', $id_shop)
                 ->update([
                     'ppn_shipping' => $ppn_shipping,
-                    'pph_shipping' => $pph_shipping
+                    'pph_shipping' => $pph_shipping,
+                    'total' => DB::raw('sum_price_non_ppn + ppn_price + sum_shipping + insurance_nominal + ppn_shipping  + handling_cost_non_ppn - discount')
                 ]);
         }
     }
-    
-    
-    
+
+
+
 }

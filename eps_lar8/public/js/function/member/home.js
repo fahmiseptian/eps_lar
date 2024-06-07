@@ -456,9 +456,276 @@ function generateDataHTML(dataArray) {
     html += "</div>";
     return html;
 }
+
 function generateviewtransaksiheader() {
     var html =
         '<div class="list-menu-transaksi"><ul><li class="active" id="item-transaksi" data-kondisi="semua">Semua</li><li  id="item-transaksi" data-kondisi="persetujuan">Butuh Persetujuan</li><li id="item-transaksi" data-kondisi="disetujui">Disetujui</li><li id="item-transaksi" data-kondisi="ditolak">Ditolak</li><li id="item-transaksi" data-kondisi="dikirim">Dikirim</li></ul></div>';
+    return html;
+}
+
+
+function generateDataDetailorderHeader(data) {
+    var html = '<div class="detail-transaksi">';
+    data.detail.forEach(function (item) {
+        html +=
+            '<div id="nomor-inv">' +
+                '<b>' + data.invoice + '-' + item.id + '</b>' +
+            '</div>' +
+            '<div id="status-payment">' +
+                '<p>' + data.status + '</p>' +
+            '</div>' +
+        '</div>' +
+        '<div class="alamat-penerima">' +
+            '<div id="header-alamat-penerima">' +
+                '<p><span class="material-icons">location_on</span> Alamat Pengiriman</p>' +
+            '</div>' +
+            '<div class="detail-alamat-penerima">' +
+                '<div class="item-alamat-penerima">' +
+                    '<b>' + (data.buyyer.instansi ? data.buyyer.instansi : 'No Department') + '</b>' +
+                    '<b>' + data.buyyer.nama_penerima + '&nbsp;| ' + data.buyyer.phone_penerima + '</b>' +
+                '</div>' +
+                '<div class="item-alamat-penerima">' +
+                    '<b>' + data.buyyer.nama + '</b>' +
+                    '<p>' +
+                        data.buyyer.alamat_penerima + '<br>' +
+                        data.buyyer.district_penerima + ', ' + data.buyyer.kota_penerima + '<br>' +
+                        data.buyyer.provinsi_penerima + ', ID ' + data.buyyer.kode_pos_penerima +
+                    '</p>' +
+                '</div>' +
+            '</div>' +
+        '</div>' +
+        '<div class="data-transaksi-penjual">' +
+            '<div class="item-transaksi-penjual">' +
+                '<div class="row">' +
+                    '<div class="label"><b>Penjual</b></div>' +
+                    '<div class="pemisah">:</div>' +
+                    '<div class="value">' + item.nama_pt + '</div>' +
+                '</div>' +
+                '<div class="row">' +
+                    '<div class="label"><b>NPWP</b></div>' +
+                    '<div class="pemisah">:</div>' +
+                    '<div class="value">' + item.npwp + '</div>' +
+                '</div>' +
+                '<div class="row">' +
+                    '<div class="label"><b>Tanggal Dibuat</b></div>' +
+                    '<div class="pemisah">:</div>' +
+                    '<div class="value">' + data.created_date + '</div>' +
+                '</div>' +
+                '<div class="row">' +
+                    '<div class="label"><b>Pemohon</b></div>' +
+                    '<div class="pemisah">:</div>' +
+                    '<div class="value">' + data.buyyer.nama + '</div>' +
+                '</div>' +
+                '<div class="row">' +
+                    '<div class="label"><b>Departemen</b></div>' +
+                    '<div class="pemisah">:</div>' +
+                    '<div class="value">' + (data.buyyer.instansi ? data.buyyer.instansi : 'No Department') + '</div>' +
+                '</div>' +
+                '<div class="row">' +
+                    '<div class="label"><b>Tipe Pembayaran</b></div>' +
+                    '<div class="pemisah">:</div>' +
+                    '<div class="value">' + data.pembayaran + '</div>' +
+                '</div>' +
+                '<div class="row">' +
+                    '<div class="label"><b>TOP</b></div>' +
+                    '<div class="pemisah">:</div>' +
+                    '<div class="value">' + data.jml_top + '</div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="item-transaksi-penjual">' +
+                '<div class="row">' +
+                    '<div class="label"><b>Untuk Keperluan</b></div>' +
+                    '<div class="pemisah">:</div>' +
+                    '<div class="value">' + (item.keperluan ? item.keperluan : '') + '</div>' +
+                '</div>' +
+                '<div class="row">' +
+                    '<div class="label"><b>Alamat Pengiriman</b></div>' +
+                    '<div class="pemisah">:</div>' +
+                    '<div class="value">' + data.buyyer.alamat_penerima + '<br>' +
+                    data.buyyer.district_penerima + ', ' + data.buyyer.kota_penerima + '<br>' +
+                    data.buyyer.provinsi_penerima + ', ID ' + data.buyyer.kode_pos_penerima + '</div>' +
+                '</div>' +
+                '<div class="row">' +
+                    '<div class="label"><b>Alamat Penagihan</b></div>' +
+                    '<div class="pemisah">:</div>' +
+                    '<div class="value">' + data.buyyer.address_biller + '<br>' +
+                    data.buyyer.district_biller + ', ' + data.buyyer.kota_biller + '<br>' +
+                    data.buyyer.provinsi_biller + ', ID ' + data.buyyer.kode_pos_biller + '</div>' +
+                '</div>' +
+                '<div class="row">' +
+                    '<div class="label"><b>Penerima</b></div>' +
+                    '<div class="pemisah">:</div>' +
+                    '<div class="value">' + data.buyyer.nama_penerima + '</div>' +
+                '</div>' +
+                '<div class="row">' +
+                    '<div class="label"><b>No Telpon Penerima</b></div>' +
+                    '<div class="pemisah">:</div>' +
+                    '<div class="value">' + data.buyyer.phone_penerima + '</div>' +
+                '</div>' +
+                '<div class="row">' +
+                    '<div class="label"><b>Pesan ke Penjual</b></div>' +
+                    '<div class="pemisah">:</div>' +
+                    '<div class="value">' + (item.pesan_seller ? item.pesan_seller : '') + '</div>' +
+                '</div>' +
+            '</div>' +
+        '</div>'
+        '<br>';
+        html +=
+        '<div class="detail-product-transaksi">' +
+            '<div class="toko-info">' +
+                '<p>' + item.nama_pt + '</p>' +
+            '</div>' +
+            '<div class="btn-group">' +
+                '<p class="btn"><span class="material-icons">content_copy</span>Lacak Pesanan</p>' +
+                '<p class="btn"><span class="material-icons">content_copy</span>Kwitansi</p>' +
+                '<p class="btn"><span class="material-icons">content_copy</span>Invoice</p>' +
+                '<p class="btn"><span class="material-icons">content_copy</span>Kontrak</p>' +
+            '</div>' +
+        '</div>'+
+        '<div class="product-transaksi">' +
+            '<div class="product-list">' ;
+        item.products.forEach(function (product) {
+            html +=
+                '<div class="product-item">' +
+                    // '<div class="product-number">' + (index + 1) + '.</div>' +
+                    '<div class="">' +
+                        '<img src="' + product.image + '" alt="product" width="50px" height="50px">' +
+                    '</div>' +
+                    '<div class="product-name">' + product.nama + '</div>' +
+                    '<div class="product-price">' + formatRupiah(product.price) + '</div>' +
+                    '<div class="product-quantity">' + product.qty + '</div>' +
+                    '<div class="product-total">' + formatRupiah(product.total) + '</div>'+
+                '</div>';
+                });
+
+                html +=
+                '<div class="product-item">' +
+                    // '<div class="product-number">' + (index + 1) + '.</div>' +
+                    '<div class="product-image">' +
+                        '<img src="" alt="product" width="50px" height="50">' +
+                    '</div>' +
+                    '<div class="product-name"> Ongkos Kirim' + item.deskripsi +'-'+ item.service + '('+ item.etd + ' Hari)' + '</div>' +
+                    '<div class="product-price">' + formatRupiah(item.total_shipping) + '</div>' +
+                    '<div class="product-quantity">1</div>' +
+                    '<div class="product-total">' + formatRupiah(item.total_shipping) + '</div>'+
+                '</div>';
+
+            html += '</div>' +
+        '</div>'+
+        '<div class="container">' +
+                            '<div class="row">' +
+                                '<div class="col-md-5"></div>' +
+                                '<div class="col-md-7">' +
+                                    '<div class="detail-pembayaran">' +
+                                        '<p>Subtotal Product tanpa PPN</p>' +
+                                        '<p>' + formatRupiah(item.total_barang_tanpa_PPN) + '</p>' +
+                                    '</div>' +
+                                    '<div class="detail-pembayaran">' +
+                                        '<p>Subtotal produk sebelum PPN</p>' +
+                                        '<p>' + formatRupiah(item.total_barang_dengan_PPN) + '</p>' +
+                                    '</div>' +
+                                    '<div class="detail-pembayaran">' +
+                                        '<p>Subtotal Ongkos Kirim sebelum PPN</p>' +
+                                        '<p>' + formatRupiah(item.sum_shipping) + '</p>' +
+                                    '</div>' +
+                                    '<div class="detail-pembayaran">' +
+                                        '<p>Subtotal Asuransi Pengiriman sebelum PPN</p>' +
+                                        '<p>' + formatRupiah(item.insurance_nominal) + '</p>' +
+                                    '</div>' +
+                                    '<div class="detail-pembayaran">' +
+                                        '<p>Biaya Penanganan sebelum PPN</p>' +
+                                        '<p>' + formatRupiah(item.handling_cost_non_ppn) + '</p>' +
+                                    '</div>' +
+                                    '<div class="detail-pembayaran">' +
+                                        '<p>PPN</p>' +
+                                        '<p>' + formatRupiah(item.total_ppn) + '</p>' +
+                                    '</div>' +
+                                    '<div class="total-pembayaran">' +
+                                        '<p>Grand Total</p>' +
+                                        '<p>' + formatRupiah(item.total) + '</p>' +
+                                    '</div>' +
+                                    '&nbsp;' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
+                    '<hr>';
+    });
+    html += '</div>';
+    return html;
+}
+
+function generateDataDetailorderMain(data) {
+    if (data.id_pembayaran == 23) {
+        var html = `
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <p>Metode Pembayaran : <b>${ data.pembayaran}</b> <br> <b> Bank BNI </b> <br> <br> No Rekening <b>03975-60583</b> a/n <br> <b>PT. Elite Proxy Sistem</b> </p>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="detail-pembayaran">
+                                <p>Subtotal Product tanpa PPN</p>
+                                <p>${formatRupiah(data.total_barang_tanpa_PPN)}</p>
+                            </div>
+                            <div class="detail-pembayaran">
+                                <p>Subtotal produk sebelum PPN</p>
+                                <p>${formatRupiah(data.total_barang_dengan_PPN)}</p>
+                            </div>
+                            <div class="detail-pembayaran">
+                                <p>Subtotal Ongkos Kirim sebelum PPN</p>
+                                <p>${formatRupiah(data.total_shipping)}</p>
+                            </div>
+                            <div class="detail-pembayaran">
+                                <p>Subtotal Asuransi Pengiriman sebelum PPN</p>
+                                <p>${formatRupiah(data.total_insurance)}</p>
+                            </div>
+                            <div class="detail-pembayaran">
+                                <p>Biaya Penanganan sebelum PPN</p>
+                                <p>${formatRupiah(data.total_handling_cost_non_ppn)}</p>
+                            </div>
+                            <div class="detail-pembayaran">
+                                <p>PPN</p>
+                                <p>${formatRupiah(data.total_ppn)}</p>
+                            </div>
+                            <div class="total-pembayaran">
+                                <p>Total pembayaran</p>
+                                <p>${formatRupiah(data.total)}</p>
+                            </div>
+                            &nbsp;
+                        </div>
+                    </div>
+                </div>
+                <hr>` ;
+    } else{
+        var html =`
+        // kode html biasa
+        `;
+    }
+    if (data.status === 'Belum Bayar' && data.id_pembayaran !== 22) {
+        var button_pebayaran = `
+            <p class="btn btn-primary">Kembali</p>
+            <p class="btn btn-success" data-id_cart="${(data.id_cart)}" data-total="${(data.total)}" id="upload-payment">Upload Pembayaran</p>
+        `;
+    } else{
+        var button_pebayaran = `
+            <p class="btn btn-primary">Kembali</p>
+        `;
+    }
+
+    html += `
+    <div>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-5">
+                </div>
+                <div class="col-md-7">
+                    ${(button_pebayaran)}
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    `;
     return html;
 }
 
@@ -519,7 +786,7 @@ function generateviewtransaksibody(dataArray) {
             formatRupiah(item.total) +
             "</b></p>";
         html +=
-            '<p><button class="btn btn-primary" style="width:100%">Detail</button></p>';
+        '<p><button class="btn btn-primary" id="detail-order" data-id_cart="'+ item.id_transaksi +'" style="width:100%">Detail</button></p>'
         html += "</div>";
         html += "</div>";
         html += "</div>";
@@ -601,7 +868,7 @@ $(document).on("click", "#item-transaksi", function () {
     } else if (kondisi === "dikirim") {
         getdata(appUrl + "/api/transaksi/kirim");
     }
-    console.log("kondisi Salah");
+    // console.log("kondisi Salah");
 });
 
 $(document).on("click", "#menu-transaksi", function () {
@@ -610,6 +877,11 @@ $(document).on("click", "#menu-transaksi", function () {
 
 $(document).on("click", "#menu-dashboard", function () {
     getdata(appUrl + "/api/dashboard");
+});
+
+$(document).on("click", "#detail-order", function () {
+    var id_cart = $(this).data("id_cart")
+    getdata(appUrl + "/api/getorder/"+id_cart);
 });
 
 function getdata(url) {
@@ -622,7 +894,11 @@ function getdata(url) {
             if (data.pesanan != null && data.negobelum != null) {
                 var header = pesanans(data);
                 var body = negose(data);
-            } else if (data.transaksi.data != null) {
+            } else if (data.order != null) {
+                var header = generateDataDetailorderHeader(data.order);
+                var body = generateDataDetailorderMain(data.order);
+                // console.log('masuk');
+            }else if (data.transaksi.data != null) {
                 var header = generateviewtransaksiheader();
                 var body = generateviewtransaksibody(data.transaksi.data);
 
@@ -864,20 +1140,208 @@ $(document).ready(function () {
 });
 
 $(document).on("click", "#asuransi-pengiriman", function () {
-        var id_shop = $(this).data("id_shop");
-        var id_courier = $(this).data("id_courier");
-        var id_cs = $(this).data("id_cs");
-        var status = $(this).data("status");
+    var id_shop = $(this).data("id_shop");
+    var id_courier = $(this).data("id_courier");
+    var id_cs = $(this).data("id_cs");
+    var status = $(this).data("status");
+    $.ajax({
+        url: "/api/insurance/"+id_shop +"/"+id_courier +"/"+id_cs +"/"+status,
+        type: "get",
+        success: function (response) {
+            location.reload();
+        },
+        error: function (error) {
+            console.error(error);
+            alert("Terjadi kesalahan saat Menambah asuransi");
+        },
+    });
+});
+
+$(document).on("click", "#paymend_method", function () {
+    var id_payment = $(this).data("id_pay");
+    $.ajax({
+        url: "/api/update-payment",
+        type: "POST",
+        data: {
+            _token: $('meta[name="csrf-token"]').attr("content"),
+            id_payment: id_payment,
+        },
+        success: function (response) {
+            location.reload();
+        },
+        error: function (error) {
+            console.error(error);
+            alert("Terjadi kesalahan saat memperbarui Payment");
+        },
+    });
+});
+
+$(document).on("click", "#updateTOP", function () {
+        var top = $(this).data("top");
+        console.log(top);
         $.ajax({
-            url: "/api/insurance/"+id_shop +"/"+id_courier +"/"+id_cs +"/"+status,
+            url: "/api/update-top/"+top,
             type: "get",
             success: function (response) {
                 location.reload();
             },
             error: function (error) {
                 console.error(error);
-                alert("Terjadi kesalahan saat Menambah asuransi");
+                alert("Terjadi kesalahan saat Menambah TOP");
             },
         });
 });
+
+$(document).on("click", "#upload-payment", function () {
+    var id_cart = $(this).data("id_cart");
+    var total = $(this).data("total");
+
+    var html = `
+        <p>
+            Nama Bank Tujuan    : PT. Elite Proxy Sistem <br>
+            Bank Tujuan         : Bank BNI <br>
+            No Rek Tujuan       : <b> 03975-60583 </b> <br>
+            Total Pembayaran    : <b> ${(formatRupiah(total))} </b>
+        </p>
+        <img id="swal2-image-preview" src="#" alt="Bukti Transfer" style="max-width: 200px; max-height: 200px; display: none;"> <!-- Tempat untuk menampilkan preview gambar -->
+        <input type="file" id="swal2-file" name="img" accept="image/*" style="display: block; margin-top: 10px;">
+    `;
+
+    Swal.fire({
+        title: 'Upload Pembayaran',
+        html: html,
+        showCancelButton: true,
+        confirmButtonText: 'Unggah',
+        cancelButtonText: 'Batal',
+        showLoaderOnConfirm: true,
+        preConfirm: () => {
+            return new Promise((resolve, reject) => {
+                var fileInput = document.getElementById('swal2-file');
+                var file = fileInput.files[0];
+                if (!file) {
+                    reject('Anda harus memilih file gambar.');
+                } else {
+                    resolve(file);
+                }
+            });
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+    }).then((result) => {
+        if (result.isConfirmed) {
+            var file = result.value;
+            var formData = new FormData();
+            formData.append('id_cart', id_cart);
+            formData.append('img', file);
+
+            $.ajax({
+                url: '/api/upload-payment',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    Swal.fire({
+                        title: 'Upload Berhasil',
+                        text: 'Pembayaran telah diunggah.',
+                        icon: 'success'
+                    });
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        title: 'Upload Gagal',
+                        text: 'Terjadi kesalahan saat mengunggah pembayaran.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+    });
+});
+
+$(document).on('change', '#swal2-file', function() {
+    previewImage(this);
+});
+
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function(e) {
+            $('#swal2-image-preview').attr('src', e.target.result).show();
+        }
+
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+$(document).on("click", "#request-checkout", function () {
+    var id_cart = $(this).data("id_cart");
+    Swal.fire({
+        title: 'Syarat dan Ketentuan',
+        html: `
+            <p>Dengan melakukan checkout, Anda setuju dengan <a href="http://127.0.0.1:8001/info-term-and-condition" target="_blank">Syarat dan Ketentuan</a>.</p>
+            <div>
+                <input type="checkbox" id="terms-checkbox">
+                <label for="terms-checkbox">Saya setuju dengan Syarat dan Ketentuan</label>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Lanjutkan',
+        cancelButtonText: 'Batal',
+        preConfirm: () => {
+            if (!document.getElementById('terms-checkbox').checked) {
+                Swal.showValidationMessage('Anda harus menyetujui Syarat dan Ketentuan untuk melanjutkan.');
+                return false;
+            }
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Tampilkan SweetAlert2 kedua untuk konfirmasi pesanan
+            Swal.fire({
+                title: 'Konfirmasi Pesanan',
+                text: 'Selesaikan Pesanan?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Selesaikan',
+                cancelButtonText: 'Batal'
+            }).then((confirmResult) => {
+                if (confirmResult.isConfirmed) {
+                    var formData = new FormData();
+                    formData.append('id_cart', id_cart);
+
+                    $.ajax({
+                        url: '/api/finishCheckout',
+                        type: 'POST',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function(response) {
+                            Swal.fire({
+                                title: 'Pesanan Berhasil Diproses',
+                                text: 'Silahkan lihat pesanan anda di transaksi.',
+                                icon: 'success'
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                title: 'Pesanan gagal Diproses',
+                                text: 'Terjadi kesalahan saat Memproses Transaksi.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                    console.log('Pesanan selesai = ' + id_cart);
+                } else {
+                    console.log('Pesanan dibatalkan');
+                }
+            });
+        } else {
+            console.log('User tidak setuju dengan Syarat dan Ketentuan');
+        }
+    });
+});
+
+
+
+
 

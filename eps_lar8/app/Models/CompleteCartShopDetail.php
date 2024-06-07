@@ -3,13 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class CompleteCartShopDetail extends Model
 {
-    // Nama tabel dalam basis data
     protected $table = 'complete_cart_shop_detail';
 
-    // Tentukan kolom-kolom yang dapat diisi
     protected $fillable = [
         'id_cart',
         'id_product',
@@ -17,19 +16,45 @@ class CompleteCartShopDetail extends Model
         'price',
         'image',
         'qty',
-        // Tambahkan kolom lain yang sesuai dengan tabel `complete_cart_shop_detail`
     ];
 
-    // Tentukan relasi antara CompleteCartShopDetail dan BastDetail
-    public function bastDetail()
-    {
+    public function bastDetail(){
         return $this->hasMany(BastDetail::class, 'id_product', 'id');
     }
 
-    // Relasi dengan model `Products`
-    public function product()
-    {
+    public function product(){
         return $this->belongsTo(Products::class, 'id_product', 'id');
     }
-    // Tambahkan relasi lain sesuai kebutuhan
+
+    function getProductOrder($id_shop,$id_cart){
+        $carts = DB::table('complete_cart_shop_detail as ccsd')
+            ->select(
+                'ccsd.*',
+            )
+            ->where('ccsd.id_cart',$id_cart)
+            ->where('ccsd.id_shop',$id_shop)
+            ->where('ccsd.status','on_process')
+            ->get();
+
+        // Hitung jumlah total barang dengan PPN dan tanpa PPN
+        $total_barang_dengan_PPN = 0;
+        $total_barang_tanpa_PPN = 0;
+
+        foreach ($carts as $cart) {
+            if ($cart->val_ppn != 0) {
+                $total_barang_dengan_PPN += $cart->total_non_ppn;
+            } else {
+                $total_barang_tanpa_PPN += $cart->total_non_ppn;
+            }
+        }
+
+        // Tambahkan total barang dengan dan tanpa PPN ke hasil
+        $result = [
+            'carts' => $carts,
+            'total_barang_dengan_PPN' => $total_barang_dengan_PPN,
+            'total_barang_tanpa_PPN' => $total_barang_tanpa_PPN,
+        ];
+
+        return $result;
+    }
 }
