@@ -3,15 +3,20 @@
 namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
+use App\Libraries\Terbilang;
+use App\Models\Bast;
+use App\Models\Cart;
 use App\Models\CartShopTemporary;
 use App\Models\CompleteCartAddress;
 use App\Models\CompleteCartShop;
 use App\Models\CompleteCartShopDetail;
 use App\Models\Invoice;
+use App\Models\Shop;
 use App\Models\UploadPayment;
 use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
 
 class CheckoutController extends Controller
 {
@@ -45,7 +50,7 @@ class CheckoutController extends Controller
         if ($orders->status_pembayaran_top == '1' ) {
             $orders->status = 'Lunas';
         }elseif ($orders->status_pembayaran_top == '0' && $orders->file_upload != null) {
-            $orders->status = 'Menunggu Persetujuan';
+            $orders->status = 'Menunggu Pengecekan Pembayaran';
         }else{
             $orders->status = 'Belum Bayar';
         }
@@ -106,5 +111,100 @@ class CheckoutController extends Controller
         return response()->json(['payment' => $payment]);
     }
 
+    function sumbit_bast(Request $request){
+        $id_cart = $request->id_cart;
+        $id_cart_shop = $request->id_cs;
 
+        $data_bast = [
+            'id_cart' => $id_cart,
+            'id_cart_shop' => $id_cart_shop,
+            'upload_image' => ''
+        ];
+
+        $CompleteCartShop= new CompleteCartShop;
+
+        $detail = CompleteCartShop::select('id_shop','qty')->where('id',$id_cart_shop)->first();
+        $id_bast 	= Bast::insertBast($data_bast);
+
+        $products = CompleteCartShopDetail::getProductOrder($detail->id_shop,$id_cart);
+        $detail->products = $products['carts'];
+
+        $data_qty_diterima = json_decode($request->qty_diterima);
+        $data_qty_dikembalikan = json_decode($request->qty_dikembalikan);
+
+        foreach ($data_qty_diterima as $index => $item) {
+            $qty_dikembalikan = $data_qty_dikembalikan[$index];
+
+            $data_bast_detail[] = [
+                'id_bast' 			=> $id_bast,
+                'id_product'        => $item->id,
+                'qty' 				=> $detail->qty,
+                'qty_diterima'      => $item->qty_diterima,
+                'qty_dikembalikan'  => $qty_dikembalikan->qty_dikembalikan,
+            ];
+        }
+
+		$bast_detail 	= Bast::insertBastDetail($data_bast_detail);
+        $receive_order 	= $CompleteCartShop->receiveOrder($id_cart, $id_cart_shop);
+
+        // return $data_bast_detail ;
+        // $report = $this->receive_order($data_bast['id_cart'], $data_bast['id_cart_shop']);
+    }
+
+    public function cetak_Invoice($id_shop,$id_cart_shop) {
+        $detail_order  = CompleteCartShop::getDetailOrderbyId($id_shop, $id_cart_shop);
+        $detail_order->detail=CompleteCartShop::getDetailProduct($id_shop, $id_cart_shop);
+        $detail_order->seller_address=Shop::getAddressByIdshop($id_shop);
+        $eps = [
+            'nama' => 'PT. Elite Proxy Sistem',
+            'npwp' => ' 73.035.456.0-022.000',
+            'alamat' => 'Rukan Sudirman Park Apartement Jl Kh. Mas Mansyur KAV 35 A/15 Kelurahan Karet Tengsin Kec. Tanah Abang Jakarta Pusat DKI Jakarta'
+        ];
+
+        // return response()->json(['detail_order' => $detail_order]);
+        $pdf = FacadePdf::loadView('pdf.invoice', ['data' => $detail_order,'eps'=>$eps]);
+
+        return $pdf->stream('informasi_invoice.pdf');
+    }
+
+    public function cetak_Kwitansi($id_shop,$id_cart_shop) {
+        $terbilang = new Terbilang();
+        $detail_order  = CompleteCartShop::getDetailOrderbyId($id_shop, $id_cart_shop);
+        $detail_order->seller_address=Shop::getAddressByIdshop($id_shop);
+        $detail_order->terbilang = $terbilang->terbilang($detail_order->total);
+        $detail_order->tgl_indo = $terbilang->tgl_indo(date('Y-m-d', strtotime($detail_order->created_date)));
+        $eps = [
+            'nama' => 'PT. Elite Proxy Sistem',
+            'npwp' => ' 73.035.456.0-022.000',
+            'alamat' => 'Rukan Sudirman Park Apartement Jl Kh. Mas Mansyur KAV 35 A/15 Kelurahan Karet Tengsin Kec. Tanah Abang Jakarta Pusat DKI Jakarta'
+        ];
+
+        // return response()->json(['detail_order' => $detail_order]);
+        $pdf = FacadePdf::loadView('pdf.kwantasi', ['data' => $detail_order,'eps'=>$eps]);
+        return $pdf->stream('informasi_kwantasi.pdf');
+    }
+
+    public function lacak_pengiriman($id_shop, $id_cart_shop) {
+        $ccs = CompleteCartShop::getorderbyidcartshop($id_shop,$id_cart_shop);
+
+        if ($ccs) {
+            return response()->json(['ccs' => $ccs]);
+        } else {
+            return response()->json(['error' => 'CompleteCartShop not found'], 404);
+        }
+    }
+
+    function get_detail_product($id_shop,$id_cart_shop) {
+        $cart_shop = CompleteCartShop::getDetailOrderbyId($id_shop, $id_cart_shop);
+        $products = CompleteCartShopDetail::getProductOrder($cart_shop->id_shop,$cart_shop->id_cart);
+
+        $cart_shop->products = $products['carts'] ;
+        return response()->json(['cart_shop' => $cart_shop]);
+    }
+
+    function testBNIVA(){
+        $va = Cart::VA_BNI();
+
+        return $va;
+    }
 }

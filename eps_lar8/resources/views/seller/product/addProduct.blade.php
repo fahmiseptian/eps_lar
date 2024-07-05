@@ -51,7 +51,7 @@
                                                     <option value="{{ $brand->id }}">{{ $brand->name }}</option>
                                                 @endforeach
                                             </select>
-                                        </div>                                        
+                                        </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="name">Spesifikasi:</label>
@@ -69,7 +69,7 @@
                                         data-pph="{{ $pph }}"
                                         data-mp-percent="{{ $mp_percent }}">
                                     </div>
-                                    
+
                                     <div class="form-group">
                                         <label for="hargaBelumPPn">Harga Tayang Sebelum PPn:</label>
                                         <input type="number" name="hargaBelumPPn" id="hargaBelumPPn" class="form-control" readonly required>
@@ -82,26 +82,39 @@
                                         <label for="hargaSudahPPn">Harga Tayang Sesudah PPn:</label>
                                         <input type="number" name="hargaSudahPPn" id="hargaSudahPPn" class="form-control" readonly required>
                                     </div>
-                                    
+
                                     <div class="form-group">
                                         <label for="name">Stok:</label>
-                                        <input type="number" name="stok" id="stok" class="form-control" placeholder="Masukkan nama gambar" required>
+                                        <input type="number" name="stok" id="stok" class="form-control" placeholder="Masukkan Stok Barang" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="image1">Pilih Gambar 1:</label>
-                                        <input type="file" name="images[]" id="image1" class="form-control-file" accept="image/*" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="image2">Pilih Gambar 2:</label>
-                                        <input type="file" name="images[]" id="image2" class="form-control-file" accept="image/*">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="image3">Pilih Gambar 3:</label>
-                                        <input type="file" name="images[]" id="image3" class="form-control-file" accept="image/*">
+                                        <label for="image1">Masukan Gambar Product:</label>
+                                        <div style="display: flex; flex-wrap: nowrap; overflow-x: auto;">
+                                            <div style="margin-right: 10px;">
+                                                <img src="https://via.placeholder.com/100" alt="Placeholder Image" style="width: 100px; height: 100px; display: block; margin-bottom: 5px;">
+                                                <input type="file" name="images[]" class="form-control-file" accept="image/*">
+                                            </div>
+                                            <div style="margin-right: 10px;">
+                                                <img src="https://via.placeholder.com/100" alt="Placeholder Image" style="width: 100px; height: 100px; display: block; margin-bottom: 5px;">
+                                                <input type="file" name="images[]" class="form-control-file" accept="image/*">
+                                            </div>
+                                            <div style="margin-right: 10px;">
+                                                <img src="https://via.placeholder.com/100" alt="Placeholder Image" style="width: 100px; height: 100px; display: block; margin-bottom: 5px;">
+                                                <input type="file" name="images[]" class="form-control-file" accept="image/*">
+                                            </div>
+                                            <div style="margin-right: 10px;">
+                                                <img src="https://via.placeholder.com/100" alt="Placeholder Image" style="width: 100px; height: 100px; display: block; margin-bottom: 5px;">
+                                                <input type="file" name="images[]" class="form-control-file" accept="image/*">
+                                            </div>
+                                            <div style="margin-right: 10px;">
+                                                <img src="https://via.placeholder.com/100" alt="Placeholder Image" style="width: 100px; height: 100px; display: block; margin-bottom: 5px;">
+                                                <input type="file" name="images[]" class="form-control-file" accept="image/*">
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="name">Berat:</label>
-                                        <input type="number" name="berat" id="berat" class="form-control" placeholder="Masukkan nama gambar" required>
+                                        <input type="number" name="berat" id="berat" class="form-control" placeholder="Masukkan berat Product" required>
                                     </div>
                                     <div class="form-group">
                                         <label for="name">Dimensi:</label>
@@ -138,13 +151,13 @@
                                             <input type="radio" name="kondisi" value="N" checked/> Bekas
                                         </label>
                                     </div>
-                                    
+
                                     <div class="form-group">
                                         <label for="name">SKU Induk:</label>
-                                        <input type="text" name="sku" id="sku" class="form-control" placeholder="Masukkan nama gambar" required>
+                                        <input type="text" name="sku" id="sku" class="form-control" placeholder="Masukkan SKU Produk" required>
                                     </div>
-                                    <button type="submit" class="btn btn-primary">Unggah Media</button>
-                                </form>                   
+                                    <button type="submit" class="btn btn-primary">Simpan</button>
+                                </form>
                             </div>
                         </div>
                     </div>

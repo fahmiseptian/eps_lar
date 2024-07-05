@@ -713,6 +713,14 @@ background-color: #2196f3;
     border-radius: 50%;
 }
 
+.nav-item{
+    padding: 10px;
+}
+
+.sidebar{
+    border:1px black ;
+}
+
 /* Menghilangkan garis bawah */
 .separator p, .label p, .value p {
     margin: 0;
@@ -1249,8 +1257,7 @@ background-color: #2196f3;
 }
 
 .product-name {
-    flex: 3;
-    /* Adjust the flex values to fit your needs */
+    flex: 2;
 }
 
 .unit-price,
@@ -1305,16 +1312,16 @@ background-color: #2196f3;
     transform: scale(1.1);
 }
 
+.product-image-cart{
+    flex-shrink: 0;
+}
+
 .product-image {
     width: 50px;
     height: 50px;
     flex-shrink: 0;
 }
 
-.product-name {
-    flex: 3;
-    /* Adjust flex for name to take more space */
-}
 
 .product-price,
 .product-quantity,

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Libraries\Calculation;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -29,6 +30,22 @@ class CartShopTemporary extends Model
             ->where('cst.id_cart', $id_cart)
             ->get();
         return $carts;
+    }
+
+    function sumPriceSelectProductCart($id_cart){
+        $sumprice = DB::table('cart_shop_temporary as cst')
+            ->where('cst.id_cart', $id_cart)
+            ->where('cst.is_selected', 'Y')
+            ->sum('cst.total');
+        return $sumprice;
+    }
+
+    function sumqtySelected($id_cart){
+        $qty = DB::table('cart_shop_temporary as cst')
+            ->where('cst.id_cart', $id_cart)
+            ->where('cst.is_selected', 'Y')
+            ->sum('cst.qty');
+        return $qty;
     }
 
     public function getCartSelectedByIdShop($id_shop, $id_cart)
@@ -143,7 +160,7 @@ class CartShopTemporary extends Model
         return false;
     }
 
-    public function cartTemporary($id_cart, $id_shop, $id_product, $price, $weight, $id_user, $qty = null, $et = null, $is_nego = null)
+    public function cartTemporary($id_cart, $id_shop, $id_product, $price, $weight, $id_user, $qty = null, $is_nego = null)
     {
         $existingCart = DB::table('cart_shop_temporary')
             ->select('id', 'qty')
@@ -605,6 +622,7 @@ class CartShopTemporary extends Model
             'ppn_price' => $ppn_price,
             'pph_price' => $pph_price,
             'qty' => $qty,
+            'handling_cost_non_ppn' => $handling_cost_exlude_ppn
         ];
 
         if ($count == 0) {
@@ -1078,8 +1096,213 @@ class CartShopTemporary extends Model
         return $ship;
     }
 
-    // function getcourierCart($id_cart,$id_shop) {
-    //     $
-    // }
+    function UpdateqtyCart($id_cst, $dataArr) {
+        $update = DB::table('cart_shop_temporary as cst')
+            ->where('id', $id_cst)
+            ->update($dataArr);
+
+        return $update;
+    }
+
+
+    public function updateTemporaryById($id_user, $id_shop, $id_cst, $qty) {
+        $cartShop = new CartShop();
+        $id_cart = Cart::getIdCartbyidmember($id_user);
+        $update_temp = $this->_updateqtyCST($id_cart, $id_cst, $qty, $id_user);
+
+        DB::table('cart_shop')
+            ->where('id_cart', $id_cart)
+            ->where('id_shop', $id_shop)
+            ->update([
+                'is_insurance' => '0',
+                'insurance_nominal' => '0'
+            ]);
+
+        // $update_cart_shop = $this->updateCartShop($id_cart, $id_shop);
+        // $update_cart = $this->updateCart($id_cart);
+
+        $update_cart_shop = $cartShop->refreshCartShop($id_cart, $id_shop);
+        $update_cart = $cartShop->refreshCart($id_cart);
+
+        if ($update_cart_shop) {
+            $sumprice = $this->sumPriceSelectProductCart($id_cart);
+            $totalqty =$this->sumqtySelected($id_cart);
+
+            $data = [
+                'sumprice' => $sumprice,
+                // 'is_selected' => $cst->is_selected,
+                'qty' => $totalqty
+            ];
+
+            return $data;
+        } else {
+            return false;
+        }
+    }
+
+    private function _updateqtyCST($id_cart, $id_cst, $qty, $id_user){
+        $cst = DB::table('cart_shop_temporary')
+        ->join('products as p', 'p.id', '=', 'cart_shop_temporary.id_product')
+        ->where('cart_shop_temporary.id', $id_cst)
+        ->where('cart_shop_temporary.id_cart', $id_cart)
+        ->select('cart_shop_temporary.id_product', 'cart_shop_temporary.qty', 'p.price')
+        ->first();
+
+        $getLpse = Lpse_config::first();
+        $getProduct = $this->getProductDetail($cst->id_product);
+        $ppn = $getLpse->ppn;
+        $pph = $getLpse->pph;
+
+        if ($getProduct->barang_kena_ppn == 0) {
+            $ppn = 0;
+        }
+
+        $promo_price = $this->getPromoPrice($cst->id_product);
+        $flash_price = $this->getFlashPrice($cst->id_product, $qty);
+        $lpse_price = $this->getLpsePrice($cst->id_product);
+        $price = $cst->price;
+
+        $nego = DB::table('nego as n')
+        ->join('product_nego as pn', 'pn.id_nego', '=', 'n.id')
+        ->where('n.member_id', $id_user)
+        ->where('n.status', 1)
+        ->where('pn.status', 1)
+        ->where('n.complete_checkout', 0)
+        ->where('pn.id_product', $cst->id_product)
+        ->where('pn.qty', $qty)
+        ->select('n.*', 'pn.*')
+        ->first();
+
+        // DATA
+        $nama = $getProduct->name;
+        $image = $getProduct->artwork_url_sm[0];
+        $input_price = $getProduct->price;
+        $fee_mp_percent = $getLpse->fee_mp_percent;
+        $fee_mp_nominal = $getLpse->fee_mp_nominal;
+        $fee_pg_percent = $getLpse->fee_pg_percent;
+        $fee_pg_nominal = $getLpse->fee_pg_nominal;
+        $tot_fee_perc = $fee_mp_percent + $fee_pg_percent;
+        $tot_fee_nom = $fee_mp_nominal + $fee_pg_nominal;
+
+        $harga_dasar_lpse = round($lpse_price / (1 + ($ppn / 100)));
+        $ppn_nom = round($harga_dasar_lpse * ($ppn / 100));
+        $pph_nom = round($harga_dasar_lpse * ($pph / 100));
+        $tot_hp = $harga_dasar_lpse + $ppn_nom;
+
+        if ($nego && $nego->base_price > 0) {
+            $harga_dasar_lpse = 0;
+            $harga_dasar_lpse_satuan = 0;
+
+            if ($qty >= 1) {
+                $harga_dasar_lpse_satuan = round($nego->harga_nego / $nego->qty);
+                $harga_dasar_lpse_exc = round($harga_dasar_lpse_satuan / (1 + ($ppn / 100)));
+                $harga_dasar_lpse = $harga_dasar_lpse_exc * $qty;
+            } else {
+                $harga_dasar_lpse_satuan = $nego->harga_nego;
+                $harga_dasar_lpse = round($nego->harga_nego / (1 + ($ppn / 100)));
+            }
+
+            $input_price = $nego->nominal_didapat / $nego->qty;
+            $harga_tayang = $nego->base_price;
+            $ppn_nom = round($harga_dasar_lpse * ($ppn / 100));
+            $pph_nom = round($harga_dasar_lpse * ($pph / 100));
+
+            DB::table('cart_shop_temporary')
+                ->where('id', $id_cst)
+                ->where('id_cart', $id_cart)
+                ->update([
+                    'id_nego' => $nego->id_nego,
+                    'input_price' => $input_price,
+                    'price' => $harga_tayang,
+                    'qty' => $qty,
+                    'nominal_ppn' => $ppn_nom,
+                    'nominal_pph' => $pph_nom,
+                    'val_ppn' => $ppn,
+                    'val_pph' => $pph,
+                    'total_non_ppn' => $harga_dasar_lpse,
+                    'harga_dasar_lpse' => DB::raw('total_non_ppn / qty'),
+                    'total' => $nego->harga_nego,
+                ]);
+        } else {
+            if ($flash_price > 0) {
+                $price_non_ppn = $flash_price;
+                $input_price = $this->getFlashOriginPrice($cst->id_product, $qty);
+                $harga_dasar_lpse = round($price_non_ppn / (1 + ($ppn / 100)));
+                $ppn_nom = round($harga_dasar_lpse * ($ppn / 100));
+                $pph_nom = round($harga_dasar_lpse * ($pph / 100));
+                $tot_hp = $harga_dasar_lpse + $ppn_nom;
+            } elseif ($promo_price > 0) {
+                $price_non_ppn = $promo_price;
+                $input_price = $this->getPromoOriginPrice($cst->id_product);
+                $harga_dasar_lpse = round($price_non_ppn / (1 + ($ppn / 100)));
+                $ppn_nom = round($harga_dasar_lpse * ($ppn / 100));
+                $pph_nom = round($harga_dasar_lpse * ($pph / 100));
+                $tot_hp = $harga_dasar_lpse + $ppn_nom;
+            } elseif ($lpse_price > 0) {
+                $price_non_ppn = $lpse_price;
+            } else {
+                $price_non_ppn = $price;
+            }
+
+            DB::table('cart_shop_temporary')
+                ->where('id', $id_cst)
+                ->where('id_cart', $id_cart)
+                ->update([
+                    'id_nego' => null,
+                    'input_price' => $input_price,
+                    'price' => $price_non_ppn,
+                    'qty' => $qty,
+                    'nominal_ppn' => DB::raw($ppn_nom . '*qty'),
+                    'nominal_pph' => DB::raw($pph_nom . '*qty'),
+                    'val_ppn' => $ppn,
+                    'val_pph' => $pph,
+                    'harga_dasar_lpse' => $harga_dasar_lpse,
+                    'total_non_ppn' => DB::raw('harga_dasar_lpse*qty'),
+                    'total' => DB::raw('price*qty'),
+                ]);
+        }
+
+        $dataArr = [
+            'harga' => $input_price,
+            'fee_pg_percent' => $fee_pg_percent,
+            'fee_mp_percent' => $fee_mp_percent,
+            'fee_mp_nominal' => $fee_mp_nominal,
+            'fee_pg_nominal' => $fee_pg_nominal,
+            'ppn' => $ppn,
+            'pph' => $pph,
+            'qty' => $qty,
+        ];
+
+        $result = Calculation::calc_harga_tayang($dataArr);
+        $price_exlude_with_ppn = $result['price_exlude_with_ppn'];
+        $final_price = $result['price_final'];
+
+        $calc_fee = $result['selisih_fee_calc'];
+        $calc_vendor_price_fee = $result['price_vendor_with_fee'];
+        $calc_vendor_price_fee_pph = $result['price_vendor_with_fee_pph'];
+
+        $price_mp_get = $result['price_mp_get'];
+        $price_mp_satuan = $result['price_mp_satuan'];
+        $price_mp_total_incl = $result['price_mp_total_incl'];
+        $price_mp_total_excl = $result['price_mp_total_excl'];
+
+        DB::table('cart_shop_temporary')
+        ->where('id', $id_cst)
+        ->where('id_cart', $id_cart)
+        ->update([
+            'calc_fee' => $calc_fee,
+            'calc_vendor_price_fee' => $calc_vendor_price_fee,
+            'calc_vendor_price_fee_pph' => $calc_vendor_price_fee_pph,
+            'calc_mp_price_get' => $price_mp_get,
+            'calc_fee_mp_satuan_nominal' => $price_mp_satuan,
+            'calc_fee_mp_incl_nominal' => $price_mp_total_incl,
+            'calc_fee_mp_excl_nominal' => $price_mp_total_excl,
+            'total_weight' => DB::raw('weight*qty'),
+            'is_selected' => 'Y',
+        ]);
+
+    return true;
+
+    }
 
 }

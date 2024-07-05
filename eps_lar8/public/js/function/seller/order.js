@@ -206,89 +206,24 @@ $(document).on("click", ".btn.btn-info.fa.fa-copy", function () {
 
 $(document).on("click", "#lacakResi", function () {
     var id_order_shop = $(this).data("id");
+
     $.ajax({
-        url: appUrl + "/seller/order/test/" + id_order_shop,
-        method: "get",
-        // data: {
-        //     id_cart_shop: id_order_shop,
-        //     _token: csrfToken,
-        // },
+        url: appUrl + "/seller/order/lacak_kurir_sendiri/" + id_order_shop,
+        method: "GET",
         success: function (response) {
-            // Respons data diterima dalam bentuk JSON
             var status = response.ccs.status;
             var deliveryStart = response.ccs.delivery_start;
             var deliveryEnd = response.ccs.delivery_end;
             var fileDO = response.ccs.file_pdf_url;
 
-            if (response.ccs.id_courier === 0 && response.ccs.file_do === "") {
-                // Buat tabel HTML untuk kondisi pertama
-                var tableHtml =
-                    '<table class="table">' +
-                    "<thead>" +
-                    "<tr>" +
-                    "<th>Track ID</th>" +
-                    "<th>Deskripsi</th>" +
-                    "<th>Date/Time</th>" +
-                    "</tr>" +
-                    "</thead>" +
-                    "<tbody>" +
-                    "<tr>" +
-                    '<td style="text-align: left;">' +
-                    '<span class="fa fa-map-marker"> On Progress </span>' +
-                    "</td>" +
-                    '<td style="text-align: left;">' +
-                    "Pesanan Dalam Pengiriman" +
-                    "</td>" +
-                    '<td style="text-align: left;">' +
-                    deliveryStart +
-                    "</td>" +
-                    "</tr>" +
-                    "</tbody>" +
-                    "</table>";
-            } else if (response.ccs.id_courier === 0 && response.ccs.file_do !== "") {
-                // Buat tabel HTML untuk kondisi kedua
-                var tableHtml =
-                    '<table class="table">' +
-                    "<thead>" +
-                    "<tr>" +
-                    "<th>Track ID</th>" +
-                    "<th>Deskripsi</th>" +
-                    "<th>Date/Time</th>" +
-                    "</tr>" +
-                    "</thead>" +
-                    "<tbody>" +
-                    "<tr>" +
-                    '<td style="text-align: left;">' +
-                    '<span class="fa fa-map-marker"> On Progress </span>' +
-                    "</td>" +
-                    '<td style="text-align: left;">' +
-                    "Pesanan Dalam Pengiriman" +
-                    "</td>" +
-                    '<td style="text-align: left;">' +
-                    deliveryStart +
-                    "</td>" +
-                    "</tr>" +
-                    "<tr>" +
-                    '<td style="text-align: left;">' +
-                    '<span class="fa fa-map-marker"> Complate <a target="_blank" href="' + fileDO + '">detail</a></span>' +
-                    "</td>" +
-                    '<td style="text-align: left;">' +
-                    "Selesai" +
-                    "</td>" +
-                    '<td style="text-align: left;">' +
-                    deliveryEnd +
-                    "</td>" +
-                    "</tr>" +
-                    "</tbody>" +
-                    "</table>";
-            }
-            
+            var tableHtml = generateTableHtml(response.ccs.id_courier, response.ccs.file_do, deliveryStart, deliveryEnd, fileDO);
+
             Swal.fire({
                 title: "Lacak Order",
                 html: tableHtml,
                 confirmButtonText: "OK",
                 width: window.innerWidth <= 600 ? '100%' : '40%'
-            });            
+            });
         },
         error: function (error) {
             console.error("Terjadi kesalahan:", error);
@@ -301,6 +236,51 @@ $(document).on("click", "#lacakResi", function () {
         },
     });
 });
+
+function generateTableHtml(idCourier, fileDO, deliveryStart, deliveryEnd, filePdfUrl) {
+    var tableHtml = `
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Track ID</th>
+                    <th>Deskripsi</th>
+                    <th>Date/Time</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    if (idCourier === 0 && deliveryStart !== null) {
+        tableHtml += `
+            <tr>
+                <td style="text-align: left;"><span class="fa fa-map-marker"> On Progress </span></td>
+                <td style="text-align: left;">Pesanan Dalam Pengiriman</td>
+                <td style="text-align: left;">${deliveryStart}</td>
+            </tr>
+        `;
+    } else if (idCourier === 0 && deliveryEnd !== null) {
+        tableHtml += `
+            <tr>
+                <td style="text-align: left;"><span class="fa fa-map-marker"> On Progress </span></td>
+                <td style="text-align: left;">Pesanan Dalam Pengiriman</td>
+                <td style="text-align: left;">${deliveryStart}</td>
+            </tr>
+            <tr>
+                <td style="text-align: left;"><span class="fa fa-map-marker"> Complete <a target="_blank" href="${filePdfUrl}">detail</a></span></td>
+                <td style="text-align: left;">Selesai</td>
+                <td style="text-align: left;">${deliveryEnd}</td>
+            </tr>
+        `;
+    }
+
+    tableHtml += `
+            </tbody>
+        </table>
+    `;
+
+    return tableHtml;
+}
+
 
 $(document).on("click", "#uploadDO", function () {
     var id_order_shop = $(this).data("id");

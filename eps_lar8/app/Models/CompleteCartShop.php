@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
@@ -180,6 +181,7 @@ class CompleteCartShop extends Model implements HasMedia
             'ccs.qty',
             'ccs.status',
         )
+        ->orderBy('ccs.id', 'desc')
         ->get();
 
         return $orders;
@@ -188,28 +190,132 @@ class CompleteCartShop extends Model implements HasMedia
 
     function getorderbyIdCart($idcart) {
         $orders = DB::table('complete_cart_shop as ccs')
-                ->select(
-                    's.nama_pt',
-                    's.npwp',
-                    'ccs.id',
-                    'ccs.id_shop',
-                    'ccs.keperluan',
-                    'ccs.pesan_seller',
-                    'ccs.sum_shipping',
-                    'ccs.insurance_nominal',
-                    'ccs.handling_cost_non_ppn',
-                    'ccs.ppn_price',
-                    'ccs.ppn_shipping',
-                    'ccs.total',
-                    'ccs.discount',
-                    'sh.service',
-                    'sh.deskripsi',
-                    'sh.etd'
-                )
-                ->where('id_cart',$idcart)
-                ->join('shipping as sh','sh.id','ccs.id_shipping')
-                ->join('shop as s','ccs.id_shop', '=','s.id')
-                ->get();
+            ->select(
+                's.nama_pt',
+                's.npwp',
+                'ccs.id',
+                'ccs.id_shop',
+                'ccs.keperluan',
+                'ccs.pesan_seller',
+                'ccs.sum_shipping',
+                'ccs.insurance_nominal',
+                'ccs.handling_cost_non_ppn',
+                'ccs.ppn_price',
+                'ccs.ppn_shipping',
+                'ccs.total',
+                'ccs.discount',
+                'ccs.status as status_dari_toko',
+                'sh.service',
+                'sh.deskripsi',
+                'sh.etd'
+            )
+            ->where('id_cart', $idcart)
+            ->leftJoin('shipping as sh', 'sh.id', '=', 'ccs.id_shipping')
+            ->leftJoin('shop as s', 'ccs.id_shop', '=', 's.id')
+            ->get();
         return $orders;
     }
+
+
+    public function receiveOrder($order_id, $id_cart_shop) {
+        $top_idp = ["23", "24", "25"];
+        $date = Carbon::createFromFormat('Y-m-d', '2024-06-07');
+
+
+        // Mengambil data cart shop yang sesuai
+        $data = DB::table('complete_cart_shop as ccs')
+            ->select('ccs.id as id_cart_shop', 'ccs.id_cart', 'ccs.id_shop', 'ccs.total', 'ccs.status', 'cc.id_user', 'cc.invoice', 'cc.id_payment')
+            ->join('complete_cart as cc', 'cc.id', '=', 'ccs.id_cart')
+            ->where('ccs.id', $id_cart_shop)
+            ->where('ccs.status', '!=', 'cancel')
+            ->get();
+
+        foreach ($data as $d) {
+            // Mengupdate status menjadi complete
+            DB::table('complete_cart_shop')
+                ->where('id', $d->id_cart_shop)
+                ->update([
+                    'status' => 'complete',
+                    'delivery_end' => $date
+                ]);
+
+            $total_diterima_seller = $this->getTotalHargaInput($d->id_cart, $d->id_shop);
+
+            $array_data = [
+                'id_cart' => $d->id_cart,
+                'id_shop' => $d->id_shop,
+                'id_user' => $d->id_user,
+                'note'    => ' ',
+                'invoice' => $d->invoice,
+                'total' => $d->total,
+                'total_diterima_seller' => $total_diterima_seller,
+            ];
+            $insert_revenue = $this->insertRevenue($array_data);
+
+			$count_sold = $this->countSold($d->id_cart);
+        }
+
+        // Mengecek jumlah data cart shop dan jumlah yang telah complete
+        $count_data_cart_shop = DB::table('complete_cart')
+            ->where('id', $order_id)
+            ->count();
+
+        $count_complete_cart_shop = DB::table('complete_cart_shop')
+            ->where('id_cart', $order_id)
+            ->where('status', 'complete')
+            ->count();
+
+        if ($count_data_cart_shop == $count_complete_cart_shop) {
+            DB::table('complete_cart')
+                ->where('id', $order_id)
+                ->update(['status' => 'completed']);
+        }
+
+        return true;
+    }
+
+    private function insertRevenue($data) {
+        $insert = DB::table('revenue')->insertGetId($data);
+        return $insert;
+    }
+
+    public function countSold($id_cart) {
+        $products = DB::table('complete_cart_shop_detail')
+                      ->select('id_product')
+                      ->where('id_cart', $id_cart)
+                      ->get();
+
+        foreach ($products as $product) {
+            $this->_countSold($product->id_product);
+        }
+
+        return true;
+    }
+
+    private function _countSold($id_product) {
+        DB::table('product')
+            ->where('id', $id_product)
+            ->increment('count_sold', 1);
+
+        return true;
+    }
+
+    public function getTotalHargaInput($id_cart, $id_shop) {
+        $data = DB::table('complete_cart_shop_detail')
+            ->select('input_price', 'qty')
+            ->where('id_cart', $id_cart)
+            ->where('id_shop', $id_shop)
+            ->get();
+
+        $total = 0;
+        foreach ($data as $ds) {
+            $total += $ds->input_price * $ds->qty;
+        }
+
+        return $total;
+    }
+
+    // function getDetailOrderbyId() : Returntype {
+
+    // }
 }

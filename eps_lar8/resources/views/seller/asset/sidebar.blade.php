@@ -2,7 +2,7 @@
     <!-- sidebar: style can be found in sidebar.less -->
     <section class="sidebar">
         <!-- Sidebar user panel -->
-        
+
         <div class="user-panel">
             {{-- <div class="pull-left image">
                 <img src="" class="img-circle" alt="User Image" />
@@ -14,7 +14,7 @@
                     @endif
                 </a>
                 <h5> <b><?= session()->get('seller') ?></b></h5>
-                
+
             </div>
             <hr width="95%" align="center">
         </div>
@@ -59,12 +59,12 @@
                 </ul>
             </li>
             <li class="list-sidebar">
-                <a href="#">
+                <a href="{{route('seller.promosi')}}">
                     <i class="fa fa-tags"></i> <span>Promosi</span>
                 </a>
             </li>
             <li class="list-sidebar">
-                <a href="#">
+                <a href="{{route('seller.nego')}}">
                     <i class="fa fa-comments"></i> <span>Nego Bela Pengadaan</span>
                 </a>
             </li>

@@ -11,7 +11,7 @@
     <link href="{{ asset('/plugins/jvectormap/jquery-jvectormap-1.2.2.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('/plugins/daterangepicker/daterangepicker-bs3.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('/plugins/datatables/dataTables.bootstrap.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('/css/AdminLTE.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('/css/Seller_center.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('/css/skins/_all-skins.min.css') }}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <!-- Sweet Alert -->
@@ -19,4 +19,5 @@
     <link href="{{ asset('/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" type="text/css" />
     <!-- Google Font -->
     <link href="https://fonts.googleapis.com" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>

@@ -11,17 +11,16 @@
         <!-- Right side column. Contains the navbar and content of the page -->
         <div class="content-wrapper">
             <!-- Content Header (Page header) -->
-
             <section class="content">
                 <div class="row">
                     <div class="col-md-1"></div>
-                    <div class="col-md-10" id="overlay">
+                    <div class="col-md-10">
                         <h3 style="color:black;  margin-bottom:-5px"> <b>Pengaturan Pembayaran</b></h3>
                         <br>
                         <div class="box box-info">
-                            <div 
+                            <div
                                 style="width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 10px;">
-                                <div id="overlay" style="display: flex; align-items: center;">
+                                <div style="display: flex; align-items: center;">
                                     <i style="font-size:20px; margin-right:10px" class="fa fa-key"></i>
                                     <div>
                                         <strong>PIN Saldo Penjual</strong><br>
@@ -39,6 +38,7 @@
             </section>
         </div><!-- /.content-wrapper -->
     </div><!-- ./wrapper -->
+    @include('seller.finance.modal-update-pin')
 </body>
 {{-- footer --}}
 @include('seller.asset.footer')

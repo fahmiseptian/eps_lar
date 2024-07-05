@@ -14,7 +14,7 @@ class Shop extends Model
     public $timestamps = false;
     protected $visible = ['nama_pt','name','nik_pemilik','npwp','phone','password', 'nama_pemilik','avatar'];
     protected $fillable = [
-        'status','type','is_top',
+        'status','type','is_top','packing_estimation',
     ];
 
     protected $Encryption;
@@ -40,7 +40,7 @@ class Shop extends Model
 
             if ($cek === false) {
                 return "Error";
-            } 
+            }
 
             return $cek;
         } else {
@@ -97,4 +97,34 @@ class Shop extends Model
 
         return $dataShop;
     }
+
+    function get_estimasiPacking($id_shop) {
+        $packing = DB::table('shop')
+        ->select(
+            'packing_estimation'
+        )
+        ->where('id',$id_shop)
+        ->first();
+        return $packing;
+    }
+
+    function getShopCategory($id_shop) {
+        $query = DB::table('shop')
+        ->select('shop_category')
+        ->where('id',$id_shop)
+        ->first();
+        return $query;
+    }
+
+    function getPinSaldo($id_shop) {
+        $query = DB::table('shop')
+        ->select('pin_saldo')
+        ->where('id',$id_shop)
+        ->first();
+
+        $pin    = $query->pin_saldo;
+
+        return $pin;
+    }
+
 }

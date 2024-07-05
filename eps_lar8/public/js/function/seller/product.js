@@ -45,26 +45,40 @@ function toggleFilterProduct(element) {
     });
 }
 
-$(document).ready(function() {
-    $('#kategori-level1').change(function() {
-        var level1Value = $(this).val();
-        if (level1Value !== '') {
-            $.ajax({
-                url: appUrl + '/seller/product/category/level2/' + level1Value,
-                type: 'GET',
-                success: function(response) {
-                    $('#kategori-level2').empty();
-                    $.each(response, function(key, value) {
-                        $('#kategori-level2').append('<option value="' + value.id + '">' + value.name + '</option>');
-                    });
-                    $('#kategorilevel2').show();
-                },
-                error: function(xhr, status, error) {
-                    console.error(xhr.responseText);
-                }
-            });
-        } else {
-            $('#kategorilevel2').hide();
+$('#kategori-level1').change(function() {
+    var level1Value = $(this).val();
+    if (level1Value !== '') {
+        $.ajax({
+            url: appUrl + '/seller/product/category/level2/' + level1Value,
+            type: 'GET',
+            success: function(response) {
+                $('#kategori-level2').empty().append('<option value="">Pilih Kategori Level 2</option>');
+                $.each(response, function(key, value) {
+                    $('#kategori-level2').append('<option value="' + value.id + '">' + value.name + '</option>');
+                });
+                $('#kategorilevel2').show();
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+            }
+        });
+    } else {
+        $('#kategorilevel2').hide();
+    }
+});
+
+$('#kategori-level2').change(function() {
+    var kategori = $(this).val();
+    $.ajax({
+        url: appUrl + '/api/seller/DetailCategory/'+ kategori ,
+        type: 'GET',
+        success: function(response) {
+            $("#phpVariables").data("ppn", response.ppn);
+            $("#phpVariables").data("pph", response.pph);
+            $("#phpVariables").data("mp-percent", response["mp-percent"]);
+        },
+        error: function(xhr, status, error) {
+            console.error(xhr.responseText);
         }
     });
 });
@@ -74,23 +88,23 @@ $(document).ready(function() {
         console.log("masuk");
         var form = $(this);
         var addUrl = form.attr('action');
-        event.preventDefault(); // Mencegah pengiriman formulir default
-        
+        event.preventDefault();
+
         // Memeriksa jumlah file yang diunggah
-        var fileInput = $('#image1'); // Ubah ke input pertama
-        var fileCount = fileInput[0].files.length;
+        var fileInputs = $('input[name="images[]"]');
+        var fileCount = 0;
+        fileInputs.each(function() {
+            if ($(this)[0].files.length > 0) {
+                fileCount++;
+            }
+        });
+
         if (fileCount < 1 || fileCount > 3) {
             alert("Please upload at least one image and maximum three images.");
-            return false; 
+            return false;
         }
-        
+
         var formData = new FormData(form[0]);
-        
-        // Test data yang dikirim
-        // for (var pair of formData.entries()) {
-        //     console.log(pair[0]+ ', ' + pair[1]); 
-        // }
-        
         $.ajax({
             url: addUrl,
             type: 'POST',
@@ -99,15 +113,14 @@ $(document).ready(function() {
             contentType: false, // Set contentType ke false
             success: function(response) {
                 console.log("berhasil");
-                // Handle respons sukses di sini
             },
             error: function(xhr, status, error) {
                 console.error(xhr.responseText);
-                // Handle respons error di sini
             }
         });
     });
 });
+
 
 
 $(document).ready(function(){
@@ -138,4 +151,90 @@ $(document).ready(function(){
         $("#ppn").val(biayaPpn);
         $("#hargaSudahPPn").val(hargaTayang);
     });
+});
+
+$(document).on("click", "#review_product", function () {
+    var id = $(this).data("id");
+    var review_productUrl = appUrl + '/product/' + id;
+    window.open(review_productUrl, '_blank');
+});
+
+$(document).on("click", "#edit_product", function () {
+    var id = $(this).data("id");
+    console.log(id);
+});
+
+$(document).on("click", "#deleteProduct", function () {
+    var id = $(this).data("id");
+    $.ajax({
+        url: appUrl + "/api/seller/deleteProduct",
+        method: "POST",
+        data: {
+            id_product: id
+        },
+        success: function (response) {
+            Swal.fire({
+                title: "Berhasil",
+                text: "Product berhasil dihapus.",
+                icon: "success",
+                confirmButtonText: "OK"
+            }).then(() => {
+                location.reload();
+            });
+        },
+        error: function (error) {
+            console.error("Terjadi kesalahan:", error);
+            Swal.fire({
+                title: "Terjadi Kesalahan",
+                text: "Silakan coba lagi nanti.",
+                icon: "error",
+                confirmButtonText: "OK"
+            });
+        }
+    });
+});
+
+$(document).on("click", "#editStatus", function () {
+    var id = $(this).data("id");
+    $.ajax({
+        url: appUrl + "/api/seller/editStatusProduct",
+        method: "POST",
+        data: {
+            id_product: id
+        },
+        success: function (response) {
+            Swal.fire({
+                title: "Berhasil",
+                text: "Berhasil Merubah Status Product.",
+                icon: "success",
+                confirmButtonText: "OK"
+            }).then(() => {
+                location.reload();
+            });
+        },
+        error: function (error) {
+            console.error("Terjadi kesalahan:", error);
+            Swal.fire({
+                title: "Terjadi Kesalahan",
+                text: "Silakan coba lagi nanti.",
+                icon: "error",
+                confirmButtonText: "OK"
+            });
+        }
+    });
+});
+
+$(document).ready(function() {
+    $('input[type="file"]').change(function() {
+        var file = this.files[0];
+        var reader = new FileReader();
+        var parentDiv = $(this).closest('div');
+
+        reader.onload = function(e) {
+            parentDiv.find('img').attr('src', e.target.result);
+        }
+
+        reader.readAsDataURL(file);
+    });
+
 });

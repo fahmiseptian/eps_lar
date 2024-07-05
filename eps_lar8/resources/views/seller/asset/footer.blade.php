@@ -21,6 +21,7 @@
 <!-- iCheck -->
 <script src="{{ asset('/plugins/iCheck/icheck.min.js') }}"></script>
 <!-- DATA TABES SCRIPT -->
+<script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
 <script src="{{ asset('/plugins/datatables/jquery.dataTables.js') }}"></script>
 <script src="{{ asset('/plugins/datatables/dataTables.bootstrap.js') }}"></script>
 <!-- ChartJS -->

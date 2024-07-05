@@ -91,14 +91,16 @@ class Invoice extends Model
                 'cc.jml_top',
                 'cc.status_pembayaran_top as status_pembayaran',
                 'cc.qty as jmlh_qty',
+                'up.file_upload'
             )
             ->join('complete_cart_shop as ccs', 'cc.id', '=', 'ccs.id_cart')
+            ->leftJoin('upload_payment as up','up.invoice','=','cc.invoice')
             ->where('cc.id_user', $idmember);
             if ($kondisi != null) {
                 $query->where('cc.status',$kondisi);
             }
             $query->orderBy('cc.created_date', 'desc')
-            ->groupBy('cc.id', 'cc.invoice', 'cc.total', 'cc.id_payment', 'cc.created_date', 'cc.jml_top', 'cc.status_pembayaran_top', 'cc.qty');
+            ->groupBy('cc.id', 'cc.invoice', 'cc.total', 'cc.id_payment', 'cc.created_date', 'cc.jml_top', 'cc.status_pembayaran_top', 'cc.qty','up.file_upload');
 
         return $query->paginate(7);
     }
@@ -200,4 +202,15 @@ class Invoice extends Model
         }
         return false;
     }
+
+    public function getDataInvoice($id_cart) {
+        $invoice = DB::table('complete_cart')
+            ->select('complete_cart.id', 'invoice', 'total', 'm.nama', 'm.email', 'm.no_hp', 'm.instansi', 'm.satker', 'status_pembayaran_top')
+            ->leftJoin('member as m', 'm.id', '=', 'complete_cart.id_user')
+            ->where('complete_cart.id', $id_cart)
+            ->first();
+
+        return $invoice;
+    }
+
 }

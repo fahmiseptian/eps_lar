@@ -20,7 +20,7 @@
                 <a href="{{ route('login') }}"><span class="material-icons">account_circle</span></a>
                 <a href="{{ route('login') }}"><span class="material-icons">shopping_cart</span></a>
             @else
-                <a href="{{ route('profile', ['id' => $id_user]) }}"><span
+                <a href="{{ route('profile') }}"><span
                         class="material-icons">account_circle</span></a>
                 <a href="{{ route('cart') }}"><span class="material-icons">shopping_cart</span></a>
             @endif

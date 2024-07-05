@@ -29,6 +29,28 @@ $(function () {
     }
 });
 
+
+function formatRupiah(angka) {
+    var number_string = angka.toString().replace(/[^,\d]/g, "");
+    var split = number_string.split(",");
+    var sisa = split[0].length % 3;
+    var rupiah = split[0].substr(0, sisa);
+    var ribuan = split[0].substr(sisa).match(/\d{3}/g);
+
+    if (ribuan) {
+        var separator = sisa ? "." : "";
+        rupiah += separator + ribuan.join(".");
+    }
+
+    rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
+    return "Rp. " + rupiah;
+}
+
+function unformatRupiah(formattedRupiah) {
+    var number_string = formattedRupiah.replace(/[^,\d]/g, "");
+    return parseInt(number_string.replace(/[.,]/g, ""));
+}
+
 function showTab(tabName) {
     document.getElementById("bisaDilepas").style.display = "none";
     document.getElementById("sudahDilepas").style.display = "none";
@@ -219,133 +241,209 @@ $(document).on("click", "#editDefaultRekening", function () {
 });
 
 $(document).on("click", "#updatePIN", function () {
-    document.getElementById("overlay").style.display = "none";
-    document.getElementById("loading").style.display = "flex"; //menampilkan loading
+    $("#updatePin").modal("show");
+});
+
+$('.pin-digit').on('input', function() {
+    var $this = $(this);
+    if ($this.val().length === 1) {
+        $this.next('.pin-digit').focus();
+    }
+});
+
+$('.pin-digit').on('keydown', function(e) {
+    var $this = $(this);
+    if (e.key === 'Backspace' && $this.val().length === 0) {
+        $this.prev('.pin-digit').focus();
+    }
+});
+
+$('#savePin').on('click', function() {
+    var newPin = '';
+    var confirmNewPin = '';
+
+    $('#newPin .pin-digit').each(function() {
+        newPin += $(this).val();
+    });
+
+    $('#confirmNewPin .pin-digit').each(function() {
+        confirmNewPin += $(this).val();
+    });
+
+    if (newPin.length !== 6 || confirmNewPin.length !== 6) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Kesalahan',
+            text: 'PIN harus terdiri dari 6 digit.'
+        });
+        return;
+    }
+
+    if (newPin !== confirmNewPin) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Kesalahan',
+            text: 'PIN dan konfirmasi PIN tidak cocok.'
+        });
+        return;
+    }
+
+    // Lakukan AJAX request
     $.ajax({
-        url: appUrl + "/seller/finance/sendVerificationCode",
-        type: "POST",
-        headers: {
-            "X-CSRF-Token": $('meta[name="csrf-token"]').attr("content"),
+        url: appUrl + '/api/seller/finance/updatePin',  // Ganti dengan URL endpoint API Anda
+        method: 'POST',
+        data: {
+            newPin: newPin
         },
-        success: function (response) {
-            // Tampilkan input untuk kode verifikasi
-            document.getElementById("overlay").style.display = "block";
-            document.getElementById("loading").style.display = "none"; //tutup loading
+        success: function(response) {
             Swal.fire({
-                title: "Verifikasi Email",
-                input: "text",
-                inputPlaceholder: "Masukkan kode verifikasi",
-                showCancelButton: true,
-                confirmButtonText: "Verifikasi",
-                cancelButtonText: "Batal",
-                focusConfirm: false,
-                preConfirm: (code) => {
-                    // Kirim kode verifikasi ke server untuk diverifikasi
-                    return fetch("/seller/finance/verifyCode", {
-                        method: "POST",
-                        body: JSON.stringify({ code: code }),
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-Token": $('meta[name="csrf-token"]').attr(
-                                "content"
-                            ),
-                        },
-                    })
-                        .then((response) => {
-                            if (!response.ok) {
-                                throw new Error("Kode verifikasi salah.");
-                            }
-                            return response.json();
-                        })
-                        .catch((error) => {
-                            Swal.showValidationMessage(
-                                `Terjadi kesalahan: ${error.message}`
-                            );
-                        });
-                },
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Jika verifikasi berhasil, tampilkan modal untuk memperbarui PIN
-                    Swal.fire({
-                        title: "Update PIN Saldo Penjual",
-                        html: `
-                            <form id="updatePinForm">
-                                <div class="form-group">
-                                    <label for="newPin">PIN Baru:</label>
-                                    <input type="password" id="newPin" name="newPin" class="form-control" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="confirmNewPin">Konfirmasi PIN Baru:</label>
-                                    <input type="password" id="confirmNewPin" name="confirmNewPin" class="form-control" required>
-                                </div>
-                            </form>
-                        `,
-                        showCancelButton: true,
-                        confirmButtonText: "Update",
-                        cancelButtonText: "Batal",
-                        focusConfirm: false,
-                        preConfirm: () => {
-                            // Ambil data dari form
-                            const form =
-                                document.getElementById("updatePinForm");
-                            const formData = new FormData(form);
-
-                            // Validasi pin dan konfirmasi pin
-                            const newPin = formData.get("newPin");
-                            const confirmNewPin = formData.get("confirmNewPin");
-
-                            if (newPin !== confirmNewPin) {
-                                Swal.showValidationMessage(
-                                    "PIN baru dan konfirmasi PIN baru tidak cocok."
-                                );
-                                return false;
-                            }
-
-                            // Kirim data dengan metode POST ke controller
-                            return fetch("/seller/finance/updateNewPin", {
-                                method: "POST",
-                                body: formData,
-                                headers: {
-                                    "X-CSRF-Token": $(
-                                        'meta[name="csrf-token"]'
-                                    ).attr("content"),
-                                },
-                            })
-                                .then((response) => {
-                                    if (!response.ok) {
-                                        throw new Error(
-                                            "Gagal memperbarui PIN saldo."
-                                        );
-                                    }
-                                    return response.json();
-                                })
-                                .catch((error) => {
-                                    Swal.showValidationMessage(
-                                        `Terjadi kesalahan: ${error.message}`
-                                    );
-                                });
-                        },
-                    }).then((finalResult) => {
-                        if (finalResult.isConfirmed) {
-                            Swal.fire(
-                                "Sukses",
-                                "PIN saldo penjual berhasil diperbarui",
-                                "success"
-                            ).then(() => {
-                                // Refresh halaman setelah menutup modal Swal
-                                window.location.reload();
-                            });
-                        }
-                    });
-                }
+                icon: 'success',
+                title: 'Berhasil',
+                text: 'PIN berhasil diperbarui.'
+            }).then(() => {
+                $('#updatePin').modal('hide');
             });
         },
-        error: function (xhr, status, error) {
-            Swal.fire(
-                "Error",
-                "Terjadi kesalahan saat mengirim kode verifikasi",
-                "error"
-            );
+        error: function(xhr, status, error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Kesalahan',
+                text: 'Anda Memasukan PIN yang Sama'
+            });
+        }
+    });
+});
+
+$(document).on("click", "#tarikTrx", function () {
+    var tbody = $("#tableTarikSaldo tbody");
+    tbody.empty();
+
+    $.ajax({
+        url: appUrl + '/api/seller/finance/getTraxPending',
+        method: 'GET',
+        success: function(response) {
+            var trxs = response.trx;
+            if (trxs.length > 0) {
+                trxs.forEach(function (trx) {
+                    var row = `
+                        <tr>
+                            <td>${trx.invoice}</td>
+                            <td class="detail-full">${trx.nama_instansi}</td>
+                            <td>${formatRupiah(trx.total_diterima_seller)}</td>
+                            <td><input type="checkbox" class="trx-checkbox" data-id="${trx.id}"></td>
+                        </tr>
+                    `;
+                    tbody.append(row);
+                });
+                if ($.fn.DataTable.isDataTable('#tableTarikSaldo')) {
+                    $('#tableTarikSaldo').DataTable().destroy();
+                }
+                $("#tableTarikSaldo").DataTable({
+                    bPaginate: true,
+                    bLengthChange: true,
+                    bFilter: true,
+                    bSort: true,
+                    bInfo: true,
+                    bAutoWidth: true,
+                    pageLength: 5
+                });
+
+                $("#tarikSaldo").modal("show");
+            } else {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Tidak Ada Transaksi',
+                    text: 'Tidak ada transaksi yang dapat ditarik.'
+                });
+            }
         },
+        error: function(xhr, status, error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Kesalahan',
+                text: 'Terjadi kesalahan dalam memuat data transaksi.'
+            });
+        }
+    });
+});
+
+
+$(document).on("click", "#requestSaldo", function () {
+    var selectedIds = [];
+    $("#tableTarikSaldo .trx-checkbox:checked").each(function () {
+        selectedIds.push($(this).data('id'));
+    });
+
+    if (selectedIds.length > 0) {
+        $("#modalPINSaldo").modal("show");
+        $('#idTrx').val(selectedIds);
+    } else {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Tidak Ada Pilihan',
+            text: 'Silakan pilih setidaknya satu transaksi.'
+        });
+    }
+});
+
+$(document).on("click", "#selectAll", function () {
+    var checkboxes = $("#tableTarikSaldo .trx-checkbox");
+    if (checkboxes.length > 0) {
+        var allChecked = checkboxes.length === checkboxes.filter(":checked").length;
+        checkboxes.prop("checked", !allChecked);
+    }
+});
+
+$(document).ready(function() {
+    $('#sendRequestTarikSaldo').on('click', function(event) {
+        event.preventDefault();
+
+        var idTrx = $('#idTrx').val();
+        var pin = '';
+        $('.pin-digit').each(function() {
+            pin += $(this).val();
+        });
+
+        if (pin.length !== 6) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'PIN Tidak Lengkap',
+                text: 'Silakan masukkan PIN lengkap.'
+            });
+            return;
+        }
+        console.log(pin);
+        $.ajax({
+            url: appUrl + '/api/seller/finance/requestrevenue',
+            method: 'POST',
+            data: {
+                pin : pin,
+                idTrx: idTrx,
+            },
+            success: function(response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Permintaan Berhasil Dikirim.'
+                });
+                $('#modalPINSaldo').modal('hide');
+                $('#tarikSaldo').modal('hide');
+                location.reload();
+            },
+            error: function(xhr, status, error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kesalahan',
+                    text: 'Terjadi kesalahan dalam memvalidasi PIN.'
+                });
+            }
+        });
+    });
+
+    // Auto focus on the next PIN input
+    $('.pin-input .form-control').on('keyup', function() {
+        if (this.value.length == this.maxLength) {
+            $(this).next('.form-control').focus();
+        }
     });
 });

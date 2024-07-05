@@ -70,16 +70,18 @@
                                                     </td>
                                                     <td class="detail-full">{{ $product->stock }}</td>
                                                     <td align="center">
-                                                        <a href="#">
+                                                        <a id="editStatus" data-id="{{$product->id}}">
                                                             <img style="width: 50px"
                                                                 src="{{ asset('/img/app/' . ($product->status_display == 'Y' ? 'tayang.png' : 'tidak-tayang.png')) }}"
                                                                 alt="{{ $product->status_display == 'Y' ? 'Aktif' : 'Tidak Aktif' }}">
                                                         </a>
                                                     </td>
                                                     <td>
-                                                        <span>sasassa</span>
-                                                        <span>sasassa</span>
-                                                        <span>sasassa</span>
+                                                        <div style="display: flex">
+                                                            <a id="edit_product" data-id="{{$product->id}}" class="material-icons" href="{{ route('seller.product.edit', ['id' => $product->id]) }}">edit</a>
+                                                            <a id="review_product" data-id="{{$product->id}}" class="material-icons">rate_review</a>
+                                                            <a id="deleteProduct" data-id="{{$product->id}}" class="material-icons">delete</a>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             @endforeach

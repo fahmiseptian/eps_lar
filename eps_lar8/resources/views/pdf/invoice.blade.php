@@ -6,7 +6,7 @@
     $handling_cost = $data->handling_cost / (1 + $data->val_ppn / 100);
     $ppn_handling_cost = $data->handling_cost - $handling_cost;
     $proforma = false;
-    
+
     if (in_array($data->id_payment, [23, 30])) {
         if ($data->status_pembayaran_top == '0') {
             $proforma = true;
@@ -17,7 +17,7 @@
             $proforma = true;
         }
     }
-    
+
     ?>
 
 
@@ -68,7 +68,7 @@
             border-bottom: none !important;
         }
 
-        
+
 
         /* Styling */
         body {

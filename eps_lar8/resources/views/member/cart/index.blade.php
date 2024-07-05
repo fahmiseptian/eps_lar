@@ -25,18 +25,28 @@
                     @foreach ($detail->products as $product)
                         {{-- Product --}}
                         <div class="item-cart-product">
-                            <button class="checkbox-btn">☐</button>
-                            <img src="{{$product->gambar_product}}"
-                                alt="product" class="product-image">
+                            <a id="updateIsSelectProduct" data-id_cart="{{ $cart->id }}" data-id_cst="{{ $product->id_cst }}">
+                                <span id="icon-{{ $product->id_cst }}" class="material-icons">
+                                    {{ $product->is_selected == 'Y' ? 'check_box' : 'check_box_outline_blank' }}
+                                </span>
+                            </a>
+                            <img src="{{$product->gambar_product}}" alt="product" id="no-mobile" class="product-image-cart">
                             <p class="product-name">{{ $product->nama_product }}</p>
                             <p class="product-price">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
                             <div>
                                 <div class="quantity-input">
+                                    <a id="kurang-qty" data-id_cst="{{ $product->id_cst }}"><span class="material-icons">remove</span></a>
+                                    <input style="width:100px" type="number" id="quantity" name="quantity" min="1" max="{{ $product->stock }}" value="{{ $product->qty }}" step="1" class="quantity" data-product-id="{{ $product->id_cst }}" data-stock="{{ $product->stock }}" data-id_cst="{{ $product->id_cst }}" data-id_cs="{{ $detail->id_cs }}">
+                                    <a id="tambah-qty" data-id_cst="{{ $product->id_cst }}"><span class="material-icons">add</span></a>
+                                </div>
+                                <p id="remaining-quantity" style="font-size: small;" data-product-id="{{ $product->id_cst }}">Tersisa {{ $product->stock - $product->qty }} buah</p>
+
+                                {{-- <div class="quantity-input">
                                     <button type="button" id="kurang-qty-cart" data-id="{{ $cart->id }}" data-id_cst="{{ $product->id_cst }}" data-id_cs="{{ $detail->id_cs }}">-</button>
                                     <input type="number" id="quantity" name="quantity" min="1" max="{{ $product->stock }}" value="{{ $product->qty }}" step="1" class="quantity" data-product-id="{{ $product->id_cst }}" data-stock="{{ $product->stock }}" data-id="{{ $cart->id }}" data-id_cst="{{ $product->id_cst }}" data-id_cs="{{ $detail->id_cs }}">
                                     <button type="button" id="tambah-qty-cart" data-id="{{ $cart->id }}" data-id_cst="{{ $product->id_cst }}" data-id_cs="{{ $detail->id_cs }}">+</button>
                                 </div>
-                                <p id="remaining-quantity" style="font-size: small;" data-product-id="{{ $product->id_cst }}">Tersisa {{ $product->stock - $product->qty }} buah</p>
+                                <p id="remaining-quantity" style="font-size: small;" data-product-id="{{ $product->id_cst }}">Tersisa {{ $product->stock - $product->qty }} buah</p> --}}
                             </div>
                             <p class="product-total">Rp {{ number_format($product->total, 0, ',', '.') }}</p>
                             <div class="item-cart-action">
@@ -71,8 +81,9 @@
                     </select>
                 </div>
                 <div class="subtotal-checkout">
-                    <p>Sub Total ({{ $cart->qty }} product) <b>Rp. {{ number_format($cart->total, 0, ',', '.') }}
-                            &nbsp;</b> <a href="{{route('checkout')}}"> <span class="btn btn-danger">Checkout</span></a></p>
+                    <p id="totalqty"> Subtotal ({{ $cart->qty }} product)</p>
+                    <b id="sumprice">Rp. {{ number_format($cart->sumprice, 0, ',', '.') }} &nbsp; </b>
+                    <a href="{{route('checkout')}}"> <span class="btn btn-danger">Checkout</span></a>
                 </div>
             </div>
 

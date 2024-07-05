@@ -140,7 +140,7 @@ class Products extends Model implements HasMedia
                    ->count();
 	}
 
-    public function getproduct() {
+    public function getproduct($perPage = 10) {
         return self::select(
             'products.*',
             'lp.price_lpse as hargaTayang',
@@ -148,14 +148,26 @@ class Products extends Model implements HasMedia
             's.id as idToko',
             'p.province_name'
         )
+        ->leftJoin('lpse_price as lp', 'products.id', '=', 'lp.id_product')
+        ->leftJoin('shop as s', 'products.id_shop', '=', 's.id')
+        ->leftJoin('member_address as ma', 's.id_address', '=', 'ma.member_address_id')
+        ->leftJoin('province as p', 'ma.province_id', '=', 'p.province_id')
+        ->where('products.status_display', 'Y')
+        ->where('products.status_delete', 'N')
+        ->where('s.status', 'active')
+        ->orderBy('products.id', 'DESC')
+        ->distinct()
+        ->paginate($perPage);
+    }
+
+    function getDataProduct($id_product){
+        return self::select(
+            'products.*',
+            'lp.price_lpse as hargaTayang',
+        )
         ->join('lpse_price as lp', 'products.id', '=', 'lp.id_product')
-        ->join('shop as s', 'products.id_shop', '=', 's.id')
-        ->join('member_address as ma', 's.id_address', '=', 'ma.member_address_id')
-        ->join('province as p', 'ma.province_id', '=', 'p.province_id')
-        ->where('products.status_display','Y')
-        ->where('products.status_delete','N')
-        ->where('s.status','active')
-        ->get();
+        ->where('products.id',$id_product)
+        ->first();
     }
 
     public function getProductByIdShop($id_shop) {
@@ -332,5 +344,28 @@ class Products extends Model implements HasMedia
         return $query ;
     }
 
+    function getproductactivebyId_shop($id_shop){
+        return self::select(
+            'products.name',
+            'products.id'
+        )
+        ->where('products.status_display','Y')
+        ->where('products.status_delete','N')
+        ->where('products.id_shop', $id_shop)
+        ->get();
+    }
+
+    function getPricewithProduct($id_product) {
+        $query  = DB::table('products as p')
+        ->select(
+            'p.price',
+            'lp.price_lpse as harga_tayang'
+        )
+        ->join('lpse_price as lp','lp.id_product','p.id')
+        ->where('p.id',$id_product)
+        ->first();
+
+        return $query;
+    }
 
 }

@@ -98,7 +98,7 @@
                                     </tfoot>
                                 </table>
                             </div>
-                            
+
                             <div class="sudahDilepas" id="sudahDilepas" style="display: none;">
                                 <table id="example2" class="table table-bordered table-hover" style="width: 100%">
                                     <!-- Konten tabel untuk 'Sudah Dilepas' -->

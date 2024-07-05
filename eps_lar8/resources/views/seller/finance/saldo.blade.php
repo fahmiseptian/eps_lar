@@ -29,7 +29,7 @@
                                 </tr>
                                 <tr>
                                     <th style="padding: 10px; ">Rp {{ number_format($saldo, 0, ',', '.') }} <span
-                                            class="btn btn-info">Tarik</span> </td>
+                                            class="btn btn-info" id="tarikTrx">Tarik</span> </td>
                                     <th style="padding: 10px;">{{ $rekening->name }} <span
                                             class="btn btn-info">Utama</span></td>
                                     <th style="padding: 10px; text-align: right;">
@@ -96,10 +96,10 @@
             </section>
         </div><!-- /.content-wrapper -->
     </div><!-- ./wrapper -->
+    @include('seller.finance.modal-tarik-saldo')
 </body>
 {{-- footer --}}
 @include('seller.asset.footer')
-
 <!-- page script -->
 <script src="{{ asset('/js/function/seller/finance.js') }}" type="text/javascript"></script>
 

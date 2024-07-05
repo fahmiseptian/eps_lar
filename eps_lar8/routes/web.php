@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Member\CartController;
+use App\Http\Controllers\Member\CheckoutController;
 use App\Http\Controllers\Member\DashboardmemberController;
 use App\Http\Controllers\Member\HomememberController;
 use App\Http\Controllers\Member\LoginmemberController;
@@ -19,8 +20,10 @@ use App\Http\Controllers\Seller\LoginSellerController;
 use App\Http\Controllers\Seller\HomesellerController;
 use App\Http\Controllers\Seller\DeliveryController;
 use App\Http\Controllers\Seller\FinanceController;
+use App\Http\Controllers\Seller\NegoController;
 use App\Http\Controllers\Seller\OrederController;
 use App\Http\Controllers\Seller\ProductController;
+use App\Http\Controllers\Seller\PromotionController;
 use App\Http\Controllers\seller\ShophealthController;
 use Illuminate\Support\Facades\Artisan;
 
@@ -70,6 +73,8 @@ Route::get('/product/{id}', [HomememberController::class, 'getDetailproduct'])->
 Route::get('/getProductsByEtalase/{etalase_id}', [HomememberController::class, 'getProductsByEtalase']);
 Route::get('/getProductsByIdshop/{id}', [HomememberController::class, 'getProductsByIdshop']);
 Route::get('/toko/detail/{id}', [HomememberController::class, 'ShowSeller'])->name('seller.detail');
+Route::get('/products', [HomememberController::class, 'getPaginatedProducts'])->name('products.get');
+
 
 // Routes Milik Admin
 Route::group(['middleware' => ['admin', 'activity']], function () {
@@ -149,6 +154,7 @@ Route::group(['middleware' => 'seller'], function () {
     Route::get('/seller/add-free-courier', [DeliveryController::class, 'addfreeCourier']);
     Route::get('/seller/remove-free-courier', [DeliveryController::class, 'removefreeCourier']);
 
+
     // order
     Route::get('/seller/order', [OrederController::class, 'index'])->name('seller.order');
     Route::post('/seller/order/accept', [OrederController::class, 'acceptOrder']);
@@ -158,7 +164,7 @@ Route::group(['middleware' => 'seller'], function () {
     Route::post('/seller/order/addResi', [OrederController::class, 'updateResi']);
     Route::post('/seller/order/lacakResi', [OrederController::class, 'lacakResi']);
     Route::post('/seller/order/uploadDo', [OrederController::class, 'uploadDo']);
-    Route::get('/seller/order/test/{id}', [OrederController::class, 'test']);
+    Route::get('/seller/order/lacak_kurir_sendiri/{id}', [OrederController::class, 'lacak_kurir_sendiri']);
     Route::get('/seller/order/Resi/{id_cart_shop}', [OrederController::class, 'generateResiPDF']);
     Route::get('/seller/order/invoice/{id_cart_shop}', [OrederController::class, 'generateINVPDF']);
     Route::get('/seller/order/kwantasi/{id_cart_shop}', [OrederController::class, 'generateKwantasiPDF']);
@@ -168,6 +174,7 @@ Route::group(['middleware' => 'seller'], function () {
     Route::get('/seller/product/', [ProductController::class, 'index'])->name('seller.product');
     Route::get('/seller/product/violation', [ProductController::class, 'showViolation'])->name('seller.product.violation');
     Route::get('/seller/product/add', [ProductController::class, 'showaddProduct'])->name('seller.product.add');
+    Route::get('/seller/product/edit/{id}', [ProductController::class, 'EditProduct'])->name('seller.product.edit');
     Route::post('/seller/product/addProduct', [ProductController::class, 'addProduct'])->name('seller.product.addProduct');
     Route::get('/seller/product/{status}', [ProductController::class, 'filterProduct'])->name('seller.product.filter');
     Route::get('/seller/product/category/level2/{id_level1}', [ProductController::class, 'getCategoryLevel2']);
@@ -186,6 +193,12 @@ Route::group(['middleware' => 'seller'], function () {
     Route::post('/seller/finance/verifyCode', [FinanceController::class, 'verifyCode']);
     Route::post('/seller/finance/updateNewPin', [FinanceController::class, 'updatePin']);
 
+    // Nego
+    Route::get('/seller/nego/', [NegoController::class, 'index'])->name('seller.nego');
+
+    // Promosi
+    Route::get('/seller/promosi/', [PromotionController::class, 'index'])->name('seller.promosi');
+
     // Shop health
     Route::get('/seller/health/', [ShophealthController::class, 'index'])->name('seller.health');
 
@@ -198,12 +211,19 @@ Route::group(['middleware' => 'seller'], function () {
 
 Route::group(['middleware' => 'member'], function () {
     Route::get('/cart', [CartController::class, 'index'])->name('cart');
-    Route::get('/profile/{id}', [ProfilememberController::class, 'index'])->name('profile');
+    Route::get('/profile', [ProfilememberController::class, 'index'])->name('profile');
+    Route::get('/dashboard', [ProfilememberController::class, 'dashboard'])->name('dashboard');
     Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
-
+    Route::get('/inv/{id_seller}/{id_cart_shop}',[CheckoutController::class,'cetak_Invoice']);
+    Route::get('/kwitansi/{id_seller}/{id_cart_shop}',[CheckoutController::class,'cetak_Kwitansi']);
 });
 
 
 Route::get('test/', [HomememberController::class, 'tampil']);
 Route::get('test1/{id}', [CartController::class, 'finish_checkout']);
 Route::get('tester/', [HomememberController::class, 'fetchCompleteCartShop']);
+
+
+Route::get('test/view', function () {
+    return view('test.index');
+});

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Libraries\VerificationService;
 use App\Models\Member;
+use Illuminate\Support\Facades\Log;
 
 class FinanceController extends Controller
 {
@@ -33,7 +34,7 @@ class FinanceController extends Controller
         $rekening       = Rekening::getDefaultRekeningByShop($this->seller);
         $rekNdefault    = Rekening::JumlahRekeningIsDefaultN($this->seller);
         $this->verificationService = new VerificationService;
-        
+
         // Membuat $this->data
         $this->data['title'] = 'Finance';
         $this->data['seller_type'] = $sellerType;
@@ -102,7 +103,7 @@ class FinanceController extends Controller
             $rekening->rek_owner = $request->input('rek_owner');
             $rekening->rek_location = $request->input('rek_location');
             $rekening->rek_city = $request->input('rek_city');
-            
+
             $rekening->save();
 
             return response()->json([
@@ -159,7 +160,7 @@ class FinanceController extends Controller
         // Kirim respons sukses
         return response()->json(['success' => true]);
     }
-    
+
     public function updateDefaultRekening(Request $request)
     {
         // Ambil ID rekening dari permintaan
@@ -201,7 +202,7 @@ class FinanceController extends Controller
                 ->value('email');
         $code = $request->input('code');
         $isValid = $this->verificationService->verifyCode($email, $code);
-        
+
         if ($isValid) {
             return response()->json(['message' => 'Kode verifikasi valid']);
         } else {
@@ -216,10 +217,70 @@ class FinanceController extends Controller
         $email = Member::where('id', $id_userbyShop)
                 ->value('email');
         $newPin = $request->input('new_pin');
-        
+
         $result = $this->verificationService->updateNewPin($id_userbyShop, $newPin);
         return response()->json($result);
     }
 
+    public function savePin(Request $request)
+    {
+        // Validasi input PIN
+        $request->validate([
+            'newPin' => 'required|string|size:6',
+        ]);
 
+        // Enkripsi PIN baru
+        $newPin = $request->input('newPin');
+        $encodedPin = base64_encode($newPin);
+
+        // Update PIN di tabel shop
+        try {
+            $update = DB::table('shop')->where('id', $this->seller)->update([
+                'pin_saldo' => $encodedPin
+            ]);
+
+            if ($update) {
+                return response()->json(['message' => 'Berhasil Memperbaharui PIN'], 200);
+            } else {
+                Log::error('Failed to update PIN: No rows affected', ['seller_id' => $this->seller]);
+                return response()->json(['message' => 'Gagal Memperbaharui PIN'], 500);
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to update PIN', ['error' => $e->getMessage(), 'seller_id' => $this->seller]);
+            return response()->json(['message' => 'Gagal Memperbaharui PIN'], 500);
+        }
+    }
+
+    function getTraxPending(){
+        $trx = Saldo::getRevenuePending($this->seller);
+        return response()->json(['trx' => $trx]);
+    }
+
+    function RequestRevenue(Request $request){
+        $pin        = base64_encode($request->pin);
+        $ids_trx    = $request->idTrx;
+
+        // Checking
+        $checkPin   = Shop::getPinSaldo($this->seller);
+        $rekening   = Rekening::getDefaultRekeningByShop($this->seller);
+
+        if ($checkPin == null) {
+            return response()->json(['message' => 'Anda Belum Membuat PIN '], 500);
+            exit();
+        }
+
+        if ($checkPin != $pin) {
+            return response()->json(['message' => $pin], 500);
+            exit();
+        }
+
+        if ($rekening == null) {
+            return response()->json(['message' => 'Anda Belum Memiliki Rekening'], 500);
+            exit();
+        }
+
+        $action = Saldo::requestRevenue($this->seller, $ids_trx);
+
+        return response()->json(['success',$action], 200);
+    }
 }

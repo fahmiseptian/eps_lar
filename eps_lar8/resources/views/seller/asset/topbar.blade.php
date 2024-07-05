@@ -28,6 +28,14 @@
       <img src="{{ asset('/img/app/loader_eps.gif') }}" width="400px">
 </div>
 
+<div id="overlay" style="display: none;">
+    <div class="overlay-content">
+        <div id="loader" class="loader" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+</div>
+
 <script>
     const appUrl = "{{ env('APP_URL') }}";
     window.appUrl = appUrl;

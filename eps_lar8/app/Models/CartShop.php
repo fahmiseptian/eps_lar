@@ -37,6 +37,7 @@ class CartShop extends Model
                 'cs.discount',
                 's.nama_pt as nama_seller',
                 'shipping.id_courier',
+                'shipping.deskripsi as deskripsi_pengiriman'
             )
             ->join('shop as s', 'cs.id_shop', '=', 's.id')
             ->leftJoin('shipping', 'cs.id_shipping', '=', 'shipping.id')
@@ -371,6 +372,12 @@ class CartShop extends Model
                     'pph_shipping' => $pph_shipping,
                     'total' => DB::raw('sum_price_non_ppn + ppn_price + sum_shipping + insurance_nominal + ppn_shipping  + handling_cost_non_ppn - discount')
                 ]);
+        }
+
+        function updateCartShop($id_cart, $id_shop){
+            $config = Lpse_config::first();
+            $ppn    = $config->ppn / 100 ;
+            $pph    = $config->pph / 100 ;
         }
     }
 

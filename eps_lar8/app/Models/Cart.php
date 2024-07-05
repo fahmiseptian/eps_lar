@@ -212,8 +212,8 @@ class Cart extends Model
 
         $ship_after = $ship_after->merge($this->getFreeShippingProvince($id_shop, $id_subdistrict_dest));
 
-        // // Sort the collection by the created_at timestamp or ID if available
-        // $ship_after = $ship_after->sortByDesc('created_dt');
+        // Sort the collection by the created_at timestamp or ID if available
+        $ship_after = $ship_after->sortByDesc('created_dt');
 
         // Filter the results to get only unique entries based on 'deskripsi'
         $unique_ship_after = $ship_after->unique('deskripsi');
@@ -455,7 +455,7 @@ class Cart extends Model
             foreach ($response['price'] as $price) {
                 if (!empty($price['price']) && in_array($price['service_display'], $service_array)) {
                     // Konversi harga menjadi dalam satuan yang benar
-                    $convertedPrice = $price['price'] / 1000;
+                    $convertedPrice = $price['price'];
 
                     $data_rates = [
                         'id_courier'            => $courier_id,
@@ -481,7 +481,7 @@ class Cart extends Model
             'api_key' => '25c898a9faea1a100859ecd9ef674548',
             'from' => $jne_origin,
             'thru' => $jne_destination,
-            'weight' =>  $weight,
+            'weight' =>  1,
         ];
 
         // Log::info('Sending payload to JNE API', $post_array);
@@ -685,9 +685,9 @@ class Cart extends Model
 
 					$total_weight = $val->total_weight;
 
-					$sum_price = $val->sum_price;
-					$sum_price_ppn = $val->sum_price_ppn;
-					$sum_price_non_ppn = $val->sum_price_non_ppn;
+					$sum_price = $val->sum_price ?? 0;
+					$sum_price_ppn = $val->sum_price_ppn ?? 0;
+					$sum_price_non_ppn = $val->sum_price_non_ppn ?? 0;
 
 
 					$sum_ppn = round($val->sum_ppn);
@@ -712,8 +712,8 @@ class Cart extends Model
 					}
 
 					$id_coupon = $shop->id_coupon ?? 0;
-					$sum_shipping = $shop->sum_shipping;
-					$insurance_nominal = $shop->insurance_nominal;
+					$sum_shipping = $shop->sum_shipping ?? 0;
+					$insurance_nominal = $shop->insurance_nominal ?? 0;
 
 					$ppn_shipping = round(($sum_shipping + $insurance_nominal) * $ppn);
 					$pph_shipping = round(($sum_shipping + $insurance_nominal) * $pph);
@@ -745,13 +745,13 @@ class Cart extends Model
         if (!empty($datasave_cart_shop)) {
             foreach ($datasave_cart_shop as $key => $val) {
                 $id_shop = $val['id_shop'];
-                // $id_cart = $val['id_cart'];
 
                 $this->_updateShop2($id_cart, $id_shop, $val);
             }
         }
-
+        $cst       = new CartShopTemporary();
         $cart_shop = new CartShop();
+        $cst->updateCartShop($id_cart, $id_shop);
         $cart_shop->refreshCart($id_cart);
 
         return $datasave_cart_shop;
@@ -1166,4 +1166,203 @@ class Cart extends Model
         return true;
     }
 
+
+    public function VA_BNI() {
+        $client_id = '44867';
+        $secret_key = '3c1a5a5cfd36cdce1dd1bcf9ec7cc735';
+        $prefix = '988';
+        $trx_id = '1230000001';
+        $trx_amount = '100000';
+        $billing_type = 'c';
+        $virtual_account = '1111111111111111';
+
+        // Generate a timestamp
+        $timestamp = Carbon::now()->format('YmdHis');
+
+        // Generate the signature
+        $data = $client_id . $trx_id . $trx_amount . $virtual_account . $timestamp;
+        $signature = hash_hmac('sha256', $data, $secret_key);
+
+        $post_array = [
+            'type' => 'createbilling',
+            'client_id' => $client_id,
+            'trx_id' => $trx_id,
+            'trx_amount' => $trx_amount,
+            'billing_type' => $billing_type,
+            'virtual_account' => $virtual_account,
+            'prefix' => $prefix,
+            'timestamp' => $timestamp,
+            'data' => $signature
+        ];
+
+        Log::info('Sending payload to BNI API', $post_array);
+
+        try {
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+            ])->post('https://apibeta.bni-ecollection.com/', $post_array);
+
+            $result = $response->json();
+
+            Log::info('Response from BNI API', ['response' => $response->body()]);
+
+            return $result;
+        } catch (\Exception $e) {
+            Log::error('Error sending request to BNI API', ['error' => $e->getMessage()]);
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    function update_cart_after_nego($id_shop, $id_nego){
+        $nego           = new Nego();
+        $shop           = new Shop();
+        $ShopCategory   = new ShopCategory();
+        $Products       = new Products();
+        $ProductCategory= new ProductCategory();
+
+        $is_cart_exist = false;
+
+        $data_nego       = $nego->DetailNegoByid($id_nego);
+
+        // LPSE Config
+        $config         = Lpse_config::first();
+        $ppn            = $config->ppn;
+        $pph            = $config->pph;
+		$fee_mp_percent = $config->fee_mp_percent;
+		$fee_mp_nominal = $config->fee_mp_nominal;
+		$fee_pg_percent = $config->fee_pg_percent;
+		$fee_pg_nominal = $config->fee_pg_nominal;
+
+        if ($data_nego) {
+            // Data Nego
+            $id_member = $data_nego->member_id;
+            $id_product = $data_nego->id_product;
+            $qty = $data_nego->qty;
+
+            // Check PPN
+            $CheckppnProduct   = $ProductCategory->check_ppn($id_product);
+            $checkShop         = $shop->getShopCategory($id_shop);
+            if ($checkShop) {
+                $checkKategori     = $ShopCategory->getSpesialKategori($checkShop->shop_category);
+                $spesial_cat_product = in_array($CheckppnProduct->id_category, [1949, 1947, 1952, 1948]) ? 1 : 0;
+
+                if (isset($checkKategori->spesial_kategori) && $checkKategori->spesial_kategori == 1 && $spesial_cat_product == 1) {
+                    $ppn = 0;
+                } else {
+                    $cek_ppn = $CheckppnProduct->barang_kena_ppn;
+                    if ($cek_ppn == '0') {
+                        $ppn = 0;
+                    }
+                }
+            } else {
+                $cek_ppn = $CheckppnProduct->barang_kena_ppn;
+                if ($cek_ppn == '0') {
+                    $ppn = 0;
+                }
+            }
+
+            $getProduct     = $Products->getProductDetail($id_product);
+
+            // Data Product
+            $id_shop        = $getProduct->id_shop;
+			$product_nama   = $getProduct->name;
+			$product_image  = $getProduct->image;
+			$product_weight = $getProduct->weight;
+			$input_price    = $getProduct->price;
+
+            // Persiapan Perhitungan
+            $tot_fee_perc = $fee_mp_percent + $fee_pg_percent;
+			$tot_fee_nom = $fee_mp_nominal + $fee_pg_nominal;
+            $harga_dasar_lpse = 0;
+			$harga_dasar_lpse_satuan = 0;
+
+			if ($qty >= 1) {
+				$harga_dasar_lpse_satuan =($data_nego->harga_nego / $data_nego->qty);
+				$harga_dasar_lpse_exc 	= ($harga_dasar_lpse_satuan / (1 + ($ppn / 100)));
+				$harga_dasar_lpse 	= $harga_dasar_lpse_exc * $qty;
+			} else {
+				$harga_dasar_lpse_satuan = $data_nego->harga_nego;
+				$harga_dasar_lpse 	= ($data_nego->harga_nego / (1 + ($ppn / 100)));
+			}
+
+			$input_price 		= $data_nego->nominal_didapat / $qty;
+			$harga_tayang 		= $data_nego->base_price;
+			$ppn_nom        	= round($harga_dasar_lpse * ($ppn / 100));
+			$pph_nom        	= round($harga_dasar_lpse * ($pph / 100));
+
+            // Data
+            $dataSave = [
+                'id_shop' => $id_shop,
+                'id_product' => $id_product,
+                'nama' => $product_nama,
+                'image' => $product_image,
+                'weight' => $product_weight,
+
+                'fee_mp_percent' => $fee_mp_percent,
+                'fee_mp_nominal' => $fee_mp_nominal,
+                'fee_pg_percent' => $fee_pg_percent,
+                'fee_pg_nominal' => $fee_pg_nominal,
+
+                'id_nego' => $data_nego->id_nego,
+                'input_price' => $input_price,
+                'price' => $harga_tayang,
+                'qty' => $qty,
+                'nominal_ppn' => $ppn_nom,
+                'nominal_pph' => $pph_nom,
+                'val_ppn' => $ppn,
+                'val_pph' => $pph,
+                'total_non_ppn' => $harga_dasar_lpse,
+                'harga_dasar_lpse' => $harga_dasar_lpse_exc,
+                'total' => $data_nego->harga_nego,
+                'is_selected' => 'Y',
+            ];
+
+
+            $data_cart_detail = DB::table('cart_shop_temporary as a')
+                ->select('a.id', 'a.id_cart', 'a.id_shop', 'a.id_product', 'a.qty')
+                ->leftJoin('cart as b', 'a.id_cart', '=', 'b.id')
+                ->where('b.id_user', $id_member)
+                ->where('a.id_product', $id_product)
+                ->first();
+
+                if ($data_cart_detail) {
+					$is_cart_exist = true;
+				} else {
+					// NOTE Data tidak ada di keranjang
+					$is_cart_exist = false;
+				}
+
+                if ($is_cart_exist) {
+                    // NOTE Data ada di keranjang
+					$id_temporary = $data_cart_detail->id;
+					$id_cart = $data_cart_detail->id_cart;
+
+                    $update_temporary = DB::table('cart_shop_temporary')
+                        ->where('id', $id_temporary)
+                        ->update(array_merge($dataSave, [
+                            'total_weight' => DB::raw('weight * qty')
+                        ]));
+
+                    if ($update_temporary) {
+                        // Memanggil fungsi update_cart_temp dengan parameter $id_cart
+                        $this->update_cart_temp($id_cart);
+                        return true;
+                    }
+                }else{
+                    $id_cart = $this->getIdCartbyidmember($id_member);
+                    if ($id_cart) {
+						$dataSave['id_cart'] = $id_cart;
+						$dataSave['total_weight'] = DB::raw('weight * qty');
+                        // Menyimpan data ke tabel cart_shop_temporary
+                        $save = DB::table('cart_shop_temporary')->insert($dataSave);
+						if ($save) {
+							$savetocart = $this->update_cart_temp($id_cart);
+							return $savetocart;
+						}
+					}
+                }
+        }else{
+            return  $data_nego;
+        }
+    }
 }

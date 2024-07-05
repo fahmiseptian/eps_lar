@@ -20,7 +20,7 @@ class CartController extends Controller
     protected $data;
     public function __construct(Request $request)
     {
-        $this->data['carts'] = new CartShopTemporary();
+        $this->data['CartShopTemporary'] = new CartShopTemporary();
         // Ambil semua data sesi
         $sessionData = $request->session()->all();
         $this->data['id_user'] = $sessionData['id'] ?? null;
@@ -38,6 +38,9 @@ class CartController extends Controller
                 $detail->products= $products;
             }
 
+            $sumprice = CartShopTemporary::sumPriceSelectProductCart($cart->id);
+            $cart->sumprice= $sumprice;
+
             // return response()->json(["cart"=>$cart]);
             return view('member.cart.index',$this->data,["cart"=>$cart]);
         } else{
@@ -45,43 +48,47 @@ class CartController extends Controller
         }
     }
 
-    public function updateQuantity(Request $request)
-    {
-        $id_cart = $request->input('id_cart');
-        $id_cst = $request->input('id_cst');
-        $id_cs = $request->input('id_cs');
-        $action = $request->input('action');
-        $quantity = $request->input('quantity');
+    function updateqtyCart(Request $request){
+        $id_user = $this->data['id_user'];
+        $cartShop = new CartShop;
+
+        $id_cst = $request->id_cst;
+        $action = $request->action;
+        $quantity = $request->quantity;
+
+        $cst =$this->data['CartShopTemporary']->find($id_cst);
+        if (!$cst) {
+            return response()->json(['message' => 'Product Cart Tidak ditemukan'], 404);
+        }
 
         try {
-            DB::transaction(function () use ($id_cart, $id_cst, $id_cs, $action, $quantity, &$newQuantity, &$remainingQuantity) {
-                if ($action === 'decrease') {
-                    DB::table('cart_shop_temporary')->where('id', $id_cst)->decrement('qty', 1);
-                    DB::table('cart_shop')->where('id', $id_cs)->decrement('qty', 1);
-                    DB::table('cart')->where('id', $id_cart)->decrement('qty', 1);
-                } elseif ($action === 'increase') {
-                    DB::table('cart_shop_temporary')->where('id', $id_cst)->increment('qty', 1);
-                    DB::table('cart_shop')->where('id', $id_cs)->increment('qty', 1);
-                    DB::table('cart')->where('id', $id_cart)->increment('qty', 1);
-                } elseif ($action === 'change' && $quantity !== null) {
-                    $oldQuantity = DB::table('cart_shop_temporary')->where('id', $id_cst)->value('qty');
-                    $difference = $quantity - $oldQuantity;
-                    DB::table('cart_shop_temporary')->where('id', $id_cst)->update(['qty' => $quantity]);
-                    DB::table('cart_shop')->where('id', $id_cs)->increment('qty', $difference);
-                    DB::table('cart')->where('id', $id_cart)->increment('qty', $difference);
-                }
+            $hasil = null;
+            DB::transaction(function () use ($id_user, $cst, $id_cst, $action, $quantity, &$hasil) {
+                if ($action == 'decrease') {
+                    $newQty = $cst->qty - 1;
+                    $dataArr = [
+                        'qty' => $newQty,
+                    ];
+                    $hasil = $this->data['CartShopTemporary']->updateTemporaryById($id_user, $cst->id_shop, $id_cst, $newQty);
 
-                $newQuantity = DB::table('cart_shop_temporary')->where('id', $id_cst)->value('qty');
-                $stock = DB::table('product')->join('cart_shop_temporary', 'product.id', '=', 'cart_shop_temporary.id_product')
-                            ->where('cart_shop_temporary.id', $id_cst)
-                            ->value('product.stock');
-                $remainingQuantity = $stock - $newQuantity;
+                } elseif ($action == 'increase') {
+                    $newQty = $cst->qty + 1;
+                    $dataArr = [
+                        'qty' => $newQty,
+                    ];
+                    $hasil = $this->data['CartShopTemporary']->updateTemporaryById($id_user, $cst->id_shop, $id_cst, $newQty);
+
+                } elseif ($action == 'custom') {
+                    $dataArr = [
+                        'qty' => $quantity,
+                    ];
+                    $hasil = $this->data['CartShopTemporary']->updateTemporaryById($id_user, $cst->id_shop, $id_cst, $quantity);
+                }
             });
 
             return response()->json([
                 'success' => true,
-                'new_quantity' => $newQuantity,
-                'remaining_quantity' => $remainingQuantity
+                'hasil' => $hasil
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -98,14 +105,14 @@ class CartController extends Controller
         $qty = $request->qty;
         $id_shop= 0;
 
-        $addcart =$this->data['carts']->updateTemporary($id_member,$id_product,$id_shop,$qty) ;
+        $addcart =$this->data['CartShopTemporary']->updateTemporary($id_member,$id_product,$id_shop,$qty) ;
 
         return response()->json(["Masagge"=>$addcart]);
     }
 
     function deletecart($id_temporary,$id_shop) {
         $id_member=$this->data['id_user'];
-        $deletecart = $this->data['carts']->deletecart($id_member,$id_temporary,$id_shop);
+        $deletecart = $this->data['CartShopTemporary']->deletecart($id_member,$id_temporary,$id_shop);
     }
 
     function checkout(){
@@ -129,7 +136,7 @@ class CartController extends Controller
 
         foreach ($cart->detail as $detail ) {
             $pengiriman = $carts->getRates($cart->id,$detail->id_shop);
-            $products = CartShopTemporary::getCartSelectedByIdShop($detail->id_shop,$cart->id);
+            $products = $this->data['CartShopTemporary']->getCartSelectedByIdShop($detail->id_shop,$cart->id);
 
             // Gabungkan pengiriman dan detail produk ke dalam satu objek
             $detail->pengiriman = $pengiriman;
@@ -267,4 +274,30 @@ class CartController extends Controller
 		}
     }
 
+    function updateIsSelectProduct(Request $request){
+        $id_cart = $request->id_cart;
+        $id_cst = $request->id_cst;
+        $cst =$this->data['CartShopTemporary']->find($id_cst);
+        if (!$cst) {
+            return response()->json(['message' => 'Product Cart Tidak ditemukan'], 404);
+        }
+
+        if ($cst->is_selected == 'Y') {
+            $cst->is_selected = 'N';
+            $cst->save();
+        }else {
+            $cst->is_selected = 'Y';
+            $cst->save();
+        }
+        $sumprice = $this->data['CartShopTemporary']->sumPriceSelectProductCart($id_cart);
+        $totalqty =$this->data['CartShopTemporary']->sumqtySelected($id_cart);
+
+        $carts = [
+            'sumprice' => $sumprice,
+            'is_selected' => $cst->is_selected,
+            'qty' => $totalqty
+        ];
+
+        return response()->json(['carts' => $carts], 200);
+    }
 }

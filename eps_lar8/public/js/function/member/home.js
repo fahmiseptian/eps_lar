@@ -570,20 +570,21 @@ function generateDataDetailorderHeader(data) {
             '</div>' +
         '</div>'
         '<br>';
-        html +=
-        '<div class="detail-product-transaksi">' +
-            '<div class="toko-info">' +
-                '<p>' + item.nama_pt + '</p>' +
-            '</div>' +
-            '<div class="btn-group">' +
-                '<p class="btn"><span class="material-icons">content_copy</span>Lacak Pesanan</p>' +
-                '<p class="btn"><span class="material-icons">content_copy</span>Kwitansi</p>' +
-                '<p class="btn"><span class="material-icons">content_copy</span>Invoice</p>' +
-                '<p class="btn"><span class="material-icons">content_copy</span>Kontrak</p>' +
-            '</div>' +
-        '</div>'+
-        '<div class="product-transaksi">' +
-            '<div class="product-list">' ;
+        html +=`
+        <div class="detail-product-transaksi">
+            <div class="toko-info">
+                <p>${item.nama_pt}</p>
+            </div>
+            <div class="btn-group">
+                <p id="lacak_pesanan" data-id_shop="${item.id_shop}" data-id_cs="${item.id}" class="btn"><span class="material-icons">content_copy</span>Lacak Pesanan</p>
+                <a href="${appUrl}/kwitansi/${item.id_shop}/${item.id}" target="blank" class="btn"><span class="material-icons">content_copy</span>Kwitansi</a>
+                <a href="${appUrl}/inv/${item.id_shop}/${item.id}" target="blank" class="btn"><span class="material-icons">content_copy</span>Invoice</a>
+                <p class="btn"><span class="material-icons">content_copy</span>Kontrak</p>
+            </div>
+        </div>
+        <div class="product-transaksi">
+            <div class="product-list">
+    `;
         item.products.forEach(function (product) {
             html +=
                 '<div class="product-item">' +
@@ -733,8 +734,16 @@ function generateviewtransaksibody(dataArray) {
     var html = '<div class="list-transaksi">';
 
     dataArray.forEach(function (item) {
+        if (item.status_pembayaran === 1) {
+            var status_pembayaran= 'Selesai';
+        } if (item.status_pembayaran === 0 && item.file_upload !== null) {
+            var status_pembayaran= 'Menunggu Pengecekkan Pembayaran';
+        }else {
+            var status_pembayaran= 'Belum Bayar';
+        }
+
         html += '<div class="item-transaksi">';
-        html += '<p style="text-align: right; color:red">Pembayaran</p>';
+        html += `<p style="text-align: right; color:red">${status_pembayaran}</p>`;
 
         // Akses properti detail dari setiap transaksi
         item.detail.forEach(function (detail) {
@@ -747,7 +756,7 @@ function generateviewtransaksibody(dataArray) {
             html += '<div class="item-product-transaksi">';
             html +=
                 '<div style="display: flex; justify-content: space-between;">';
-            html += "<p>" + detail.nama_pt + " </p> <p>status </p>";
+            html += `<p> ${detail.nama_pt} </p> <p> ${status_pembayaran} </p>`;
             html += "</div>";
 
             detail.products.forEach(function (product) {
@@ -773,6 +782,17 @@ function generateviewtransaksibody(dataArray) {
             });
 
             html += "</div>";
+
+            var tombol;
+            if (detail.status_dari_toko === 'send_by_seller') {
+                tombol = `<p><button class="btn btn-warning" id="pesanan-diterima" data-id_cs="${detail.id}" data-id_cart="${item.id_transaksi}" data-id_shop=${detail.id_shop} style="width:100%">Terima Pesanan</button></p>`;
+            } else if (detail.status_dari_toko === 'complete') {
+                tombol = `<p><button class="btn btn-success" style="width:100%">Pesanan Telah Sampai</button></p>`;
+            } else {
+                tombol = '';
+            }
+        html += tombol;
+
         });
 
         html += '<div style="display: flex; justify-content: space-between;">';
@@ -786,7 +806,9 @@ function generateviewtransaksibody(dataArray) {
             formatRupiah(item.total) +
             "</b></p>";
         html +=
-        '<p><button class="btn btn-primary" id="detail-order" data-id_cart="'+ item.id_transaksi +'" style="width:100%">Detail</button></p>'
+        `
+            <p><button class="btn btn-primary" id="detail-order" data-id_cart="${item.id_transaksi}" style="width:100%">Detail</button></p>'
+        `
         html += "</div>";
         html += "</div>";
         html += "</div>";
@@ -853,6 +875,163 @@ $(document).on("click", "#nextPage", function () {
     getdata(nextPageUrl);
 });
 
+$(document).on("click", "#pesanan-diterima", function () {
+    var id_cart = $(this).data("id_cart");
+    var id_cs = $(this).data("id_cs");
+    var id_shop = $(this).data("id_shop");
+
+    $.ajax({
+        url: appUrl + "/api/get_detail_transaksi/" + id_shop + "/" + id_cs,
+        method: "GET",
+        success: function (response) {
+            var nama_seller = response.cart_shop.nama_seller;
+            var detail_product = response.cart_shop.products.map(function (item) {
+                return `
+                    <tr>
+                        <td style="width: 40%; text-align: left; padding: 8px; border: 1px solid #ddd;">${item.nama}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">${item.qty}</td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">
+                            <input id="qty_diterima_${item.id}" class="swal2-input" type="number" value="${item.qty}" style="width: calc(100% - 16px); padding: 6px; box-sizing: border-box;">
+                        </td>
+                        <td style="padding: 8px; border: 1px solid #ddd;">
+                            <input id="qty_dikembalikan_${item.id}" class="swal2-input" type="number" value="0" style="width: calc(100% - 16px); padding: 6px; box-sizing: border-box;">
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            var tableHtml = `
+                <div style="margin-bottom: 10px;"><b>${nama_seller}</b></div>
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th style="width: 40%; text-align: left; padding: 8px; border: 1px solid #ddd;">Nama</th>
+                                <th style="padding: 8px; border: 1px solid #ddd;">Qty</th>
+                                <th style="padding: 8px; border: 1px solid #ddd;">Qty yang diterima</th>
+                                <th style="padding: 8px; border: 1px solid #ddd;">Qty yang dikembalikan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${detail_product}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            Swal.fire({
+                title: 'Formulir Penerimaan',
+                html: tableHtml,
+                confirmButtonText: 'Simpan',
+                width: window.innerWidth <= 600 ? '100%' : '40%',
+                preConfirm: () => {
+                    var qty_diterima = [];
+                    var qty_dikembalikan = [];
+
+                    response.cart_shop.products.forEach(function (item) {
+                        var diterima = Swal.getPopup().querySelector(`#qty_diterima_${item.id}`).value;
+                        var dikembalikan = Swal.getPopup().querySelector(`#qty_dikembalikan_${item.id}`).value;
+
+                        if (!diterima || !dikembalikan) {
+                            Swal.showValidationMessage(`Harap mengisi semua field untuk semua produk`);
+                            return;
+                        }
+
+                        qty_diterima.push({ id: item.id, qty_diterima: diterima });
+                        qty_dikembalikan.push({ id: item.id, qty_dikembalikan: dikembalikan });
+                    });
+
+                    return { qty_diterima: qty_diterima, qty_dikembalikan: qty_dikembalikan };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var formData = new FormData();
+                    formData.append('id_cart', id_cart);
+                    formData.append('id_cs', id_cs);
+                    formData.append('qty_diterima', JSON.stringify(result.value.qty_diterima));
+                    formData.append('qty_dikembalikan', JSON.stringify(result.value.qty_dikembalikan));
+                    $.ajax({
+                        url: appUrl + '/api/sumbitBast',
+                        type: 'POST',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function(response) {
+                            Swal.fire({
+                                title: 'Berhasil',
+                                icon: 'success'
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                title: 'Gagal',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                }
+            });
+        },
+        error: function (error) {
+            console.error("Terjadi kesalahan:", error);
+            Swal.fire({
+                title: "Terjadi Kesalahan",
+                text: "Silakan coba lagi nanti.",
+                icon: "error",
+                confirmButtonText: "OK",
+            });
+        },
+    });
+
+
+    // Swal.fire({
+    //     title: 'Formulir Penerimaan',
+    //     html:
+    //         '<input id="qty_diterima" class="swal2-input" placeholder="Qty Diterima">' +
+    //         '<input id="qty_dikembalikan" class="swal2-input" placeholder="Qty Dikembalikan">',
+    //     showCancelButton: true,
+    //     confirmButtonText: 'Submit',
+    //     preConfirm: () => {
+    //         const qty_diterima = Swal.getPopup().querySelector('#qty_diterima').value;
+    //         const qty_dikembalikan = Swal.getPopup().querySelector('#qty_dikembalikan').value;
+
+    //         if (!qty_diterima || !qty_dikembalikan) {
+    //             Swal.showValidationMessage(`Harap mengisi semua field`);
+    //         }
+
+    //         return { qty_diterima: qty_diterima, qty_dikembalikan: qty_dikembalikan };
+    //     }
+    // }).then((result) => {
+    //     if (result.isConfirmed) {
+    //         var formData = new FormData();
+    //         formData.append('id_cart', id_cart);
+    //         formData.append('id_cs', id_cs);
+    //         formData.append('qty_diterima', result.value.qty_diterima);
+    //         formData.append('qty_dikembalikan', result.value.qty_dikembalikan);
+
+            // $.ajax({
+            //     url: appUrl + '/api/sumbitBast',
+            //     type: 'POST',
+            //     data: formData,
+            //     contentType: false,
+            //     processData: false,
+            //     success: function(response) {
+            //         Swal.fire({
+            //             title: 'Berhasil',
+            //             icon: 'success'
+            //         });
+            //     },
+            //     error: function(xhr, status, error) {
+            //         Swal.fire({
+            //             title: 'Gagal',
+            //             icon: 'error'
+            //         });
+            //     }
+            // });
+    //     }
+    // });
+});
+
+
 $(document).on("click", "#menu-profile", function () {});
 
 $(document).on("click", "#item-transaksi", function () {
@@ -881,7 +1060,8 @@ $(document).on("click", "#menu-dashboard", function () {
 
 $(document).on("click", "#detail-order", function () {
     var id_cart = $(this).data("id_cart")
-    getdata(appUrl + "/api/getorder/"+id_cart);
+    console.log(id_cart);
+    getdata(appUrl + "/api/getorder/"+ id_cart);
 });
 
 function getdata(url) {
@@ -925,216 +1105,226 @@ function getdata(url) {
     });
 }
 
-$(document).ready(function () {
-    function updateQuantity(id_cart, id_cst, id_cs, action, quantity = null) {
-        $.ajax({
-            url: "/api/update-quantity",
-            type: "POST",
-            data: {
-                _token: $('meta[name="csrf-token"]').attr("content"),
-                id_cart: id_cart,
-                id_cst: id_cst,
-                id_cs: id_cs,
-                action: action,
-                quantity: quantity,
-            },
-            success: function (response) {
-                if (response.success) {
-                    let productId = id_cst;
-                    $("input[data-product-id='" + productId + "']").val(
-                        response.new_quantity
-                    );
-                    $("p[data-product-id='" + productId + "']").text(
-                        "Tersisa " + response.remaining_quantity + " buah"
-                    );
-                } else {
-                    alert("Gagal memperbarui kuantitas");
-                }
-            },
-            error: function (error) {
-                console.error(error);
-                alert("Terjadi kesalahan saat memperbarui kuantitas");
-            },
-        });
-    }
-
-    $(document).on("click", "#kurang-qty-cart", function () {
-        var id_cart = $(this).data("id");
-        var id_cst = $(this).data("id_cst");
-        var id_cs = $(this).data("id_cs");
-        updateQuantity(id_cart, id_cst, id_cs, "decrease");
-    });
-
-    $(document).on("click", "#tambah-qty-cart", function () {
-        var id_cart = $(this).data("id");
-        var id_cst = $(this).data("id_cst");
-        var id_cs = $(this).data("id_cs");
-        console.log(id_cart);
-        updateQuantity(id_cart, id_cst, id_cs, "increase");
-    });
-
-    $(document).on("change", "#quantity", function () {
-        var id_cart = $(this).data("id");
-        var id_cst = $(this).data("id_cst");
-        var id_cs = $(this).data("id_cs");
-        var newQuantity = parseInt($(this).val());
-        var stock = $(this).data("stock");
-        console.log(id_cart);
-        if (newQuantity > stock) {
-            alert("Kuantitas melebihi stok yang tersedia");
-            newQuantity = stock;
-            $(this).val(stock);
+function updateqtyCart( id_cst, action, quantity = null) {
+    $.ajax({
+        url: appUrl + "/api/updateqtyCart",
+        method: "POST",
+        data: {
+            id_cst: id_cst,
+            action : action,
+            quantity : quantity,
+        },
+        success: function (response) {
+            console.log('masuk');
+        },
+        error: function (error) {
+            console.error("Terjadi kesalahan:", error);
+            Swal.fire({
+                title: "Terjadi Kesalahan",
+                text: "Silakan coba lagi nanti.",
+                icon: "error",
+                confirmButtonText: "OK"
+            });
         }
-        updateQuantity(id_cart, id_cst, id_cs, "change", newQuantity);
     });
+}
 
-    $(document).on("click", ".cart-btn", function () {
-        const quantity = getQuantity();
-        var id_product = $(this).data("id");
-        var qty = quantity;
-        console.log("Quantity:", id_product);
+$(document).on("click", "#kurang-qty", function () {
+    var id_cst = $(this).data("id_cst");
 
-        $.ajax({
-            url: "/api/add-cart",
-            type: "POST",
-            data: {
-                _token: $('meta[name="csrf-token"]').attr("content"),
-                id_product: id_product,
-                qty: qty,
-            },
-            success: function (response) {
-                console.log("test");
-            },
-            error: function (error) {
-                console.error(error);
-                alert("Terjadi kesalahan saat menambah cart");
-            },
+    updateqtyCart(id_cst, 'decrease');
+});
+
+$(document).on("click", "#tambah-qty", function () {
+    var id_cst = $(this).data("id_cst");
+
+    updateqtyCart(id_cst, 'increase');
+});
+
+$(document).on("change", "#quantity", function () {
+    var id_cst = $(this).data("id_cst");
+    var newQuantity = parseInt($(this).val());
+    var stock = $(this).data("stock");
+    if (newQuantity > stock) {
+        Swal.fire({
+            title: 'Gagal',
+            text: 'Quantity product melebihi stok toko',
+            icon: 'error',
+            confirmButtonText: 'OK'
         });
-    });
+        newQuantity = stock;
+        $(this).val(stock);
+    }
+    updateqtyCart(id_cst, 'coustom' ,newQuantity);
+});
 
-    $(document).on("click", "#deleteCart", function () {
-        var id_temporary = $(this).data("idtemp");
-        var id_shop = $(this).data("idshop");
-        $.ajax({
-            url: "/api/cart/" + id_temporary + "/" + id_shop,
-            type: "delete",
-            success: function (response) {
-                console.log("berhasil");
-            },
-            error: function (error) {
-                console.error(error);
-                alert("Terjadi kesalahan saat Menghapus cart");
-            },
-        });
-    });
+$(document).on("click", ".cart-btn", function () {
+    const quantity = getQuantity();
+    var id_product = $(this).data("id");
+    var qty = quantity;
+    console.log("Quantity:", qty);
 
-    $(document).on("click", "#ubah-lokasi-pengiriman", function () {
-        var member_address_id = $(this).data("id_address");
+    $.ajax({
+        url: appUrl + "/api/add-cart",
+        type: "POST",
+        data: {
+            _token: $('meta[name="csrf-token"]').attr("content"),
+            id_product: id_product,
+            qty: qty,
+        },
+        success: function (response) {
+            Swal.fire({
+                title: 'Berhasil!',
+                text: 'Produk berhasil dimasukkan ke dalam keranjang.',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+        },
+        error: function (error) {
+            console.error(error);
+            Swal.fire({
+                title: 'Gagal',
+                text: 'Terjadi kesalahan saat menambah produk ke dalam keranjang.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        },
+    });
+});
+
+$(document).on("click", "#deleteCart", function () {
+    var id_temporary = $(this).data("idtemp");
+    var id_shop = $(this).data("idshop");
+    $.ajax({
+        url: appUrl + "/api/cart/" + id_temporary + "/" + id_shop,
+        type: "delete",
+        success: function (response) {
+            Swal.fire({
+                title: 'Berhasil!',
+                text: 'Menghapus Produk dari keranjang.',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            });
+            location.reload();
+        },
+        error: function (error) {
+            console.error(error);
+            Swal.fire({
+                title: 'Gagal',
+                text: 'Terjadi kesalahan saat menghapus produk di keranjang.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        },
+    });
+});
+
+$(document).on("click", "#ubah-lokasi-pengiriman", function () {
+    var member_address_id = $(this).data("id_address");
+    $.ajax({
+        url: appUrl + "/api/member/getaddress",
+        type: "get",
+        success: function (response) {
+            let addressList = response.address;
+            let addressHTML = addressList
+                .map(
+                    (addr) => `
+                <div>
+                    <input type="radio" id="address_${
+                        addr.member_address_id
+                    }" name="address" value="${addr.member_address_id}" ${
+                        addr.member_address_id == member_address_id
+                            ? "checked"
+                            : ""
+                    }>
+                    <label for="address_${addr.member_address_id}">
+                        ${addr.address_name} - ${addr.address}, ${
+                        addr.subdistrict_name
+                    }, ${addr.city}, ${addr.province_name}, ${
+                        addr.postal_code
+                    }
+                    </label>
+                </div>
+            `
+                )
+                .join("");
+
+            Swal.fire({
+                title: "Pilih Alamat Pengiriman",
+                html: `<form id="addressForm">${addressHTML}</form>`,
+                showCancelButton: true,
+                confirmButtonText: "Pilih",
+                preConfirm: () => {
+                    const selectedAddress = $(
+                        '#addressForm input[name="address"]:checked'
+                    ).val();
+
+                    if (!selectedAddress) {
+                        Swal.showValidationMessage(
+                            "Anda harus memilih satu alamat"
+                        );
+                    }
+
+                    return selectedAddress;
+                },
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let selectedAddress = result.value;
+                    console.log("Alamat yang dipilih:", selectedAddress);
+                    // Mengirim permintaan AJAX ke route untuk memperbarui alamat di keranjang
+                    $.ajax({
+                        url: appUrl + '/api/updateAddressCart/'+selectedAddress,
+                        type: "get",
+                        success: function (response) {
+                            // Lakukan sesuatu setelah alamat keranjang berhasil diperbarui
+                            console.log(
+                                "Alamat keranjang berhasil diperbarui",
+                                response
+                            );
+                            Swal.fire(
+                                "Sukses",
+                                "Alamat pengiriman berhasil diperbarui!",
+                                "success"
+                            ).then(() => {
+                                location.reload();
+                            });
+                        },
+                        error: function (error) {
+                            console.error(
+                                "Terjadi kesalahan saat memperbarui alamat keranjang",
+                                error
+                            );
+                            Swal.fire(
+                                "Gagal",
+                                "Terjadi kesalahan saat memperbarui alamat pengiriman",
+                                "error"
+                            );
+                        },
+                    });
+                }
+            });
+        },
+        error: function (error) {
+            console.error(error);
+            alert("Terjadi kesalahan saat mengambil alamat");
+        },
+    });
+});
+
+$(document).ready(function () {
+    $(".jasa-pengiriman").change(function () {
+        var id_cs = $(this).data("id_cs");
+        var selectedId = $(this).val();
         $.ajax({
-            url: "api/member/getaddress",
+            url: appUrl + "/api/shipping/" + selectedId + "/" + id_cs,
             type: "get",
             success: function (response) {
-                let addressList = response.address;
-                let addressHTML = addressList
-                    .map(
-                        (addr) => `
-                    <div>
-                        <input type="radio" id="address_${
-                            addr.member_address_id
-                        }" name="address" value="${addr.member_address_id}" ${
-                            addr.member_address_id == member_address_id
-                                ? "checked"
-                                : ""
-                        }>
-                        <label for="address_${addr.member_address_id}">
-                            ${addr.address_name} - ${addr.address}, ${
-                            addr.subdistrict_name
-                        }, ${addr.city}, ${addr.province_name}, ${
-                            addr.postal_code
-                        }
-                        </label>
-                    </div>
-                `
-                    )
-                    .join("");
-
-                Swal.fire({
-                    title: "Pilih Alamat Pengiriman",
-                    html: `<form id="addressForm">${addressHTML}</form>`,
-                    showCancelButton: true,
-                    confirmButtonText: "Pilih",
-                    preConfirm: () => {
-                        const selectedAddress = $(
-                            '#addressForm input[name="address"]:checked'
-                        ).val();
-
-                        if (!selectedAddress) {
-                            Swal.showValidationMessage(
-                                "Anda harus memilih satu alamat"
-                            );
-                        }
-
-                        return selectedAddress;
-                    },
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        let selectedAddress = result.value;
-                        console.log("Alamat yang dipilih:", selectedAddress);
-                        // Mengirim permintaan AJAX ke route untuk memperbarui alamat di keranjang
-                        $.ajax({
-                            url: `api/updateAddressCart/${selectedAddress}`,
-                            type: "get",
-                            success: function (response) {
-                                // Lakukan sesuatu setelah alamat keranjang berhasil diperbarui
-                                console.log(
-                                    "Alamat keranjang berhasil diperbarui",
-                                    response
-                                );
-                                Swal.fire(
-                                    "Sukses",
-                                    "Alamat pengiriman berhasil diperbarui!",
-                                    "success"
-                                ).then(() => {
-                                    location.reload();
-                                });
-                            },
-                            error: function (error) {
-                                console.error(
-                                    "Terjadi kesalahan saat memperbarui alamat keranjang",
-                                    error
-                                );
-                                Swal.fire(
-                                    "Gagal",
-                                    "Terjadi kesalahan saat memperbarui alamat pengiriman",
-                                    "error"
-                                );
-                            },
-                        });
-                    }
-                });
+                location.reload();
             },
             error: function (error) {
                 console.error(error);
-                alert("Terjadi kesalahan saat mengambil alamat");
+                alert("Terjadi kesalahan saat Menambah shipping");
             },
-        });
-    });
-
-    $(document).ready(function () {
-        $(".jasa-pengiriman").change(function () {
-            var id_cs = $(this).data("id_cs");
-            var selectedId = $(this).val();
-            $.ajax({
-                url: "/api/shipping/" + selectedId + "/" + id_cs,
-                type: "get",
-                success: function (response) {
-                    location.reload();
-                },
-                error: function (error) {
-                    console.error(error);
-                    alert("Terjadi kesalahan saat Menambah shipping");
-                },
-            });
         });
     });
 });
@@ -1145,7 +1335,7 @@ $(document).on("click", "#asuransi-pengiriman", function () {
     var id_cs = $(this).data("id_cs");
     var status = $(this).data("status");
     $.ajax({
-        url: "/api/insurance/"+id_shop +"/"+id_courier +"/"+id_cs +"/"+status,
+        url: appUrl + "/api/insurance/"+id_shop +"/"+id_courier +"/"+id_cs +"/"+status,
         type: "get",
         success: function (response) {
             location.reload();
@@ -1160,7 +1350,7 @@ $(document).on("click", "#asuransi-pengiriman", function () {
 $(document).on("click", "#paymend_method", function () {
     var id_payment = $(this).data("id_pay");
     $.ajax({
-        url: "/api/update-payment",
+        url: appUrl + "/api/update-payment",
         type: "POST",
         data: {
             _token: $('meta[name="csrf-token"]').attr("content"),
@@ -1180,7 +1370,7 @@ $(document).on("click", "#updateTOP", function () {
         var top = $(this).data("top");
         console.log(top);
         $.ajax({
-            url: "/api/update-top/"+top,
+            url: appUrl + "/api/update-top/"+top,
             type: "get",
             success: function (response) {
                 location.reload();
@@ -1234,7 +1424,7 @@ $(document).on("click", "#upload-payment", function () {
             formData.append('img', file);
 
             $.ajax({
-                url: '/api/upload-payment',
+                url: appUrl + '/api/upload-payment',
                 type: 'POST',
                 data: formData,
                 contentType: false,
@@ -1310,7 +1500,7 @@ $(document).on("click", "#request-checkout", function () {
                     formData.append('id_cart', id_cart);
 
                     $.ajax({
-                        url: '/api/finishCheckout',
+                        url: appUrl + '/api/finishCheckout',
                         type: 'POST',
                         data: formData,
                         contentType: false,
@@ -1337,6 +1527,127 @@ $(document).on("click", "#request-checkout", function () {
             });
         } else {
             console.log('User tidak setuju dengan Syarat dan Ketentuan');
+        }
+    });
+});
+
+$(document).on("click", "#lacak_pesanan", function () {
+    var id_shop = $(this).data("id_shop");
+    var id_order_shop = $(this).data("id_cs");
+
+    console.log(id_order_shop);
+
+    $.ajax({
+        url: appUrl + "/api/lacak_pengiriman/"+ id_shop + `/` + id_order_shop,
+        method: "GET",
+        success: function (response) {
+            var status = response.ccs.status;
+            var deliveryStart = response.ccs.delivery_start;
+            var deliveryEnd = response.ccs.delivery_end;
+            var fileDO = response.ccs.file_pdf_url;
+
+            var tableHtml = generateTableHtml(response.ccs.id_courier, response.ccs.file_do, deliveryStart, deliveryEnd, fileDO);
+
+            Swal.fire({
+                title: "Lacak Order",
+                html: tableHtml,
+                confirmButtonText: "OK",
+                width: window.innerWidth <= 600 ? '100%' : '40%'
+            });
+        },
+        error: function (error) {
+            console.error("Terjadi kesalahan:", error);
+            Swal.fire({
+                title: "Terjadi Kesalahan",
+                text: "Silakan coba lagi nanti.",
+                icon: "error",
+                confirmButtonText: "OK",
+            });
+        },
+    });
+});
+
+function generateTableHtml(idCourier, fileDO, deliveryStart, deliveryEnd, filePdfUrl) {
+    var tableHtml = `
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Track ID</th>
+                    <th>Deskripsi</th>
+                    <th>Date/Time</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    if (idCourier === 0 && deliveryStart !== null) {
+        tableHtml += `
+            <tr>
+                <td style="text-align: left;"><span class="fa fa-map-marker"> On Progress </span></td>
+                <td style="text-align: left;">Pesanan Dalam Pengiriman</td>
+                <td style="text-align: left;">${deliveryStart}</td>
+            </tr>
+        `;
+    } else if (idCourier === 0 && deliveryEnd !== null) {
+        tableHtml += `
+            <tr>
+                <td style="text-align: left;"><span class="fa fa-map-marker"> On Progress </span></td>
+                <td style="text-align: left;">Pesanan Dalam Pengiriman</td>
+                <td style="text-align: left;">${deliveryStart}</td>
+            </tr>
+            <tr>
+                <td style="text-align: left;"><span class="fa fa-map-marker"> Complete </span></td>
+                <td style="text-align: left;">Selesai</td>
+                <td style="text-align: left;">${deliveryEnd}</td>
+            </tr>
+        `;
+    } else {
+        tableHtml += `
+            <tr>
+                <td style="text-align: left;"><span class="fa fa-map-marker" colspan="3"> Pesanan Belum Melakukan Request Pengiriman</span></td>
+            </tr>
+        `;
+    }
+
+    tableHtml += `
+            </tbody>
+        </table>
+    `;
+
+    return tableHtml;
+}
+
+$(document).on("click", "#updateIsSelectProduct", function () {
+    var id_cart = $(this).data("id_cart");
+    var id_cst = $(this).data("id_cst");
+
+    $.ajax({
+        url: appUrl + "/api/updateIsSelectProduct",
+        method: "POST",
+        data: {
+            id_cart: id_cart,
+            id_cst: id_cst
+        },
+        success: function (response) {
+            $("#sumprice").empty();
+            var sumprice = `${formatRupiah(response.carts.sumprice)} &nbsp;`;
+            $("#sumprice").append(sumprice);
+
+            $("#totalqty").empty();
+            var qty = `Subtotal (${response.carts.qty} Produk)`;
+            $("#totalqty").append(qty);
+
+            var icon = response.carts.is_selected === 'Y' ? 'check_box' : 'check_box_outline_blank';
+            $("#icon-" + id_cst).text(icon);
+        },
+        error: function (error) {
+            console.error("Terjadi kesalahan:", error);
+            Swal.fire({
+                title: "Terjadi Kesalahan",
+                text: "Silakan coba lagi nanti.",
+                icon: "error",
+                confirmButtonText: "OK"
+            });
         }
     });
 });

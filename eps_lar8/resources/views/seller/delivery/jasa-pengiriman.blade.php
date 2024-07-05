@@ -57,7 +57,7 @@
                                         <td><b> Dikirim dalam </b> <br> <small>Ubah jumlah hari "Dikirim dalam" untuk
                                                 semua produk yang ada di toko Anda.</small> </td>
                                         <td>
-                                            <a onclick="ubahestimasi()" class="btn btn-info">Ubah</a>
+                                            <a id="ubahestimasi" class="btn btn-info">Ubah</a>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -70,10 +70,9 @@
         </div>
     </div>
 </body>
-<!-- Your custom script -->
-<script src="{{ asset('/js/function/seller/delivery.js') }}" type="text/javascript"></script>
-<!-- Your custom script -->
-<script src="{{ asset('/js/function/seller/delivery.js') }}" type="text/javascript"></script>
 @include('seller.asset.footer')
+
+<script src="{{ asset('/js/function/seller/delivery.js') }}" type="text/javascript"></script>
+
 
 </html>

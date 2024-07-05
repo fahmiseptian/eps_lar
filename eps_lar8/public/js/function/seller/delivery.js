@@ -33,9 +33,10 @@ function showDescription(description, berat) {
         });
     }
 }
+
 function toggleCourier(checkbox) {
     var courierId = checkbox.getAttribute('data-courier-id');
-    var isChecked = checkbox.checked;         
+    var isChecked = checkbox.checked;
 
     if (isChecked) {
         addCourier(courierId);
@@ -52,7 +53,7 @@ function addCourier(courierId) {
         type: 'post',
         url: appUrl + '/seller/add-courier/',
         data: {
-            courierId: courierId, _token: csrfToken 
+            courierId: courierId, _token: csrfToken
         },
         success: function(data) {
             Swal.fire({
@@ -60,7 +61,7 @@ function addCourier(courierId) {
                 title: 'Sukses!',
                 text: 'Kurir berhasil ditambahkan',
                 timer: 1000,
-                showConfirmButton: false 
+                showConfirmButton: false
             });
             console.log('Kurir berhasil ditambahkan');
         },
@@ -69,7 +70,7 @@ function addCourier(courierId) {
                 icon: 'error',
                 title: 'Eror!',
                 text: 'Gagal menambahkan kurir',
-                showConfirmButton: true 
+                showConfirmButton: true
             });
             console.error('Gagal menambahkan kurir:', error);
         }
@@ -93,7 +94,7 @@ function removeCourier(courierId) {
                 title: 'Sukses!',
                 text: 'Kurir berhasil dihapus',
                 timer: 1000,
-                showConfirmButton: false 
+                showConfirmButton: false
             });
             console.log('Kurir berhasil dihapus');
         },
@@ -102,18 +103,18 @@ function removeCourier(courierId) {
                 icon: 'error',
                 title: 'Eror!',
                 text: 'Gagal menghapus kurir',
-                showConfirmButton: true 
+                showConfirmButton: true
             });
             console.error('Gagal menghapus kurir:', error);
         }
     });
-    
+
 }
 
 
 function togglefreeCourier(checkbox) {
     var id_province = checkbox.getAttribute('data-province-id');
-    var isChecked = checkbox.checked;         
+    var isChecked = checkbox.checked;
 
     if (isChecked) {
         addfreeCourier(id_province);
@@ -135,7 +136,7 @@ function addfreeCourier(id_province) {
                 title: 'Sukses!',
                 text: 'Lokasi free ongkir berhasil ditambahkan',
                 timer: 1000,
-                showConfirmButton: false 
+                showConfirmButton: false
             });
             console.log('Lokasi free ongkir berhasil ditambahkan');
         },
@@ -144,7 +145,7 @@ function addfreeCourier(id_province) {
                 icon: 'error',
                 title: 'Eror!',
                 text: 'Gagal menambahkan Lokasi free ongkir',
-                showConfirmButton: true 
+                showConfirmButton: true
             });
             console.error('Gagal menambahkan Lokasi free ongkir:', error);
         }
@@ -165,7 +166,7 @@ function removefreeCourier(id_province) {
                 title: 'Sukses!',
                 text: 'Lokasi free ongkir berhasil dihapus',
                 timer: 1000,
-                showConfirmButton: false 
+                showConfirmButton: false
             });
             console.log('Lokasi free ongkir berhasil dihapus');
         },
@@ -174,47 +175,79 @@ function removefreeCourier(id_province) {
                 icon: 'error',
                 title: 'Eror!',
                 text: 'Gagal menghapus Lokasi free ongkir',
-                showConfirmButton: true 
+                showConfirmButton: true
             });
             console.error('Gagal menghapus Lokasi free ongkir:', error);
         }
     });
-    
+
 }
 
-async function ubahestimasi() {
-console.log("dsadas");
-const { value: estimasi } = await Swal.fire({
-    title: "Masukkan Estimasi Packing",
-    input: "range",
-    icon: "question",
-    inputLabel: "Estimasi Packing",
-    inputAttributes: {
-        min: "1",
-        max: "7",
-        step: "1"
-    },
-    inputValue: 2,
-    showCancelButton: true,
-    confirmButtonText: "OK",
-    cancelButtonText: "Batal",
-    reverseButtons: true,
-    allowOutsideClick: false,
+$(document).on("click", "#ubahestimasi", function () {
+
+    $.ajax({
+        url: appUrl + "/api/seller/get-packingDay",
+        method: "get",
+        success: function (response) {
+            var estimasi_lama= response.packing_estimation;
+            Swal.fire({
+                title: 'Ubah Estimasi Packing',
+                html: `
+                    <div style="display: flex; align-items: center; justify-content: center;">
+                        <input id="estimasi-input" type="number" class="swal2-input" value="${estimasi_lama}" min="1" max="7" style="width: 60%; display: inline-block;">
+                        <span style="margin-left: 10px;">hari</span>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Submit',
+                cancelButtonText: 'Batal',
+                preConfirm: () => {
+                    const estimasi = Swal.getPopup().querySelector('#estimasi-input').value;
+                    if (!estimasi || estimasi < 1 || estimasi > 7) {
+                        Swal.showValidationMessage('Masukkan jumlah hari antara 1 dan 7');
+                    }
+                    return { estimasi: estimasi };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const estimasi = result.value.estimasi;
+                    console.log("Estimasi hari:", estimasi);
+                    $.ajax({
+                        url: appUrl + "/api/seller/update-packingDay",
+                        method: "POST",
+                        data: {
+                            estimasi: estimasi
+                        },
+                        success: function (response) {
+                            Swal.fire({
+                                title: "Berhasil",
+                                text: "Estimasi pengiriman berhasil diubah.",
+                                icon: "success",
+                                confirmButtonText: "OK"
+                            });
+                        },
+                        error: function (error) {
+                            console.error("Terjadi kesalahan:", error);
+                            Swal.fire({
+                                title: "Terjadi Kesalahan",
+                                text: "Silakan coba lagi nanti.",
+                                icon: "error",
+                                confirmButtonText: "OK"
+                            });
+                        }
+                    });
+                }
+            });
+        },
+        error: function (error) {
+            console.error("Terjadi kesalahan:", error);
+            Swal.fire({
+                title: "Terjadi Kesalahan",
+                text: "Silakan coba lagi nanti.",
+                icon: "error",
+                confirmButtonText: "OK"
+            });
+        }
+    });
 });
 
-// Jika pengguna mengklik tombol OK dan memberikan nilai estimasi
-if (estimasi) {
-    console.log(estimasi);
-}
-
-// Contoh kode ajax jika Anda perlu menggunakan csrfToken
-// var csrfToken = $('meta[name="csrf-token"]').attr('content');
-// $.ajax({
-//     url: "/seller/order/cencel",
-//     type: "POST",
-//     data: { id_cart_shop: id_cart_shop, note: noteSeller, _token: csrfToken },
-//     success: function () {
-//         location.reload();
-//     },
-// });
-}

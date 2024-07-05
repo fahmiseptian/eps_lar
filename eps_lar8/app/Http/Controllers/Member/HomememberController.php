@@ -33,11 +33,36 @@ class HomememberController extends Controller
     }
 
     public function index() {
-        $products= Products::getproduct();
+        $products= Products::getproduct(12);
         $this->data['id_user']=$this->user_id;
 
         // return response()->json(["products"=>$products]);
         return view('member.home.index',$this->data,["products"=>$products]);
+    }
+
+    public function getPaginatedProducts(Request $request) {
+        $perPage = 12;
+        $products = Products::select(
+            'products.*',
+            'lp.price_lpse as hargaTayang',
+            's.name as namaToko',
+            's.id as idToko',
+            'p.province_name'
+        )
+        ->join('lpse_price as lp', 'products.id', '=', 'lp.id_product')
+        ->join('shop as s', 'products.id_shop', '=', 's.id')
+        ->join('member_address as ma', 's.id_address', '=', 'ma.member_address_id')
+        ->join('province as p', 'ma.province_id', '=', 'p.province_id')
+        ->where('products.status_display', 'Y')
+        ->where('products.status_delete', 'N')
+        ->where('s.status', 'active')
+        ->paginate($perPage);
+
+        if ($request->ajax()) {
+            return view('member.home.product-list', compact('products'))->render();
+        }
+
+        return view('home.index', compact('products'));
     }
 
     public function getDetailproduct($id) {
@@ -150,6 +175,9 @@ class HomememberController extends Controller
         }elseif ($kondisi == 'kirim') {
             $status ='on_delivery';
         }
+
+        // $detail = CompleteCartShop::getorderbyIdCart(630);
+
 
         $transaksi = Invoice::getOrderByIdmember($this->user_id,$status);
 

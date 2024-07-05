@@ -64,7 +64,7 @@
                                     Opsi Pengiriman</option>
                                 @foreach ($detail->pengiriman as $ongkir)
                                     <option value="{{ $ongkir->id }}"
-                                        {{ $ongkir->id == $detail->id_shipping ? 'selected' : '' }}>
+                                        {{ $ongkir->deskripsi == $detail->deskripsi_pengiriman ? 'selected' : '' }}>
                                         {{ $ongkir->deskripsi }}-({{ $ongkir->etd }} Hari) Rp.
                                         {{ number_format($ongkir->sum_shipping, 0, ',', '.') }}
                                     </option>

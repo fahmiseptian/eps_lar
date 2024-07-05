@@ -8,12 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Lpseprice extends Model
 {
     use HasFactory;
-    protected $table = 'lpseprice';
+    protected $table = 'lpse_price';
     public $timestamps = false;
 
     protected $visible = ['price_lpse'];
     protected $fillable = [
         'price_lpse',
-        // Kolom untuk di edit
+        'id_product',
+        'price_before_rounded',
+
     ];
 }

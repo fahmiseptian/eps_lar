@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\seller;
+namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Carbon;
@@ -26,7 +26,7 @@ class DeliveryController extends Controller
 
         $sellerType     = Shop::getTypeById($this->seller);
         $saldoPending   = Saldo::calculatePendingSaldo($this->seller);
-        
+
         // Membuat $this->data
         $this->data['title'] = 'Delivery';
         $this->data['seller_type'] = $sellerType;
@@ -49,9 +49,9 @@ class DeliveryController extends Controller
 
     public function pengaturan_free()
     {
-        $Province = Province::where('country_id', 1) 
-        ->orderBy('province_name', 'asc')             
-        ->get();       
+        $Province = Province::where('country_id', 1)
+        ->orderBy('province_name', 'asc')
+        ->get();
 
         foreach ($Province as $active) {
             $is_check = FreeOngkir::where('id_shop', $this->seller)
@@ -76,7 +76,7 @@ class DeliveryController extends Controller
             'id_courier' => $courierId,
             'created_date' => $currentDateTime,
         ]);
-        
+
         return response()->json(['success' => true]);
     }
 
@@ -103,10 +103,10 @@ class DeliveryController extends Controller
             'status' => 1,
             'datetime' => $currentDateTime,
         ]);
-        
+
         return response()->json(['success' => true]);
     }
-    
+
     public function removefreeCourier(Request $request)
     {
         $id_province = $request->input('id_province');
@@ -119,6 +119,25 @@ class DeliveryController extends Controller
         return response()->json(['success' => true]);
     }
 
-    
+    function get_packingDay(){
+        $id_shop = $this->seller;
+        $packing = Shop::get_estimasiPacking($id_shop);
+        return $packing;
+    }
+
+    public function update_packingDay(Request $request)
+    {
+        $id_shop = $this->seller;
+        $request->validate([
+            'estimasi' => 'required|integer|min:1|max:7'
+        ]);
+        $shop = Shop::find($id_shop);
+        if (!$shop) {
+            return response()->json(['message' => 'Shop tidak ditemukan'], 404);
+        }
+        $shop->packing_estimation = $request->input('estimasi');
+        $shop->save();
+        return response()->json(['message' => 'Estimasi packing berhasil diperbarui'], 200);
+    }
 
 }

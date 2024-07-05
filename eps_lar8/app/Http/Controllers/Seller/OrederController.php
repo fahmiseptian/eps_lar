@@ -52,7 +52,7 @@ class OrederController extends Controller
 
                     $sellerType     = Shop::getTypeById($this->seller);
                     $saldoPending   = Saldo::calculatePendingSaldo($this->seller);
-                    
+
                     // Membuat $this->data
                     $this->data['title'] = 'order';
                     $this->data['seller_type'] = $sellerType;
@@ -121,11 +121,11 @@ class OrederController extends Controller
         $order = CompleteCartShop::find($id_cart_shop);
         $current_date= date('Y-m-d H:i:s');
         $due_date_packing = date('Y-m-d H:i:s', strtotime($current_date . ' +' . $estimation_packing . ' day'));
-        
+
         if ($order && $estimation_packing ) {
             $order->status = 'on_packing_process';
             $order->receive_date = $current_date;
-            $order->due_date_packing = $due_date_packing; 
+            $order->due_date_packing = $due_date_packing;
             $order->save();
             return "Pesanan berhasil diterima dan sedang diproses packing.";
         } else {
@@ -139,7 +139,7 @@ class OrederController extends Controller
 
         $order = CompleteCartShop::find($id_cart_shop)->where('id_shop', $this->seller);
         $current_date= date('Y-m-d H:i:s');
-        
+
         if ($order) {
             $order->status = 'cancel_by_seller';
             $order->note_seller =  $note;
@@ -150,7 +150,7 @@ class OrederController extends Controller
             return "Pesanan tidak ditemukan.";
         }
     }
-    
+
     public function updateResi(Request $request)
     {
         // Validasi data
@@ -210,9 +210,9 @@ class OrederController extends Controller
     }
 
 
-    public function test($id_cart_shop) {
+    public function lacak_kurir_sendiri($id_cart_shop) {
         $ccs = CompleteCartShop::getorderbyidcartshop($this->seller,$id_cart_shop);
-        
+
         if ($ccs) {
             return response()->json(['ccs' => $ccs]);
         } else {
@@ -228,7 +228,7 @@ class OrederController extends Controller
 
 
         $pdf = FacadePdf::loadView('pdf.resi', ['data' => $detail_order]);
-        
+
         return $pdf->stream('informasi_pengiriman.pdf');
     }
 
@@ -242,10 +242,10 @@ class OrederController extends Controller
             'npwp' => ' 73.035.456.0-022.000',
             'alamat' => 'Rukan Sudirman Park Apartement Jl Kh. Mas Mansyur KAV 35 A/15 Kelurahan Karet Tengsin Kec. Tanah Abang Jakarta Pusat DKI Jakarta'
         ];
-    
+
 
         $pdf = FacadePdf::loadView('pdf.invoice', ['data' => $detail_order,'eps'=>$eps]);
-        
+
         return $pdf->stream('informasi_invoice.pdf');
     }
 
@@ -261,10 +261,10 @@ class OrederController extends Controller
             'npwp' => ' 73.035.456.0-022.000',
             'alamat' => 'Rukan Sudirman Park Apartement Jl Kh. Mas Mansyur KAV 35 A/15 Kelurahan Karet Tengsin Kec. Tanah Abang Jakarta Pusat DKI Jakarta'
         ];
-    
+
 
         $pdf = FacadePdf::loadView('pdf.kwantasi', ['data' => $detail_order,'eps'=>$eps]);
-        
+
         return $pdf->stream('informasi_kwantasi.pdf');
     }
 

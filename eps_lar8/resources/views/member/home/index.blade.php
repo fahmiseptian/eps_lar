@@ -183,24 +183,10 @@
         <section class="products">
             <h2>Produk</h2>
             <div class="product-grid" id="productGrid">
-                @foreach ($products as $product)
-                    <div class="product-item">
-                        <a href="{{ route('product.show', ['id' => $product->id]) }}" class="product-link">
-                            <img src="{{ $product->artwork_url_md[0] }}" alt="Produk">
-                            <p title="{{ $product->name }}">{{ substr($product->name, 0, 20) }}...</p>
-                            <p>Rp {{ number_format($product->hargaTayang, 0, ',', '.') }}</p>
-                            <div class="product-info">
-                                <small title="{{$product->namaToko}}">{{ substr($product->namaToko, 0, 6) }}...</small>
-                                <small>{{ $product->count_sold }} terjual</small>
-                                <small>{{ $product->province_name }}</small>
-                            </div>
-                        </a>
-                    </div>
-                @endforeach
-                <!-- Tambahkan produk lain -->
+                @include('member.home.product-list', ['products' => $products])
             </div>
-            <div class="button-container">
-                <button class="load-more-button" id="loadMoreButton">Tampilkan produk lainnya</button>
+            <div class="loading" style="display: none;">
+                <p>Loading...</p>
             </div>
         </section>
     </main>
@@ -208,7 +194,37 @@
     @include('member.asset.footer')
 
     <script src="{{ asset('/js/function/member/home.js') }}" type="text/javascript"></script>
-    {{-- <script src="{{ secure_asset('/js/function/member/home.js') }}" type="text/javascript"></script> --}}
+    <script>
+        let page = 1;
+
+        function loadMoreProducts(page) {
+            $.ajax({
+                url: "{{ route('products.get') }}?page=" + page,
+                type: "get",
+                beforeSend: function () {
+                    $('.loading').show();
+                }
+            })
+            .done(function (data) {
+                if (data.length === 0) {
+                    $('.loading').html("<p>No more products to load</p>");
+                    return;
+                }
+                $('.loading').hide();
+                $('#productGrid').append(data);
+            })
+            .fail(function (jqXHR, ajaxOptions, thrownError) {
+                alert('Server error occurred');
+            });
+        }
+
+        $(window).scroll(function() {
+            if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
+                page++;
+                loadMoreProducts(page);
+            }
+        });
+    </script>
 </body>
 
 </html>

@@ -11,8 +11,7 @@ class Bast extends Model
     protected $primaryKey = 'id';
     public $timestamps = false;
 
-    public function getProductBast($id_bast, $id_cart)
-{
+    public function getProductBast($id_bast, $id_cart) {
     // Mengambil semua detail dari `bast_detail` dengan relasi `cartDetail` berdasarkan `id_cart`
     $details = BastDetail::with(['cartDetail' => function ($query) use ($id_cart) {
         $query->where('id_cart', '=', $id_cart);
@@ -22,7 +21,7 @@ class Bast extends Model
 
     // Inisialisasi array untuk menyimpan output
     $outputs = [];
-    
+
     // Variabel untuk menyimpan `created_date`
     $created_date = null;
 
@@ -35,7 +34,7 @@ class Bast extends Model
         if ($detail->cartDetail && $detail->cartDetail->id_product) {
             // Mengambil produk terkait berdasarkan `id_product`
             $product = Products::find($detail->cartDetail->id_product);
-            $detail->product = $product;
+            // $detail->product = $product;
 
             // Jika produk memiliki gambar dan arraynya tidak kosong, ambil gambar pertama dari array
             if ($product && is_array($product->artwork_url_lg) && count($product->artwork_url_lg) > 0) {
@@ -78,7 +77,7 @@ class Bast extends Model
     return $result;
 }
 
-    
+
     public static function getBast($id_cart_shop)
     {
         $bast = self::select('*')
@@ -90,12 +89,39 @@ class Bast extends Model
 
             $dataBast->id = $bast->id;
             $dataBast->detail= self::getProductBast($bast->id, $bast->id_cart);
-            
-            return $dataBast; 
+
+            return $dataBast;
         }
-        return null; 
+        return null;
     }
 
 
-    
+    public function insertBast($data_bast) {
+        // Update the 'is_bast' field in the 'complete_cart_shop' table
+        DB::table('complete_cart_shop')
+            ->where('id', $data_bast['id_cart_shop'])
+            ->update(['is_bast' => '1']);
+
+        // Check if the record already exists in the 'bast' table
+        $bast = DB::table('bast')
+            ->where($data_bast)
+            ->first();
+
+        // If record does not exist, insert new record and get the inserted id
+        if (is_null($bast)) {
+            $id_bast = DB::table('bast')->insertGetId($data_bast);
+        } else {
+            $id_bast = $bast->id;
+        }
+
+        return $id_bast;
+    }
+
+    public function insertBastDetail($data_bast_detail) {
+        // Insert the data into the 'bast_detail' table
+        DB::table('bast_detail')->insert($data_bast_detail);
+        return true;
+    }
+
+
 }

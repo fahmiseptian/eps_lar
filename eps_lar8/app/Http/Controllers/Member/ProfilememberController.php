@@ -17,7 +17,11 @@ class ProfilememberController extends Controller
     }
 
     // Metode lain dalam controller
-    public function index($id) {
+    public function index() {
         return view('member.profile.index',$this->data);
+    }
+
+    public function dashboard() {
+        return view('member.profile.dashboard',$this->data);
     }
 }
