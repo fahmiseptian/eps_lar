@@ -41,9 +41,10 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
-            'throttle:api',
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        ],
+                    'throttle:api',
+                    \Illuminate\Routing\Middleware\SubstituteBindings::class,
+                    'cors', // tambahkan middleware CORS di sini
+                ],
     ];
 
     /**
@@ -67,5 +68,6 @@ class Kernel extends HttpKernel
         'seller' => \App\Http\Middleware\SellerMiddleware::class,
         'member' => \App\Http\Middleware\MemberMiddleware::class,
         'activity' => \App\Http\Middleware\CheckUserActivity::class,
+        'cors' => \Fruitcake\Cors\HandleCors::class,
     ];
 }

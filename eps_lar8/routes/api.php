@@ -5,6 +5,7 @@ use App\Http\Controllers\Member\CheckoutController;
 use App\Http\Controllers\Member\HomememberController;
 use App\Http\Controllers\Member\LoginmemberController;
 use App\Http\Controllers\Partner\BniController;
+use App\Http\Controllers\Partner\KurirController;
 use App\Http\Controllers\Seller\DeliveryController;
 use App\Http\Controllers\Seller\FinanceController;
 use App\Http\Controllers\Seller\NegoController;
@@ -25,9 +26,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
 Route::post('/bni/hit', [BniController::class, 'apiHiting']);
 Route::post('/bni/create-billing', [BniController::class, 'createBilling']);
@@ -108,3 +109,8 @@ Route::post('/updateqtyCart',[CartController::class,'updateqtyCart']);
 // Route::get('/bni/create-billing', [BniController::class, 'createBilling']);
 
 });
+
+// kurir
+Route::post('/kurir/anter', [KurirController::class, 'anter']);
+Route::post('/kurir/pickup', [KurirController::class, 'pickup']);
+Route::post('/kurir/tracking',[KurirController::class,'Tracking']);
