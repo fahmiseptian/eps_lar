@@ -16,19 +16,12 @@ return [
     */
 
     'paths' => ['api/*'],
-
-    'allowed_methods' => ['*'],
-
-    'allowed_origins' => ['https://alphagc.proyek.web.id/v2'],
-
-    'allowed_origins_patterns' => [],
-
-    'allowed_headers' => ['*'],
-
+    'allowed_origins' => ['http://alphagc.proyek.web.id', '*'],
+    'allowed_methods' => ['GET', 'POST'],
+    'allowed_headers' => ['Content-Type', 'Authorization'],
     'exposed_headers' => [],
-
     'max_age' => 0,
+    'supports_credentials' => true,
 
-    'supports_credentials' => false,
 
 ];

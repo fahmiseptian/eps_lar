@@ -108,6 +108,9 @@ $(document).on("click", "#category-promotion", function () {
             id: id,
             _token: csrfToken,
         },
+        xhrFields: {
+            withCredentials: true
+        },
         success: function (response) {
             var products = response.products;
             var tbody = $("#example2 tbody");
@@ -123,22 +126,17 @@ $(document).on("click", "#category-promotion", function () {
             } else {
                 products.forEach(function (product, index) {
                     var row = `
-                       <tr>
-                        <td class="detail-full">${index + 1}</td>
-                        <td>${product.name}</td>
-                        <td>${formatRupiah(product.promo_origin)}</td>
-                        <td>${formatRupiah(product.promo_price)}</td>
-                        <td class="detail-full">${formatRupiah(
-                            product.price
-                        )}</td>
-                        <td class="detail-full">${product.created_dt}</td>
-                        <td style="display:flex;">
-                            <a href="#" class="delete-promo-product" data-id="${
-                                product.id
-                            }"><i class="material-icons">delete</i></a>
-                        </td>
-                    </tr>
-                    `;
+                        <tr>
+                            <td class="detail-full">${index + 1}</td>
+                            <td>${product.name}</td>
+                            <td>${formatRupiah(product.promo_origin)}</td>
+                            <td>${formatRupiah(product.promo_price)}</td>
+                            <td class="detail-full">${formatRupiah(product.price)}</td>
+                            <td class="detail-full">${product.created_dt}</td>
+                            <td style="display:flex;">
+                                <a href="#" class="delete-promo-product" data-id="${product.id}"><i class="material-icons">delete</i></a>
+                            </td>
+                        </tr>`;
                     tbody.append(row);
                 });
             }
@@ -159,16 +157,10 @@ $("#modal_TambahPromosi").click(function () {
         type: "get",
         success: function (response) {
             var products = response.products;
-            var selectOptions = "";
             var selectOptions = `<option value="0" disabled selected>Pilih Barang</option>`;
 
             products.forEach(function (product) {
-                selectOptions +=
-                    '<option value="' +
-                    product.id +
-                    '">' +
-                    product.name +
-                    "</option>";
+                selectOptions += '<option value="' + product.id + '">' + product.name + '</option>';
             });
             $("#produkSelect").html(selectOptions);
             $.ajax({
