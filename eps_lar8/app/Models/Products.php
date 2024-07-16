@@ -43,18 +43,23 @@ class Products extends Model implements HasMedia
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/svg']);
 
         $this->addMediaConversion('sm')
-            ->width(100)
-            ->height(100)
+            ->width(50)
+            ->height(50)
             ->performOnCollections('artwork')->nonOptimized()->nonQueued();
 
         $this->addMediaConversion('md')
-            ->width(200)
-            ->height(200)
+            ->width(100)
+            ->height(100)
             ->performOnCollections('artwork')->nonOptimized()->nonQueued();
 
         $this->addMediaConversion('lg')
             ->width(300)
             ->height(300)
+            ->performOnCollections('artwork')->nonOptimized()->nonQueued();
+
+        $this->addMediaConversion('bg')
+            ->width(800)
+            ->height(800)
             ->performOnCollections('artwork')->nonOptimized()->nonQueued();
     }
 

@@ -24,6 +24,7 @@ use App\Http\Controllers\Seller\NegoController;
 use App\Http\Controllers\Seller\OrederController;
 use App\Http\Controllers\Seller\ProductController;
 use App\Http\Controllers\Seller\PromotionController;
+use App\Http\Controllers\Seller\SettingController;
 use App\Http\Controllers\seller\ShophealthController;
 use Illuminate\Support\Facades\Artisan;
 
@@ -201,6 +202,9 @@ Route::group(['middleware' => 'seller'], function () {
 
     // Shop health
     Route::get('/seller/health/', [ShophealthController::class, 'index'])->name('seller.health');
+
+    // Setting
+    Route::get('/seller/setting/address', [SettingController::class, 'address'])->name('seller.setting.address');
 
     // Pengetesan
     Route::get('/seller/product/test/{id}', [ProductController::class, 'test']); //Test Get Json Product

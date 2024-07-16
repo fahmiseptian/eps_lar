@@ -8,9 +8,12 @@ use App\Http\Controllers\Partner\BniController;
 use App\Http\Controllers\Partner\KurirController;
 use App\Http\Controllers\Seller\DeliveryController;
 use App\Http\Controllers\Seller\FinanceController;
+use App\Http\Controllers\Seller\LoginSellerController;
 use App\Http\Controllers\Seller\NegoController;
+use App\Http\Controllers\Seller\OrederController;
 use App\Http\Controllers\Seller\ProductController;
 use App\Http\Controllers\Seller\PromotionController;
+use App\Http\Controllers\Seller\SettingController;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -64,6 +67,10 @@ Route::group(['middleware' => 'seller'], function () {
     Route::get('/seller/product/', [ProductController::class, 'getProductSeller']);
     Route::get('/seller/product/price/{id}', [ProductController::class, 'getPrice']);
 
+// Order
+    Route::post('/seller/getKontrak', [OrederController::class, 'getKontrak']);
+    Route::get('/seller/getOrder/{id}', [OrederController::class, 'getorder']);
+
 // Finance
     Route::post('/seller/finance/updatePin',[FinanceController::class,'savePin']);
     Route::get('/seller/finance/getTraxPending',[FinanceController::class,'getTraxPending']);
@@ -85,7 +92,19 @@ Route::group(['middleware' => 'seller'], function () {
     Route::post('/seller/promo/add-promo',[PromotionController::class,'addPromotionProduct']);
     Route::post('/seller/promo/delete-promo',[PromotionController::class,'deleteProductPromo']);
 
+// Setting
+    Route::post('/seller/setting/address/setdefault',[SettingController::class,'setDefaultAddress']);
+    Route::post('/seller/setting/address/delete',[SettingController::class,'deleteAddress']);
+    Route::post('/seller/setting/address/getAddress',[SettingController::class,'getAddress']);
+    Route::post('/seller/setting/address/update',[SettingController::class,'addAddress']);
+
 });
+
+// Document
+// Route::get('/generate-pdf', [PDFController::class, 'index'])->name('generate.pdf.form');
+Route::post('/generate-kontrak', [OrederController::class, 'generateKontrak'])->name('generate.kontrak');
+Route::post('/download-kontrak', [OrederController::class, 'downloadKontrak'])->name('download.kontrak');
+
 
 // Member
 Route::group(['middleware' => 'member'], function () {
@@ -114,3 +133,7 @@ Route::post('/updateqtyCart',[CartController::class,'updateqtyCart']);
 Route::post('/kurir/anter', [KurirController::class, 'anter']);
 Route::post('/kurir/pickup', [KurirController::class, 'pickup']);
 Route::post('/kurir/tracking',[KurirController::class,'Tracking']);
+
+Route::get('/config/getProvince',[LoginSellerController::class,'getProvince']);
+Route::get('/config/getCity/{id}',[LoginSellerController::class,'getCity']);
+Route::get('/config/getdistrict/{id}',[LoginSellerController::class,'getdistrict']);

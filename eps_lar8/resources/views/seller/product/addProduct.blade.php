@@ -154,7 +154,7 @@
 
                                     <div class="form-group">
                                         <label for="name">SKU Induk:</label>
-                                        <input type="text" name="sku" id="sku" class="form-control" placeholder="Masukkan SKU Produk" required>
+                                        <input type="text" name="sku" id="sku" class="form-control" placeholder="Masukkan SKU Produk">
                                     </div>
                                     <button type="submit" class="btn btn-primary">Simpan</button>
                                 </form>

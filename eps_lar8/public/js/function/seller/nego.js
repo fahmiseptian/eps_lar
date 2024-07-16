@@ -9,6 +9,9 @@ $(function () {
         bSort: true,
         bInfo: true,
         bAutoWidth: true,
+        language: {
+            emptyTable: 'Belum ada Data'  // Pesan untuk tabel kosong
+        }
     };
 
     // Inisialisasi DataTables
@@ -62,6 +65,9 @@ $(document).on("click", "#change-nego", function () {
     $.ajax({
         url: appUrl + "/api/seller/nego/" + kondisi,
         type: "get",
+        xhrFields: {
+            withCredentials: true
+        },
         success: function (response) {
             var negos = response.negos;
             var tbody = $("#example2 tbody");
@@ -117,6 +123,9 @@ $(document).on("click", "#detailNego", function () {
     $.ajax({
         url: appUrl + "/api/seller/nego/detail/" + id_nego,
         type: "get",
+        xhrFields: {
+            withCredentials: true
+        },
         success: function (response) {
             var tbody = $(".box-body");
             var list_nego = $(".horizontal-list");
@@ -365,6 +374,9 @@ $(document).on("click", "#detailNego", function () {
                             data: {
                                 id_nego : id_nego,
                             },
+                            xhrFields: {
+                                withCredentials: true
+                            },
                             success: function(response) {
                                 location.reload();
                             },
@@ -403,6 +415,9 @@ $(document).on("click", "#detailNego", function () {
                             data: {
                                 id_nego: id_nego,
                                 alasan: alasanPenolakan
+                            },
+                            xhrFields: {
+                                withCredentials: true
                             },
                             success: function(response) {
                                 location.reload();
@@ -456,6 +471,9 @@ $(document).ready(function() {
                 id_product : id_product,
                 hargaResponSatuan: hargaResponSatuan
             },
+            xhrFields: {
+                withCredentials: true
+            },
             success: function(response) {
                 $('#hargaDiterimaSatuan').val(formatRupiah(response.hargaSatuanDiterimaSeller));
                 $('#hargaDiterimaTotal').val(formatRupiah(response.hargaTotalDiterimaSeller));
@@ -491,6 +509,9 @@ $(document).ready(function() {
             url: appUrl + "/api/seller/nego/add_respon",
             type: "POST",
             data: formData,
+            xhrFields: {
+                withCredentials: true
+            },
             success: function(response) {
                 location.reload();
             },

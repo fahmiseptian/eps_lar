@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Libraries\VerificationService;
 use App\Models\Member;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class FinanceController extends Controller
@@ -151,7 +152,7 @@ class FinanceController extends Controller
             'rek_location' => $request->cabangBank,
             'rek_city' => $request->kotaKabupaten,
             'id_shop' => $this->seller,
-            'created_dt'=>now()
+            'created_dt'=>Carbon::now()
         ]);
 
         // Simpan rekening baru

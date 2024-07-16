@@ -72,7 +72,8 @@ class Shop extends Model
             's.sap_district_code',
             'ma.subdistrict_id',
             'ma.is_default_shipping',
-            'ma.is_shop_address'
+            'ma.is_shop_address',
+            'ma.address'
         )
         ->join('member_address as ma', 'shop.id_user', '=', 'ma.member_id')
         ->join('member as mm', 'mm.id', '=', 'ma.member_id')
@@ -80,7 +81,9 @@ class Shop extends Model
         ->join('city as c', 'c.city_id', '=', 'ma.city_id')
         ->join('subdistrict as s', 's.subdistrict_id', '=', 'ma.subdistrict_id')
         ->where('shop.id', $id_shop)
-        ->get();
+        ->where('ma.active_status','active')
+        ->where('ma.is_shop_address','yes')
+        ->first();
     }
 
     public function  getShopById($id_shop) {
@@ -125,6 +128,76 @@ class Shop extends Model
         $pin    = $query->pin_saldo;
 
         return $pin;
+    }
+
+    public function getIdShopByOrder($id_order_shop)
+    {
+        $id_shop = DB::table('complete_cart_shop')
+                        ->where('id', $id_order_shop)
+                        ->value('id_shop');
+
+        return $id_shop;
+    }
+
+    function AddressByIdshop($id_shop, $id_address = null) {
+        $query = DB::table('shop as s')
+            ->select(
+                'ma.*',
+                's.id_address as id_address_default',
+                'p.province_name',
+                'c.city_name',
+                'sub.subdistrict_name',
+            )
+            ->join('member as m', 'm.id', 's.id_user')
+            ->join('member_address as ma', 'ma.member_id', 'm.id')
+            ->join('province as p', 'p.province_id', '=', 'ma.province_id')
+            ->join('city as c', 'c.city_id', '=', 'ma.city_id')
+            ->join('subdistrict as sub', 'sub.subdistrict_id', '=', 'ma.subdistrict_id')
+            ->where('s.id', $id_shop)
+            ->where('ma.active_status','active');
+            if ($id_address != null) {
+                $query->where('ma.member_address_id',$id_address );
+                $address = $query->first();
+            }else {
+                $address = $query->get();
+            }
+
+        return $address;
+    }
+
+    function setDefaultAddress($id_shop, $id_address) {
+        DB::transaction(function () use ($id_shop, $id_address) {
+            // Set all addresses for the shop to not be default
+            DB::table('member_address')
+                ->join('shop', 'member_address.member_id', '=', 'shop.id_user')
+                ->where('shop.id', $id_shop)
+                ->update([
+                    'member_address.is_shop_address' => 'no',
+                    'is_default_shipping'=>'no'
+                ]);
+
+            // Set the specific address as the default address
+            DB::table('member_address')
+                ->where('member_address_id', $id_address)
+                ->update([
+                    'member_address.is_shop_address' => 'yes',
+                    'is_default_shipping'=>'yes'
+                ]);
+
+            // Update the shop's default address
+            DB::table('shop')
+                ->where('id', $id_shop)
+                ->update(['id_address' => $id_address]);
+        });
+
+        return true;
+    }
+
+    function getIdUserByid_shop($id_shop)  {
+        $id_user = DB::table('shop')
+                        ->where('id', $id_shop)
+                        ->value('id_user');
+        return $id_user;
     }
 
 }

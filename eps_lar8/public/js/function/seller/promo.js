@@ -9,6 +9,9 @@ $(function () {
         bSort: true,
         bInfo: true,
         bAutoWidth: true,
+        language: {
+            emptyTable: 'Belum ada Data'  // Pesan untuk tabel kosong
+        }
     };
 
     // Inisialisasi DataTables
@@ -59,6 +62,7 @@ function unformatRupiah(formattedRupiah) {
 
 $(".delete-promo-product").click(function () {
     var id = $(this).data("id");
+    console.log(id);
 
     // Tampilkan konfirmasi menggunakan SweetAlert
     Swal.fire({
@@ -72,6 +76,7 @@ $(".delete-promo-product").click(function () {
         cancelButtonText: "Batal",
     }).then((result) => {
         if (result.isConfirmed) {
+            $("#overlay").show();
             // Jika pengguna mengonfirmasi, lakukan AJAX untuk menghapus promo
             $.ajax({
                 url: appUrl + "/api/seller/promo/delete-promo",
@@ -79,6 +84,9 @@ $(".delete-promo-product").click(function () {
                 data: {
                     id: id,
                     _token: csrfToken,
+                },
+                xhrFields: {
+                    withCredentials: true
                 },
                 success: function (response) {
                     // Jika berhasil hapus promo, reload halaman
@@ -108,6 +116,7 @@ $(document).on("click", "#category-promotion", function () {
             id: id,
             _token: csrfToken,
         },
+        // cors
         xhrFields: {
             withCredentials: true
         },
@@ -155,6 +164,9 @@ $("#modal_TambahPromosi").click(function () {
     $.ajax({
         url: appUrl + "/api/seller/product/",
         type: "get",
+        xhrFields: {
+            withCredentials: true
+        },
         success: function (response) {
             var products = response.products;
             var selectOptions = `<option value="0" disabled selected>Pilih Barang</option>`;
@@ -166,6 +178,9 @@ $("#modal_TambahPromosi").click(function () {
             $.ajax({
                 url: appUrl + "/api/seller/kategoripromo",
                 type: "get",
+                xhrFields: {
+                    withCredentials: true
+                },
                 success: function (response) {
                     var kategoriSelect = response.promotions;
                     var options = '<option value="0" disabled selected>Pilih Kategori Promo</option>';
@@ -212,6 +227,9 @@ $("#tambahProdukpromosiForm").on("submit", function (e) {
             promo_price: promoTayangPrice,
             _token: csrfToken,
         },
+        xhrFields: {
+            withCredentials: true
+        },
         success: function (response) {
             $("#promoPrice").empty();
             $("#promoTayangPrice").empty();
@@ -243,6 +261,9 @@ $('#produkSelect').on('change', function() {
             url: appUrl + '/api/seller/product/price/' + produkId,
             type: 'GET',
             dataType: 'json',
+            xhrFields: {
+                withCredentials: true
+            },
             success: function(response) {
                 price.val(formatRupiah(response.price));
                 hargaTayang.val(formatRupiah(response.harga_tayang));
@@ -284,6 +305,9 @@ function calcHargaTayang() {
         data: {
             id_product: id_product,
             price: promoPrice
+        },
+        xhrFields: {
+            withCredentials: true
         },
         success: function(response) {
             $('#promoTayangPrice').val(formatRupiah(response.harga_tayang));

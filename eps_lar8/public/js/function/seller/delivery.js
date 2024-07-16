@@ -9,6 +9,9 @@ $(function () {
         bSort: true,
         bInfo: true,
         bAutoWidth: true,
+        language: {
+            emptyTable: 'Belum ada Data'  // Pesan untuk tabel kosong
+        }
     });
 });
 
@@ -55,6 +58,9 @@ function addCourier(courierId) {
         data: {
             courierId: courierId, _token: csrfToken
         },
+        xhrFields: {
+            withCredentials: true
+        },
         success: function(data) {
             Swal.fire({
                 icon: 'success',
@@ -87,6 +93,9 @@ function removeCourier(courierId) {
         url: appUrl +'/seller/remove-courier',
         data: {
             courierId: courierId, _token: csrfToken
+        },
+        xhrFields: {
+            withCredentials: true
         },
         success: function(data) {
             Swal.fire({
@@ -130,6 +139,9 @@ function addfreeCourier(id_province) {
         data: {
             id_province: id_province,
         },
+        xhrFields: {
+            withCredentials: true
+        },
         success: function(data) {
             Swal.fire({
                 icon: 'success',
@@ -160,6 +172,9 @@ function removefreeCourier(id_province) {
         data: {
             id_province: id_province,
         },
+        xhrFields: {
+            withCredentials: true
+        },
         success: function(data) {
             Swal.fire({
                 icon: 'success',
@@ -184,10 +199,12 @@ function removefreeCourier(id_province) {
 }
 
 $(document).on("click", "#ubahestimasi", function () {
-
     $.ajax({
         url: appUrl + "/api/seller/get-packingDay",
         method: "get",
+        xhrFields: {
+            withCredentials: true
+        },
         success: function (response) {
             var estimasi_lama= response.packing_estimation;
             Swal.fire({
@@ -217,6 +234,9 @@ $(document).on("click", "#ubahestimasi", function () {
                         method: "POST",
                         data: {
                             estimasi: estimasi
+                        },
+                        xhrFields: {
+                            withCredentials: true
                         },
                         success: function (response) {
                             Swal.fire({

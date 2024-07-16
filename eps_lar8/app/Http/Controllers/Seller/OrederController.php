@@ -11,12 +11,17 @@ use App\Models\Saldo;
 use App\Models\CompleteCartShop;
 use App\Models\CompleteCartAddress;
 use App\Models\Invoice;
+use App\Models\Lpse_config;
 use Barryvdh\DomPDF\Facade as PDF;
 use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
 use Barryvdh\DomPDF\PDF as DomPDFPDF;
+use Carbon\Carbon;
 use Dompdf\Adapter\PDFLib;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Nette\Utils\Json;
 use Spatie\MediaLibrary\Conversions\ImageGenerators\Pdf as ImageGeneratorsPdf;
 
@@ -25,6 +30,8 @@ class OrederController extends Controller
     protected $seller;
     protected $getOrder;
     protected $data;
+    protected $Model;
+    protected $Liberies;
 
     public function __construct(Request $request)
     {
@@ -48,15 +55,19 @@ class OrederController extends Controller
         ->join('member_address as ma', 'm.id', '=', 'ma.member_id')
         ->join('city as c', 'cca.city_id', '=', 'c.city_id');
 
-                    $this->seller 	= $request->session()->get('seller_id');
+        $this->seller 	= $request->session()->get('seller_id');
+        $sellerType     = Shop::getTypeById($this->seller);
+        $saldoPending   = Saldo::calculatePendingSaldo($this->seller);
 
-                    $sellerType     = Shop::getTypeById($this->seller);
-                    $saldoPending   = Saldo::calculatePendingSaldo($this->seller);
+        // Membuat $this->data
+        $this->data['title'] = 'order';
+        $this->data['seller_type'] = $sellerType;
+        $this->data['saldo'] = $saldoPending;
 
-                    // Membuat $this->data
-                    $this->data['title'] = 'order';
-                    $this->data['seller_type'] = $sellerType;
-                    $this->data['saldo'] = $saldoPending;
+        $this->Model['CompleteCartShop']= new CompleteCartShop();
+
+        $this->Liberies['terbilang']    = new Terbilang();
+
     }
 
     public function index()
@@ -236,22 +247,18 @@ class OrederController extends Controller
     {
         $detail_order  = CompleteCartShop::getDetailOrderbyId($this->seller, $id_cart_shop);
         $detail_order->detail=CompleteCartShop::getDetailProduct($this->seller,$id_cart_shop);
-        $detail_order->seller_address=Shop::getAddressByIdshop($this->seller);
-        $eps = [
-            'nama' => 'PT. Elite Proxy Sistem',
-            'npwp' => ' 73.035.456.0-022.000',
-            'alamat' => 'Rukan Sudirman Park Apartement Jl Kh. Mas Mansyur KAV 35 A/15 Kelurahan Karet Tengsin Kec. Tanah Abang Jakarta Pusat DKI Jakarta'
-        ];
 
+        $dataPembeli    = $this->Model['CompleteCartShop']->getUserById_cart_shop($id_cart_shop);
+        $dataSeller     = $this->Model['CompleteCartShop']->getSellerById_cart_shop($id_cart_shop);
 
-        $pdf = FacadePdf::loadView('pdf.invoice', ['data' => $detail_order,'eps'=>$eps]);
+        $pdf = FacadePdf::loadView('pdf.newInvoice', ['data' => $detail_order, 'dataPembeli'=>$dataPembeli, 'dataSeller'=>$dataSeller]);
 
         return $pdf->stream('informasi_invoice.pdf');
     }
 
     public function generateKwantasiPDF($id_cart_shop)
     {
-        $terbilang = new Terbilang();
+        $terbilang = $this->Liberies['terbilang'];
         $detail_order  = CompleteCartShop::getDetailOrderbyId($this->seller, $id_cart_shop);
         $detail_order->seller_address=Shop::getAddressByIdshop($this->seller);
         $detail_order->terbilang = $terbilang->terbilang($detail_order->total);
@@ -262,10 +269,11 @@ class OrederController extends Controller
             'alamat' => 'Rukan Sudirman Park Apartement Jl Kh. Mas Mansyur KAV 35 A/15 Kelurahan Karet Tengsin Kec. Tanah Abang Jakarta Pusat DKI Jakarta'
         ];
 
+        $dataPembeli    = $this->Model['CompleteCartShop']->getUserById_cart_shop($id_cart_shop);
 
-        $pdf = FacadePdf::loadView('pdf.kwantasi', ['data' => $detail_order,'eps'=>$eps]);
+        $pdf = FacadePdf::loadView('pdf.Kwitansi', ['data' => $detail_order,'eps'=>$eps, 'dataPembeli'=>$dataPembeli]);
 
-        return $pdf->stream('informasi_kwantasi.pdf');
+        return $pdf->stream('Kwitansi.pdf');
     }
 
     public function generateBastPDF($id_cart_shop)
@@ -292,5 +300,122 @@ class OrederController extends Controller
         );
         return $pdf->stream('informasi_bast.pdf');
     }
+
+    function getKontrak(Request $request) {
+        $id_cart_shop = $request->idcs;
+        $kontrak    = DB::table('kontrak')->where('id_complete_cart_shop',$id_cart_shop)->first();
+
+        if (!$kontrak) {
+            return response()->json(0);
+        }
+        return response()->json($kontrak);
+    }
+
+    function getorder($id_cart_shop){
+        $order  = CompleteCartShop::getDetailOrderbyId($this->seller, $id_cart_shop);
+
+        $order->terbilang = $this->Liberies['terbilang']->terbilang($order->total);
+        $order->tgl_indo = $this->Liberies['terbilang']->tgl_indo(date('Y-m-d', strtotime("+3 day", strtotime($order->created_date))));
+
+        $order->detail=CompleteCartShop::getDetailProduct($this->seller,$id_cart_shop);
+        $htmlContent = view('pdf.kontrak', ['order' => $order])->render();
+
+        // Mengirim respons JSON dengan data order dan konten HTML
+        return response()->json([
+            'order' => $order,
+            'htmlContent' => $htmlContent,
+        ]);
+    }
+
+
+    public function generateKontrak(Request $request)
+    {
+        // Ambil data dari form
+        $id_cart_shop       = $request->id_cs;
+        $no_kontrak         = $request->no_kontrak;
+        $total_harga        = $request->total_harga;
+        $tanggal_kontrak    = $request->tanggal_kontrak;
+        $nilai_kontrak      = $request->nilai_kontrak;
+        $catatan            = $request->catatan;
+        $content            = $request->content;
+
+        $dataKontrak = CompleteCartShop::GetIdSellerAndId_memeber($id_cart_shop);
+
+        $dataArr = [
+            'id_complete_cart_shop' => $id_cart_shop,
+            'no_kontrak'=>$no_kontrak,
+            'id_shop' => $dataKontrak->id_shop,
+            'member_id' => $dataKontrak->id_user,
+            'total_harga' => $total_harga,
+            'nilai_kontrak' => $nilai_kontrak,
+            'tanggal_kontrak' => $tanggal_kontrak,
+            'catatan' => $catatan,
+            'document' => $content,
+            'update_date' => Carbon::now(),
+        ];
+
+        $check = DB::table('kontrak')->where('id_complete_cart_shop', $id_cart_shop)->count();
+
+        if ($check > 0) {
+            // Ambil nilai is_seller_input sebelumnya
+            $existingData = DB::table('kontrak')->where('id_complete_cart_shop', $id_cart_shop)->first();
+            $currentIsSellerInput = $existingData->is_seller_input ?? 0;
+
+            $data = array_merge([
+                'created_date'=>Carbon::now(),
+                'is_seller_input'=> $currentIsSellerInput + 1
+            ],$dataArr);
+
+            $update = DB::table('kontrak')->where('id_complete_cart_shop', $id_cart_shop)->update($data);
+        } else {
+            $data = array_merge([
+                'created_date'=>Carbon::now(),
+                'is_seller_input'=>1
+            ],$dataArr);
+
+            $insert = DB::table('kontrak')->insert($data);
+        }
+
+        return response()->json([
+            'success' => true,
+        ]);
+    }
+
+    function downloadKontrak(Request $request) {
+        $id_cart_shop = $request->idcs;
+        $kontrak = DB::table('kontrak')->where('id_complete_cart_shop', $id_cart_shop)->first();
+
+        if (!$kontrak) {
+            return response()->json(['error' => 'Kontrak tidak ditemukan'], 404);
+        }
+
+        $content = $kontrak->document;
+
+        // Setup Dompdf
+        $options = new Options();
+        $options->set('isHtml5ParserEnabled', true);
+        $options->set('isRemoteEnabled', true);
+        $dompdf = new Dompdf($options);
+
+        // Load HTML content
+        $dompdf->loadHtml($content);
+
+        // Render PDF (optional settings)
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        // Output PDF to string
+        $pdfOutput = $dompdf->output();
+
+        // Membuat respons untuk mengunduh file PDF
+        return response($pdfOutput, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="kontrak_' . time() . '.pdf"',
+            'Cache-Control' => 'public, must-revalidate, max-age=0',
+            'Pragma' => 'public',
+            'Expires' => 'Sat, 26 Jul 1997 05:00:00 GMT'
+        ]);
+    }
+
 }
 

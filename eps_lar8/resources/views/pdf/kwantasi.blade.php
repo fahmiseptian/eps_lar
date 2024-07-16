@@ -96,12 +96,12 @@
                 <div>KW/<?= $data->invoice . '-' . $data->id_cart_shop ?></div>
             </div>
         </div>
-        
+
         <br />
-        
-        
+
+
         <br />
-        
+
         <!-- Tabel informasi -->
         <div class="row">
             <div class="col-xs-12">
@@ -125,7 +125,7 @@
                 </table>
             </div>
         </div>
-        
+
 
         <!-- Payment amount and other details -->
         <div class="row">

@@ -9,6 +9,9 @@ $(function () {
         bSort: true,
         bInfo: true,
         bAutoWidth: true,
+        language: {
+            emptyTable: 'Belum ada Data'  // Pesan untuk tabel kosong
+        }
     };
 
     // Inisialisasi DataTables
@@ -68,6 +71,9 @@ $(document).on("click", "#editRekening", function () {
     $.ajax({
         url: appUrl + "/seller/finance/getRekening/" + rekeningId,
         type: "get",
+        xhrFields: {
+            withCredentials: true
+        },
         success: function (response) {
             if (response && response.data_rekening_seller) {
                 const data = response.data_rekening_seller;
@@ -169,6 +175,9 @@ $(document).on("click", "#hapusRekening", function () {
                     _token: $('meta[name="csrf-token"]').attr("content"), // Kirim token CSRF jika diperlukan
                     id: rekeningId,
                 },
+                xhrFields: {
+                    withCredentials: true
+                },
                 success: function (response) {
                     if (response.success) {
                         Swal.fire(
@@ -218,6 +227,9 @@ $(document).on("click", "#editDefaultRekening", function () {
                 data: {
                     id: rekeningId,
                     _token: $('meta[name="csrf-token"]').attr("content"),
+                },
+                xhrFields: {
+                    withCredentials: true
                 },
                 success: function (response) {
                     Swal.fire(
@@ -295,6 +307,9 @@ $('#savePin').on('click', function() {
         data: {
             newPin: newPin
         },
+        xhrFields: {
+            withCredentials: true
+        },
         success: function(response) {
             Swal.fire({
                 icon: 'success',
@@ -321,6 +336,9 @@ $(document).on("click", "#tarikTrx", function () {
     $.ajax({
         url: appUrl + '/api/seller/finance/getTraxPending',
         method: 'GET',
+        xhrFields: {
+            withCredentials: true
+        },
         success: function(response) {
             var trxs = response.trx;
             if (trxs.length > 0) {
@@ -419,6 +437,9 @@ $(document).ready(function() {
             data: {
                 pin : pin,
                 idTrx: idTrx,
+            },
+            xhrFields: {
+                withCredentials: true
             },
             success: function(response) {
                 Swal.fire({

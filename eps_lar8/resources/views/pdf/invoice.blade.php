@@ -127,12 +127,9 @@
                         <td scope="col" width="25%">
                             <p style="font-family: helveticab; font-size: 14px;">Rekanan</p>
                             <p style="font-size: 12px;">
-                                @foreach ($data->seller_address as $sla)
-                                    Nama : <?= $sla->name ?> <br />
-                                    NPWP : <?= $sla->npwp ?> <br />
-                                    Alamat : <?= $sla->npwp_address ?><br />
-                                @endforeach
-
+                                    Nama : <?= $data->seller_address->name ?> <br />
+                                    NPWP : <?= $data->seller_address->npwp ?> <br />
+                                    Alamat : <?= $data->seller_address->address ?><br />
                             </p>
                         </td>
                         <?php

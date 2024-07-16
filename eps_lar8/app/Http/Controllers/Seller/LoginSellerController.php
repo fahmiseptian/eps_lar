@@ -8,6 +8,7 @@ use App\Models\Shop;
 use App\Models\Member;
 
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 
 class LoginSellerController extends Controller
 {
@@ -58,6 +59,46 @@ public function login(Request $request)
 
         // Redirect ke halaman login
         return redirect()->route('seller.login');
+    }
+
+    function getProvince() {
+        $province = DB::table('province')->select('*')->get();
+
+        if ($province) {
+            return response()->json(['province' => $province], 200);
+        } else {
+            return response()->json(['message' => 'Failed to get province'], 500);
+        }
+    }
+
+    function getCity($id_province = null) {
+        $query  = DB::table('city')->select('*');
+
+        if ($id_province != null) {
+            $query->where('province_id',$id_province);
+        }
+        $city   = $query->get();
+
+        if ($query) {
+            return response()->json(['citys' => $city], 200);
+        } else {
+            return response()->json(['message' => 'Failed to get City'], 500);
+        }
+    }
+
+    function getdistrict($id_city = null) {
+        $query  = DB::table('subdistrict')->select('*');
+
+        if ($id_city != null) {
+            $query->where('city_id',$id_city);
+        }
+        $subdistrict   = $query->get();
+
+        if ($query) {
+            return response()->json(['subdistricts' => $subdistrict], 200);
+        } else {
+            return response()->json(['message' => 'Failed to get subdistrict'], 500);
+        }
     }
 
 }

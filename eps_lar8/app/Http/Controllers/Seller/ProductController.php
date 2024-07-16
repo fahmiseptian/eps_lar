@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
 use App\Libraries\Calculation;
+use App\Libraries\Fungsi;
 use App\Models\Shop;
 use App\Models\Saldo;
 use App\Models\Products;
@@ -12,6 +13,7 @@ use App\Models\Brand;
 use App\Models\Lpseprice;
 use App\Models\ProductCategory;
 use App\Models\ShopCategory;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -22,6 +24,7 @@ class ProductController extends Controller
     protected $getOrder;
     protected $data;
     protected $Model;
+    protected $Libraries;
 
     public function __construct(Request $request)
     {
@@ -35,10 +38,16 @@ class ProductController extends Controller
         $this->data['title'] = 'Product';
         $this->data['seller_type'] = $sellerType;
         $this->data['saldo'] = $saldoPending;
+        $this->data['ppn'] = $lpse ->ppn;
+        $this->data['pph'] = $lpse ->pph;
+        $this->data['mp_percent'] = $lpse->mp_percent;
 
         $this->Model['ProductCategory'] = new ProductCategory();
         $this->Model['ShopCategory'] = new ShopCategory();
         $this->Model['Shop'] = new Shop();
+
+        // Libraries
+        $this->Libraries['Fungsi'] = new Fungsi();
 
     }
 
@@ -99,8 +108,7 @@ class ProductController extends Controller
         // Tentukan ID kategori yang akan disimpan
         $id_category = $request->kategorilevel2 ? $request->kategorilevel2 : $request->kategorilevel1;
 
-        // Buat objek produk baru
-        $product = Products::create([
+        $data = [
             'sku' => $request->sku,
             'id_shop' => $this->seller,
             'id_brand' => $request->merek,
@@ -116,14 +124,28 @@ class ProductController extends Controller
             'status_delete' => 'N', // Nilai default
             'status_lpse' => '0', // Nilai default
             'is_pdn' => $request->produk_dalam_negeri,
-        ]);
+        ];
+
+        // Buat record baru menggunakan array data
+        $product = Products::create($data);
 
         // Simpan informasi tambahan produk
-        $product->spesifikasi = $request->spesifikasi;
-        $product->dimension_length = $request->demensipanjang;
-        $product->dimension_width = $request->demensilebar;
-        $product->dimension_high = $request->demensitinggi;
-        $product->save();
+        $additionalData = [
+            'spesifikasi' => $request->spesifikasi,
+            'dimension_length' => $request->demensipanjang,
+            'dimension_width' => $request->demensilebar,
+            'dimension_high' => $request->demensitinggi,
+        ];
+
+        // Update produk dengan data tambahan
+        $product->update($additionalData);
+
+        $fulldata = array_merge([
+            'seoname' => $this->Libraries['Fungsi']->getSeoName($request->name, '',),
+            'id'      => $product->id,
+        ],$data,$additionalData);
+
+        DB::table('product')->insert($fulldata);
 
         // Lakukan perhitungan harga tayang dan simpan ke dalam LPSE
         $data_kategori = ProductCategory::getCategoryById($id_category);
@@ -153,11 +175,32 @@ class ProductController extends Controller
         ]);
 
         // Unggah semua file media yang diunggah
-        foreach ($request->file('images') as $file) {
+        foreach ($request->file('images') as $index => $file) {
             if ($file->isValid()) {
-                $product->addMedia($file)
-                    ->usingFileName(time() . '.jpg') // Nama file unik
+                $media = $product->addMedia($file)
+                    ->usingFileName(time() . '_' . $index . '.jpg') // Nama file unik
                     ->toMediaCollection('artwork', 'products');
+
+                // Ambil URL dari berbagai konversi
+                $image50 = $media->getUrl('sm');
+                $image100 = $media->getUrl('md');
+                $image300 = $media->getUrl('lg');
+                $image800 = $media->getUrl('bg');
+
+                // Simpan informasi gambar di tabel product_image
+                $data_img = [
+                    'id_product' => $product->id,
+                    'image50' => $image50,
+                    'image100' => $image100,
+                    'image300' => $image300,
+                    'image800' => $image800,
+                    'is_default' => $index == 0 ? 'yes' : 'no', // Gambar pertama sebagai default
+                    'description' => 'Product',
+                    'created_dt' => Carbon::now(),
+                    'last_updated_dt' =>Carbon::now(),
+                ];
+
+                DB::table('product_image')->insert($data_img);
             }
         }
 
@@ -228,8 +271,7 @@ class ProductController extends Controller
 
     public function test($id)
     {
-        $products =Products::where('id',$id)
-                    ->get();
+        $products =Shop::getAddressByIdshop($id);
         return response()->json([ 'product' => $products], 200);
     }
 

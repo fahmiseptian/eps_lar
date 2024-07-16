@@ -88,6 +88,7 @@ class CompleteCartShop extends Model implements HasMedia
             'cc.val_pph',
             'cc.jml_top',
             'cc.id_payment',
+            'cc.va_number',
             'cc.sum_discount',
             'cc.invoice',
             'cc.val_ppn',
@@ -104,9 +105,10 @@ class CompleteCartShop extends Model implements HasMedia
             'sh.name as nama_seller'
         )
         ->join('complete_cart as cc', 'cc.id', '=', 'complete_cart_shop.id_cart')
+        ->join('complete_cart_address as cca','cca.id_cart','complete_cart_shop.id_cart')
         ->join('payment_method as pm', 'pm.id', '=', 'cc.id_payment')
         ->join('member as m', 'm.id', '=', 'cc.id_user')
-        ->join('member_address as ma', 'm.id', '=', 'ma.member_id')
+        ->join('member_address as ma', 'cca.id_address', '=', 'ma.member_address_id')
         ->join('shipping as sp', 'sp.id', '=', 'complete_cart_shop.id_shipping')
         ->join('shop as sh', 'sh.id', '=', 'complete_cart_shop.id_shop')
         ->join('province as p', 'p.province_id', '=', 'ma.province_id')
@@ -114,6 +116,7 @@ class CompleteCartShop extends Model implements HasMedia
         ->join('subdistrict as s', 's.subdistrict_id', '=', 'ma.subdistrict_id')
         ->where('complete_cart_shop.id', '=', $id_cart_shop)
         ->where('complete_cart_shop.id_shop', $shopId)
+        ->where('cca.id_billing_address', '!=', null)
         ->first();
     }
 
@@ -315,7 +318,77 @@ class CompleteCartShop extends Model implements HasMedia
         return $total;
     }
 
-    // function getDetailOrderbyId() : Returntype {
+    public function setRestOrder($id, $id_shop, $data)
+    {
+        $updated = DB::table('complete_cart_shop')
+                        ->where('id', $id)
+                        ->where('id_shop', $id_shop)
+                        ->update($data);
 
-    // }
+        if ($updated) {
+            return true;
+        } else {
+            return false; // Atau sesuaikan dengan kebutuhan penanganan kesalahan
+        }
+    }
+
+    function getUserById_cart_shop($id_cart_shop) {
+        $query  = DB::table('complete_cart_shop as ccs')
+        ->select(
+            'm.instansi',
+            'm.satker',
+            'm.npwp',
+            'ma.*',
+            'p.province_name',
+            'c.city_name',
+            'sub.subdistrict_name',
+        )
+        ->join('complete_cart as cc','cc.id','ccs.id_cart')
+        ->join('member as m','m.id','cc.id_user')
+        ->join('member_address as ma','ma.member_id','m.id')
+        ->join('province as p', 'p.province_id', '=', 'ma.province_id')
+        ->join('city as c', 'c.city_id', '=', 'ma.city_id')
+        ->join('subdistrict as sub', 'sub.subdistrict_id', '=', 'ma.subdistrict_id')
+        ->where('ccs.id',$id_cart_shop)
+        ->where('ma.is_default_billing','yes')
+        ->first();
+
+        return $query;
+    }
+
+    function getSellerById_cart_shop($id_cart_shop) {
+        $query  = DB::table('complete_cart_shop as ccs')
+        ->select(
+            's.nama_pt',
+            's.npwp',
+            'ma.*',
+            'p.province_name',
+            'c.city_name',
+            'sub.subdistrict_name',
+        )
+        ->join('shop as s','s.id','ccs.id_shop')
+        ->join('member as m','m.id','s.id_user')
+        ->join('member_address as ma','ma.member_id','m.id')
+        ->join('province as p', 'p.province_id', '=', 'ma.province_id')
+        ->join('city as c', 'c.city_id', '=', 'ma.city_id')
+        ->join('subdistrict as sub', 'sub.subdistrict_id', '=', 'ma.subdistrict_id')
+        ->where('ccs.id',$id_cart_shop)
+        ->where('ma.is_shop_address','yes')
+        ->first();
+
+        return $query;
+    }
+
+    function GetIdSellerAndId_memeber($id_cart_shop) {
+        $query = DB::table('complete_cart_shop as ccs')
+        ->select(
+            'ccs.id_shop',
+            'cc.id_user'
+        )
+        ->join('complete_cart as cc','cc.id','ccs.id_cart')
+        ->where('ccs.id',$id_cart_shop)
+        ->first();
+        return $query;
+    }
+
 }

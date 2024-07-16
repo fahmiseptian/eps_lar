@@ -113,7 +113,7 @@
                     <i class="fa fa-cog"></i> <span>Pengaturan</span> <i class="fa fa-angle-left pull-right"></i>
                 </a>
                 <ul class="treeview-menu">
-                    <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Alamat</a></li>
+                    <li><a style="color: #eee" href="{{route('seller.setting.address')}}"><i class="fa fa-circle-o"></i> Alamat</a></li>
                     <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Pengaturan Toko</a></li>
                     </li>
                 </ul>

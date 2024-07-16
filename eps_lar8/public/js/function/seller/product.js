@@ -9,6 +9,9 @@ $(function() {
         bSort: true,
         bInfo: true,
         bAutoWidth: true,
+        language: {
+            emptyTable: 'Belum ada Data'  // Pesan untuk tabel kosong
+        }
     };
 
     // Inisialisasi DataTables
@@ -35,6 +38,9 @@ function toggleFilterProduct(element) {
     $.ajax({
         type: "GET",
         url: appUrl + "/seller/product/" + status,
+        xhrFields: {
+            withCredentials: true
+        },
         success: function (data) {
             console.log("berhasil ");
             window.location.href = "/seller/product/" + status;
@@ -51,6 +57,9 @@ $('#kategori-level1').change(function() {
         $.ajax({
             url: appUrl + '/seller/product/category/level2/' + level1Value,
             type: 'GET',
+            xhrFields: {
+                withCredentials: true
+            },
             success: function(response) {
                 $('#kategori-level2').empty().append('<option value="">Pilih Kategori Level 2</option>');
                 $.each(response, function(key, value) {
@@ -72,6 +81,9 @@ $('#kategori-level2').change(function() {
     $.ajax({
         url: appUrl + '/api/seller/DetailCategory/'+ kategori ,
         type: 'GET',
+        xhrFields: {
+            withCredentials: true
+        },
         success: function(response) {
             $("#phpVariables").data("ppn", response.ppn);
             $("#phpVariables").data("pph", response.pph);
@@ -99,7 +111,7 @@ $(document).ready(function() {
             }
         });
 
-        if (fileCount < 1 || fileCount > 3) {
+        if (fileCount < 1 || fileCount > 5) {
             alert("Please upload at least one image and maximum three images.");
             return false;
         }
@@ -109,10 +121,14 @@ $(document).ready(function() {
             url: addUrl,
             type: 'POST',
             data: formData,
+            xhrFields: {
+                withCredentials: true
+            },
             processData: false, // Set processData ke false
             contentType: false, // Set contentType ke false
             success: function(response) {
                 console.log("berhasil");
+                window.location.href = "";
             },
             error: function(xhr, status, error) {
                 console.error(xhr.responseText);
@@ -172,6 +188,9 @@ $(document).on("click", "#deleteProduct", function () {
         data: {
             id_product: id
         },
+        xhrFields: {
+            withCredentials: true
+        },
         success: function (response) {
             Swal.fire({
                 title: "Berhasil",
@@ -201,6 +220,9 @@ $(document).on("click", "#editStatus", function () {
         method: "POST",
         data: {
             id_product: id
+        },
+        xhrFields: {
+            withCredentials: true
         },
         success: function (response) {
             Swal.fire({

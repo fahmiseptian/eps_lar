@@ -5807,3 +5807,101 @@ Gradient Background colors
         width: 100px; /* Sesuaikan lebar sesuai kebutuhan */
     }
 }
+
+
+.add-Address {
+    background-color: deepskyblue;
+    margin-left: 10px;
+}
+
+.add-Address:hover {
+    background-color: deepskyblue; /* Mengubah warna latar belakang saat hover */
+    border-color: blue; /* Mengubah warna border saat hover */
+    transform: translateY(-5px); /* Menggeser elemen ke atas untuk efek "melayang" */
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2); /* Meningkatkan shadow saat hover */
+    transition: all 0.3s ease; /* Transisi halus */
+}
+
+.DetailToko {
+    margin-top: 10px;
+}
+
+.set-default-address{
+    background-color: #06D001; /* Hijau */
+    border: none;
+    color: white;
+    padding: 12px 22px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    font-size: large;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Efek bayangan */
+    transition: box-shadow 0.3s ease; /* Transisi efek saat hover */
+}
+
+.set-default-address:hover{
+    opacity:0.9;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Efek bayangan saat hover */
+}
+
+.delete-address {
+    background-color: red;
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    padding: 8px 14px;
+    font-size: smaller;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Efek bayangan */
+    transition: box-shadow 0.3s ease; /* Transisi efek saat hover */
+}
+
+.delete-address:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Efek bayangan saat hover */
+}
+
+.edit-address {
+    background-color: #59B4C3;
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    padding: 8px 14px;
+    font-size: smaller;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Efek bayangan */
+    transition: box-shadow 0.3s ease; /* Transisi efek saat hover */
+}
+
+.edit-address:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Efek bayangan saat hover */
+}
+
+.dashed-line {
+    border-top: 1px dashed #000; /* Ganti #000 dengan warna garis yang diinginkan */
+    width: 100%; /* Sesuaikan lebar garis sesuai kebutuhan */
+    margin: 20px auto; /* Atur margin agar garis berada di tengah halaman */
+}
+
+#pdfContainer {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+canvas {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    height: auto;
+}

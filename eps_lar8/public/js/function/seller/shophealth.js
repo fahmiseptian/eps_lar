@@ -9,6 +9,9 @@ $(function() {
         bSort: true,
         bInfo: true,
         bAutoWidth: true,
+        language: {
+            emptyTable: 'Belum ada Data'  // Pesan untuk tabel kosong
+        }
     };
 
     // Inisialisasi DataTables

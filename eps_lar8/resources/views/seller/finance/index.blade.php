@@ -37,9 +37,12 @@
                             </table>
                             <br>
                             <br>
-                            <small style="float: left; margin-top:-20px; margin-left:4px">Rekening Bank Saya: **** {{substr( $rekening->rek_number, -4);  }}</small>
-                            <a href="#"><small style="float: Right; margin-top:-20px; margin-right:4px">Saldo
-                                    Penjual</small></a>
+                            @if ($rekening != null)
+                                <small style="float: left; margin-top:-20px; margin-left:4px">Rekening Bank Saya: **** {{substr( $rekening->rek_number, -4);  }}</small>
+                            @else
+                                <small style="float: left; margin-top:-20px; margin-left:4px">Rekening Bank</small>
+                            @endif
+                            <a href="#"><small style="float: Right; margin-top:-20px; margin-right:4px">Saldo Penjual</small></a>
                         </div>
                         <br>
                         <h3 style="color:black;  margin-bottom:-5px"> <b>Rincian penghasilan</b></h3>

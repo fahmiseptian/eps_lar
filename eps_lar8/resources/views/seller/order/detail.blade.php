@@ -20,13 +20,13 @@
                         // Rumus
                         // ppn asuransi
                         $ppn_insurance = ($detailOrder->val_ppn / 100) * $detailOrder->insurance_nominal;
-                        
+
                         // proforma Invoice
                         $proforma = false;
                         if ($detailOrder->status_pembayaran_top == '0') {
                             $proforma = true;
                         }
-                        
+
                         $list_payment = [22, 23, 30];
                         $list_payment_direct = [21];
 
@@ -58,7 +58,7 @@
                         } elseif ($detailOrder->status == 'on_packing_process') {
                             $sta = 2;
                             $status = '<span style="width:100%;background-color:purple;" class="badge">Diproses</span>';
-                        
+
                             $action = '<a style="width:80%; margin:5px; background-color:green;color:white" data-id="' . $detailOrder->id_cart_shop . '" data-id_courier="' . $detailOrder->id_courier . '" href="javascript:;" class="btn fa fa-truck" id="request_courier">&nbsp;Request <br> Pengiriman</a>';
                         } elseif ($detailOrder->status == 'send_by_seller') {
                             $sta = 3;
@@ -67,50 +67,50 @@
                                 '<a style="width:80%; margin:5px; color:white" data-resi="' .
                                 $detailOrder->no_resi .
                                 '" href="javascript:;" class="btn btn-info fa fa-copy">&nbsp;Resi</a>
-                                                        <a style="width:80%; margin:5px; background-color:purple;color:white" data-id="' .
+                                <a style="width:80%; margin:5px; background-color:purple;color:white" data-id="' .
                                 $detailOrder->id_cart_shop .
-                                '" href="javascript:;" class="btn fa fa-map-marker" id="lacakResi">&nbsp;Lacak</a>';
-                        
+                                '" href="javascript:;" class="btn fa fa-map-marker" id="lacakResi" data-resi="'.$detailOrder->no_resi.'" data-id_courier="'.$detailOrder->id_courier.'">&nbsp;Lacak</a>';
+
                             if ($detailOrder->id_courier == '0') {
                                 $action .= '<a style="width:80%; margin:5px; color:white" data-id="' . $detailOrder->id_cart_shop . '" data-id_courier="' . $detailOrder->id_courier . '" href="javascript:;" class="btn btn-warning fa fa-upload" id="uploadDO">&nbsp; DO</a>';
                             }
                         } elseif ($detailOrder->status == 'complete' && $detailOrder->no_resi != null && $pembayaran == true && $detailOrder->is_bast == '1') {
                             $sta = 4;
                             $status = '<span style="width:100%;background-color:green;" class="badge">Selesai</span>';
-                        
+
                             $action =
                                 '<a style="width:80%; margin:5px; color:white" data-resi="' .
                                 $detailOrder->no_resi .
                                 '" href="javascript:;" class="btn btn-info fa fa-copy">&nbsp;Resi</a>
-                                                                                                                                                                                    <a style="width:80%; margin:5px; background-color:purple;color:white" data-id="' .
+                                <a style="width:80%; margin:5px; background-color:purple;color:white" data-id="' .
                                 $detailOrder->id_cart_shop .
-                                '" href="javascript:;" class="btn fa fa-map-marker" id="lacakResi">&nbsp;Lacak</a>';
+                                '" href="javascript:;" class="btn fa fa-map-marker" id="lacakResi" data-resi="'.$detailOrder->no_resi.'" data-id_courier="'.$detailOrder->id_courier.'" >&nbsp;Lacak</a>';
                         } elseif ($detailOrder->status == 'complete' && $detailOrder->no_resi != null && $pembayaran == true) {
                             $sta = 4;
                             $status = '<span style="width:100%;background-color:green;" class="badge">Selesai</span>';
-                        
+
                             $action =
                                 '<a style="width:80%; margin:5px; color:white" data-resi="' .
                                 $detailOrder->no_resi .
                                 '" href="javascript:;" class="btn btn-info fa fa-copy">&nbsp;Resi</a>
-                                                                                                                                                                                    <a style="width:80%; margin:5px; background-color:purple;color:white" data-id="' .
+                                <a style="width:80%; margin:5px; background-color:purple;color:white" data-id="' .
                                 $detailOrder->id_cart_shop .
-                                '" href="javascript:;" class="btn fa fa-map-marker" id="lacakResi">&nbsp;Lacak</a>';
+                                '" href="javascript:;" class="btn fa fa-map-marker" id="lacakResi" data-resi="'.$detailOrder->no_resi.'" data-id_courier="'.$detailOrder->id_courier.'" >&nbsp;Lacak</a>';
                         } elseif ($detailOrder->status == 'complete' && $detailOrder->no_resi != null && $pembayaran == false) {
                             $sta = 5;
                             $status = '<span style="width:100%;background-color:yellow;" class="badge">Pesanan <br> sedang <br> dikirim</span>';
-                        
+
                             if ($detailOrder->is_bast == '1') {
                                 $status = '<span style="width:100%;" class="badge btn-info">Pesanan <br> sudah <br>  Diterima</span>';
                             }
-                        
+
                             $action =
                                 '<a style="width:80%; margin:5px; color:white" data-resi="' .
                                 $detailOrder->no_resi .
                                 '" href="javascript:;" class="btn btn-info fa fa-copy">&nbsp;Resi</a>
                                                         <a style="width:80%; margin:5px; background-color:purple;color:white" data-id="' .
                                 $detailOrder->id_cart_shop .
-                                '" href="javascript:;" class="btn fa fa-map-marker" id="lacakResi">&nbsp;Lacak</a>';
+                                '" href="javascript:;" class="btn fa fa-map-marker" id="lacakResi" data-resi="'.$detailOrder->no_resi.'" data-id_courier="'.$detailOrder->id_courier.'">&nbsp;Lacak</a>';
                         } elseif ($detailOrder->status == 'waiting_approve_by_ppk') {
                             $sta = 6;
                             $status = '<span style="width:100%;background-color:red;" class="badge">Menunggu <br> Persetujuan <br> PPK</span>';
@@ -218,7 +218,7 @@
                                         <td><a style="width: 100%"
                                                 class="btn btn-info fa fa-file-o" data-id="<?= $detailOrder->id_cart_shop ?>"
                                                 id="cetakkwantasi"> &nbsp;KWATANSI</a></td>
-                                        <td><a style="width: 100%" class="btn btn-info fa fa-plus">&nbsp;KONTRAK</a>
+                                        <td><a style="width: 100%" class="btn btn-info fa fa-plus" id="openKontrak" data-id="<?= $detailOrder->id_cart_shop ?>">&nbsp;KONTRAK</a>
                                         </td>
                                     </tr>
                                     <tr>
@@ -263,6 +263,9 @@
                                 </table>
                                 <br>
                                 <div class="detailbiaya">
+                                    <?php
+                                        $total = ($detailOrder->sum_price+($detailOrder->sum_shipping + $detailOrder->ppn_shipping)+($detailOrder->insurance_nominal + $ppn_insurance))
+                                    ?>
                                     <table class="table-detail-order">
                                         <tr>
                                             <td><span class="fa fa-truck">&nbsp; Biaya Pengiriman :</span></td>
@@ -279,7 +282,7 @@
                                         <tr>
                                             <td><span class="fa fa-money">&nbsp; Total Pesanan
                                                     ({{ $detailOrder->qty }}) :</span></td>
-                                            <td>Rp. {{ str_replace(',', '.', number_format($detailOrder->total)) }}
+                                            <td>Rp. {{ str_replace(',', '.', number_format($total)) }}
                                             </td>
                                         </tr>
                                     </table>
@@ -323,7 +326,7 @@
                                         <tr>
                                             <td colspan="2">PPN {{ $detailOrder->val_ppn }}% :</td>
                                             <td style="color: :orangered">Rp.
-                                                {{ str_replace(',', '.', number_format($detailOrder->ppn_price)) }}
+                                                {{ str_replace(',', '.', number_format($detailOrder->ppn_total)) }}
                                             </td>
                                         </tr>
                                         <tr>
@@ -336,7 +339,7 @@
                                             <th style="color:orangered; font-size:15px" colspan="2">Total Pembayaran
                                                 :</th>
                                             <td style="color:orangered;"><b> Rp.
-                                                    {{ str_replace(',', '.', number_format($detailOrder->total)) }}
+                                                    {{ str_replace(',', '.', number_format($total)) }}
                                                 </b></td>
                                         </tr>
                                     </table>

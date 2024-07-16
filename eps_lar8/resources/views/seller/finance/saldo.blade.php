@@ -28,12 +28,17 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th style="padding: 10px; ">Rp {{ number_format($saldo, 0, ',', '.') }} <span
-                                            class="btn btn-info" id="tarikTrx">Tarik</span> </td>
-                                    <th style="padding: 10px;">{{ $rekening->name }} <span
-                                            class="btn btn-info">Utama</span></td>
-                                    <th style="padding: 10px; text-align: right;">
-                                        ****{{ substr($rekening->rek_number, -4) }}</td>
+                                    <td style="padding: 10px; ">Rp {{ number_format($saldo, 0, ',', '.') }}
+                                        <span class="btn btn-info" id="tarikTrx">Tarik</span>
+                                    </td>
+                                    @if ($rekening != null)
+                                        <td style="padding: 10px;">{{ $rekening->name }} <span class="btn btn-info">Utama</span></td>
+                                        <td style="padding: 10px; text-align: right;">  ****{{ substr($rekening->rek_number, -4) }}</td>
+                                    @else
+                                        <td style="padding: 10px;"> </td>
+                                        <td style="padding: 10px; text-align: right;"> </td>
+                                    @endif
+
                                 </tr>
                             </table>
                             <br>
@@ -53,6 +58,7 @@
                                             <th>Dana</th>
                                             <th>Status</th>
                                             <th class="detail-full">Tanggal Dipebaharui</th>
+                                            <th>Detail</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -74,6 +80,7 @@
                                                 </td>
                                                 <td class="detail-full">{{ \Carbon\Carbon::parse($Penarikan->last_update)->format('Y-m-d') }}
                                                 </td>
+                                                <td>Detail</td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -85,6 +92,7 @@
                                             <th>Dana</th>
                                             <th>Status</th>
                                             <th class="detail-full">Tanggal Dipebaharui</th>
+                                            <th>Detail</th>
                                         </tr>
                                     </tfoot>
                                 </table>

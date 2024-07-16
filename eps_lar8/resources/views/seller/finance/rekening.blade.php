@@ -21,6 +21,8 @@
                         <div class="box box-info">
                             <div>
                                 <div class="credit-card-container">
+
+                                    @if ($rekening != null)
                                     <!-- Kartu Kredit Default -->
                                     <div class="credit-card">
                                         <div class="logo-and-bank">
@@ -43,6 +45,7 @@
                                             <div class="card-holder">{{ $rekening->rek_owner }}</div>
                                         </div>
                                     </div>
+                                    @endif
                                     <!-- Kartu Kredit Non-Default -->
                                     @foreach ($rekeningNotdefault as $rk)
                                         <div class="credit-card" >
