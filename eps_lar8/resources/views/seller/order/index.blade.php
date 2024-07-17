@@ -95,12 +95,11 @@
                                                 <th>Status</th>
                                                 <th>Aksi</th>
                                             </tr>
-                                        </tfoot>                                        
+                                        </tfoot>
                                     </table>
                                 </div>
                             </div>
                         </div>
-
                     </div>
                     <div class="col-md-1"></div>
                 </div>

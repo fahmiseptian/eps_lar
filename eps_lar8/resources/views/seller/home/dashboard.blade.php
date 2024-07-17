@@ -18,36 +18,37 @@
                                 <small>Ini merupakan informasi tentang toko mu</small>
                             </h4>
                         </div>
-                        <div class="box-home" style="display: grid; background-color:#EFF9FF">
-                            <!-- Container -->
-                            <div class="box-home">
+                        <div class="box-home" style=" background-color:#EFF9FF; display:grid">
+                            <div class="box box-info"
+                                style="background-color: #fff8ec; border: 2px solid #FC6703; border-radius: 10px; box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.15); padding: 16px; margin-bottom: 20px; display:flex">
                                 <div class="item" style="text-align: center; flex: 1; padding: 10px;">
-                                    <p style="font-size: 20px">{{ $jmlhproduct }}</p>
+                                    <p style="font-size: 18px">{{ $jmlhproduct }}</p>
                                     <b>Produk Aktif</b>
                                 </div>
                                 <div class="item">
-                                    <p style="font-size: 20px">{{ $neworder }}</p>
+                                    <p style="font-size: 18px">{{ $neworder }}</p>
                                     <b>Pesanan Baru</b>
                                 </div>
                                 <div class="item">
-                                    <p style="font-size: 20px">{{ $ondelivery }}</p>
+                                    <p style="font-size: 18px">{{ $ondelivery }}</p>
                                     <b>Pengiriman Diproses</b>
                                 </div>
-                                <div class="item">
-                                    <p style="font-size: 20px">{{$product_habis ?? ''}}</p>
+                                <div class="item" id="only-dekstop">
+                                    <p style="font-size: 18px">{{$product_habis ?? ''}}</p>
                                     <b>Produk Habis</b>
                                 </div>
                             </div>
-                            {{-- BOX 2 --}}
-                            <div class="box-home">
-                                <!-- Item 1 -->
+
+                            <div class="box box-info"
+                                style="background-color: #fff8ec; border: 2px solid #FC6703; border-radius: 10px; box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.15); padding: 16px; margin-bottom: 20px; display:flex">
                                 <div class="item">
                                     <b>Total Pendapatan Hari Ini </b>
                                     <p style="font-size: 20px"><b>Rp {{number_format($pendapatanHariIni,0,".",",")}} </b></p>
                                 </div>
                             </div>
-                            {{-- BOX 3 --}}
-                            <div class="box-home">
+
+                            <div class="box box-info"
+                                style="background-color: #fff8ec; border: 2px solid #FC6703; border-radius: 10px; box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.15); padding: 16px; margin-bottom: 20px; display:flex">
                                 <div class="item" style="text-align: center; flex: 1; padding: 10px;">
                                     <p><b>Nego Baru</b></p>
                                     <p style="font-size: 20px"><b>{{ $newNego }}</b></p>
@@ -62,6 +63,8 @@
                                 </div>
                             </div>
                         </div>
+
+
                     </div>
                     <div class="col-md-1"></div>
                 </div>

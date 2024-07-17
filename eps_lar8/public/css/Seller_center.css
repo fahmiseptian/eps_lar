@@ -515,6 +515,10 @@ body {
     margin-top: 5px;
     /* Memberikan jarak antara tombol-tombol */
   }
+
+  #only-dekstop {
+    display: none;
+  }
 }
 
 /* Layout */
@@ -5904,4 +5908,11 @@ canvas {
     margin: 0 auto;
     max-width: 100%;
     height: auto;
+}
+
+
+@media (max-width: 767px) {
+    body{
+        font-size: 14px;
+    }
 }
