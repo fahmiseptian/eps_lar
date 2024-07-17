@@ -63,7 +63,6 @@ function unformatRupiah(formattedRupiah) {
 $(".delete-promo-product").click(function () {
     var id = $(this).data("id");
     console.log(id);
-
     // Tampilkan konfirmasi menggunakan SweetAlert
     Swal.fire({
         title: "Yakin menghapus promo?",
@@ -216,7 +215,7 @@ $("#tambahProdukpromosiForm").on("submit", function (e) {
     var selectedCategory = $("#kategoriSelect").val();
     var promoPrice = unformatRupiah($("#promoPrice").val());
     var promoTayangPrice = unformatRupiah($("#promoTayangPrice").val());
-
+    $("#overlay").show();
     $.ajax({
         url: appUrl + "/api/seller/promo/add-promo",
         type: "post",

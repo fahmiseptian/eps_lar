@@ -62,7 +62,7 @@ function unformatRupiah(formattedRupiah) {
 
 function toggleFilterorder(element) {
     var status_order = element.getAttribute("data-status-order");
-
+    $("#overlay").show();
     $.ajax({
         type: "GET",
         url: appUrl + "/seller/order/filter/" + status_order,
@@ -77,12 +77,15 @@ function toggleFilterorder(element) {
         error: function (xhr, status, error) {
             console.error("Gagal:", error);
         },
+        complete: function () {
+            $("#overlay").hide();
+        },
     });
 }
 
 function viewDetail(element) {
     var id_cart_shop = element.getAttribute("data-id-order");
-    console.log(appUrl);
+    $("#overlay").show();
     $.ajax({
         type: "GET",
         url: appUrl + "/seller/order/detail/" + id_cart_shop,
@@ -96,6 +99,9 @@ function viewDetail(element) {
         },
         error: function (xhr, status, error) {
             console.error("Gagal:", error);
+        },
+        complete: function () {
+            $("#overlay").hide();
         },
     });
 }
@@ -128,10 +134,7 @@ $(document).on("click", ".accept-this-order", function () {
         confirmButtonText: "Ya",
     }).then((result) => {
         if (result.isConfirmed) {
-            console.log(id_cart_shop);
-            var csrfToken = document
-                .querySelector('meta[name="csrf-token"]')
-                .getAttribute("content");
+            $("#overlay").show();
             $.ajax({
                 url: appUrl + "/seller/order/accept",
                 type: "POST",
@@ -141,6 +144,12 @@ $(document).on("click", ".accept-this-order", function () {
                 },
                 success: function () {
                     location.reload();
+                },
+                error: function (xhr, status, error) {
+                    console.error("Gagal:", error);
+                },
+                complete: function () {
+                    $("#overlay").hide();
                 },
             });
         }
@@ -163,9 +172,7 @@ $(document).on("click", ".cancel-order", async function () {
     });
     if (noteSeller) {
         console.log(noteSeller);
-        var csrfToken = document
-            .querySelector('meta[name="csrf-token"]')
-            .getAttribute("content");
+        $("#overlay").show();
         $.ajax({
             url: appUrl + "/seller/order/cencel",
             type: "POST",
@@ -179,6 +186,12 @@ $(document).on("click", ".cancel-order", async function () {
             },
             success: function () {
                 location.reload();
+            },
+            error: function (xhr, status, error) {
+                console.error("Gagal:", error);
+            },
+            complete: function () {
+                $("#overlay").hide();
             },
         });
     }
@@ -392,7 +405,6 @@ function downloadKontrak(id_cart_shop) {
 
 
 function FormKotrak(dataArr) {
-    console.log(dataArr);
     var formulir = `
         <div class="box box-warning">
             <div class="box-body">
@@ -522,7 +534,7 @@ function generatePDF() {
 $(document).on("click", "#request_courier", function () {
     var id = $(this).data("id");
     var id_courier = $(this).data("id_courier");
-
+    $("#overlay").show();
     if (id_courier === 0) {
         // Tampilkan Swal.fire untuk mengisi nomor resi
         Swal.fire({
@@ -536,8 +548,6 @@ $(document).on("click", "#request_courier", function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 var nomorResi = result.value;
-
-                // Kirim nomor resi ke controller menggunakan AJAX
                 $.ajax({
                     url: appUrl + "/seller/order/addResi",
                     method: "POST",
@@ -560,6 +570,9 @@ $(document).on("click", "#request_courier", function () {
                             "Terjadi kesalahan saat menyimpan nomor resi:",
                             error
                         );
+                    },
+                    complete: function () {
+                        $("#overlay").hide();
                     },
                 });
             }
@@ -611,6 +624,9 @@ $(document).on("click", "#request_courier", function () {
                                     }
                                 });
                             },
+                            complete: function () {
+                                $("#overlay").hide();
+                            },
                         });
                     }
                 }
@@ -660,6 +676,9 @@ $(document).on("click", "#request_courier", function () {
                                         location.reload();
                                     }
                                 });
+                            },
+                            complete: function () {
+                                $("#overlay").hide();
                             },
                         });
                     }
@@ -711,6 +730,9 @@ $(document).on("click", "#request_courier", function () {
                                     }
                                 });
                             },
+                            complete: function () {
+                                $("#overlay").hide();
+                            },
                         });
                     } else if (selectedMethod === "Pickup") {
                         $.ajax({
@@ -743,6 +765,9 @@ $(document).on("click", "#request_courier", function () {
                                         location.reload();
                                     }
                                 });
+                            },
+                            complete: function () {
+                                $("#overlay").hide();
                             },
                         });
                     }
@@ -1049,7 +1074,7 @@ $(document).on("click", "#uploadDO", function () {
             formData.append("file_Do", file);
             formData.append("id_cart_shop", id_order_shop);
             formData.append("_token", csrfToken);
-
+            $("#overlay").show();
             // Mengirim data menggunakan AJAX
             $.ajax({
                 url: appUrl + "/seller/order/uploadDo",
@@ -1070,6 +1095,9 @@ $(document).on("click", "#uploadDO", function () {
                         "Terjadi kesalahan saat mengunggah file.",
                         "error"
                     );
+                },
+                complete: function () {
+                    $("#overlay").hide();
                 },
             });
         }

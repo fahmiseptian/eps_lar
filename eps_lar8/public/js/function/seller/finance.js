@@ -68,6 +68,7 @@ function showTab(tabName) {
 
 $(document).on("click", "#editRekening", function () {
     var rekeningId = $(this).attr("data-id");
+    $("#overlay").show();
     $.ajax({
         url: appUrl + "/seller/finance/getRekening/" + rekeningId,
         type: "get",
@@ -151,6 +152,9 @@ $(document).on("click", "#editRekening", function () {
         error: function (xhr, status, error) {
             Swal.fire("Error", "Terjadi kesalahan saat memuat data", "error");
         },
+        complete: function () {
+            $("#overlay").hide();
+        },
     });
 });
 
@@ -167,6 +171,8 @@ $(document).on("click", "#hapusRekening", function () {
         cancelButtonText: "Batal",
     }).then((result) => {
         if (result.isConfirmed) {
+            $("#overlay").show();
+
             // Jika konfirmasi penghapusan disetujui, kirim permintaan POST ke server
             $.ajax({
                 url: appUrl + "/seller/finance/deleteRekening/" + rekeningId,
@@ -203,6 +209,9 @@ $(document).on("click", "#hapusRekening", function () {
                         "error"
                     );
                 },
+                complete: function () {
+                    $("#overlay").hide();
+                },
             });
         }
     });
@@ -220,6 +229,8 @@ $(document).on("click", "#editDefaultRekening", function () {
         reverseButtons: true,
     }).then((result) => {
         if (result.isConfirmed) {
+            $("#overlay").show();
+
             // Kirim permintaan ke server untuk mengubah rekening utama
             $.ajax({
                 url: appUrl + "/seller/finance/updateDefaultRekening",
@@ -246,6 +257,9 @@ $(document).on("click", "#editDefaultRekening", function () {
                         "Terjadi kesalahan saat mengubah rekening utama",
                         "error"
                     );
+                },
+                complete: function () {
+                    $("#overlay").hide();
                 },
             });
         }
@@ -299,6 +313,7 @@ $('#savePin').on('click', function() {
         });
         return;
     }
+    $("#overlay").show();
 
     // Lakukan AJAX request
     $.ajax({
@@ -325,14 +340,17 @@ $('#savePin').on('click', function() {
                 title: 'Kesalahan',
                 text: 'Anda Memasukan PIN yang Sama'
             });
-        }
+        },
+        complete: function () {
+            $("#overlay").hide();
+        },
     });
 });
 
 $(document).on("click", "#tarikTrx", function () {
     var tbody = $("#tableTarikSaldo tbody");
     tbody.empty();
-
+    $("#overlay").show();
     $.ajax({
         url: appUrl + '/api/seller/finance/getTraxPending',
         method: 'GET',
@@ -381,7 +399,10 @@ $(document).on("click", "#tarikTrx", function () {
                 title: 'Kesalahan',
                 text: 'Terjadi kesalahan dalam memuat data transaksi.'
             });
-        }
+        },
+        complete: function () {
+            $("#overlay").hide();
+        },
     });
 });
 
@@ -430,7 +451,7 @@ $(document).ready(function() {
             });
             return;
         }
-        console.log(pin);
+        $("#overlay").show();
         $.ajax({
             url: appUrl + '/api/seller/finance/requestrevenue',
             method: 'POST',
@@ -457,7 +478,10 @@ $(document).ready(function() {
                     title: 'Kesalahan',
                     text: 'Terjadi kesalahan dalam memvalidasi PIN.'
                 });
-            }
+            },
+            complete: function () {
+                $("#overlay").hide();
+            },
         });
     });
 

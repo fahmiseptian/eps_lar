@@ -34,7 +34,7 @@ $(function() {
 
 function toggleFilterProduct(element) {
     var status= element.getAttribute("data-status");
-    console.log(status);
+    $("#overlay").show();
     $.ajax({
         type: "GET",
         url: appUrl + "/seller/product/" + status,
@@ -47,6 +47,9 @@ function toggleFilterProduct(element) {
         },
         error: function (xhr, status, error) {
             console.error("Gagal:", error);
+        },
+        complete: function () {
+            $("#overlay").hide();
         },
     });
 }
@@ -97,7 +100,7 @@ $('#kategori-level2').change(function() {
 
 $(document).ready(function() {
     $('#addProduct').submit(function(event) {
-        console.log("masuk");
+        $("#overlay").show();
         var form = $(this);
         var addUrl = form.attr('action');
         event.preventDefault();
@@ -127,12 +130,16 @@ $(document).ready(function() {
             processData: false, // Set processData ke false
             contentType: false, // Set contentType ke false
             success: function(response) {
-                console.log("berhasil");
-                window.location.href = "";
+                var targetUrl =
+                    appUrl + "/seller/product/";
+                window.open(targetUrl);
             },
             error: function(xhr, status, error) {
                 console.error(xhr.responseText);
-            }
+            },
+            complete: function () {
+                $("#overlay").hide();
+            },
         });
     });
 });
@@ -177,11 +184,11 @@ $(document).on("click", "#review_product", function () {
 
 $(document).on("click", "#edit_product", function () {
     var id = $(this).data("id");
-    console.log(id);
 });
 
 $(document).on("click", "#deleteProduct", function () {
     var id = $(this).data("id");
+    $("#overlay").show();
     $.ajax({
         url: appUrl + "/api/seller/deleteProduct",
         method: "POST",
@@ -209,12 +216,16 @@ $(document).on("click", "#deleteProduct", function () {
                 icon: "error",
                 confirmButtonText: "OK"
             });
-        }
+        },
+        complete: function () {
+            $("#overlay").hide();
+        },
     });
 });
 
 $(document).on("click", "#editStatus", function () {
     var id = $(this).data("id");
+    $("#overlay").show();
     $.ajax({
         url: appUrl + "/api/seller/editStatusProduct",
         method: "POST",
@@ -242,7 +253,10 @@ $(document).on("click", "#editStatus", function () {
                 icon: "error",
                 confirmButtonText: "OK"
             });
-        }
+        },
+        complete: function () {
+            $("#overlay").hide();
+        },
     });
 });
 

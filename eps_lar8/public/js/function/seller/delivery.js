@@ -49,9 +49,7 @@ function toggleCourier(checkbox) {
 }
 
 function addCourier(courierId) {
-    var csrfToken = document
-                .querySelector('meta[name="csrf-token"]')
-                .getAttribute("content");
+    $("#overlay").show();
     $.ajax({
         type: 'post',
         url: appUrl + '/seller/add-courier/',
@@ -79,15 +77,16 @@ function addCourier(courierId) {
                 showConfirmButton: true
             });
             console.error('Gagal menambahkan kurir:', error);
-        }
+        },
+        complete: function () {
+            $("#overlay").hide(); // Sembunyikan loader setelah selesai
+        },
     });
 }
 
 
 function removeCourier(courierId) {
-    var csrfToken = document
-                .querySelector('meta[name="csrf-token"]')
-                .getAttribute("content");
+    $("#overlay").show();
     $.ajax({
         type: 'POST',
         url: appUrl +'/seller/remove-courier',
@@ -115,7 +114,10 @@ function removeCourier(courierId) {
                 showConfirmButton: true
             });
             console.error('Gagal menghapus kurir:', error);
-        }
+        },
+        complete: function () {
+            $("#overlay").hide(); // Sembunyikan loader setelah selesai
+        },
     });
 
 }
@@ -133,6 +135,7 @@ function togglefreeCourier(checkbox) {
 }
 
 function addfreeCourier(id_province) {
+    $("#overlay").show();
     $.ajax({
         type: 'GET',
         url: appUrl + '/seller/add-free-courier',
@@ -160,12 +163,16 @@ function addfreeCourier(id_province) {
                 showConfirmButton: true
             });
             console.error('Gagal menambahkan Lokasi free ongkir:', error);
-        }
+        },
+        complete: function () {
+            $("#overlay").hide(); // Sembunyikan loader setelah selesai
+        },
     });
 }
 
 
 function removefreeCourier(id_province) {
+    $("#overlay").show();
     $.ajax({
         type: 'GET',
         url: appUrl + '/seller/remove-free-courier',
@@ -193,12 +200,16 @@ function removefreeCourier(id_province) {
                 showConfirmButton: true
             });
             console.error('Gagal menghapus Lokasi free ongkir:', error);
-        }
+        },
+        complete: function () {
+            $("#overlay").hide(); // Sembunyikan loader setelah selesai
+        },
     });
 
 }
 
 $(document).on("click", "#ubahestimasi", function () {
+    $("#overlay").show();
     $.ajax({
         url: appUrl + "/api/seller/get-packingDay",
         method: "get",
@@ -254,7 +265,10 @@ $(document).on("click", "#ubahestimasi", function () {
                                 icon: "error",
                                 confirmButtonText: "OK"
                             });
-                        }
+                        },
+                        complete: function () {
+                            $("#overlay").hide();
+                        },
                     });
                 }
             });
@@ -267,7 +281,10 @@ $(document).on("click", "#ubahestimasi", function () {
                 icon: "error",
                 confirmButtonText: "OK"
             });
-        }
+        },
+        complete: function () {
+            $("#overlay").hide();
+        },
     });
 });
 

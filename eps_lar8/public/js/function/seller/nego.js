@@ -120,6 +120,7 @@ $(document).on("click", "#change-nego", function () {
 
 $(document).on("click", "#detailNego", function () {
     var id_nego = $(this).data("id");
+    $("#overlay").show();
     $.ajax({
         url: appUrl + "/api/seller/nego/detail/" + id_nego,
         type: "get",
@@ -358,6 +359,7 @@ $(document).on("click", "#detailNego", function () {
             $(document).on('click', '.btn-app[data-text="Setujui"]', function(event) {
                 event.preventDefault();
                 var id_nego = $(this).data('id');
+                $("#overlay").show();
 
                 swal.fire({
                     title: 'Apakah kamu yakin?',
@@ -382,7 +384,10 @@ $(document).on("click", "#detailNego", function () {
                             },
                             error: function(xhr, status, error) {
                                 console.error(xhr.responseText);
-                            }
+                            },
+                            complete: function () {
+                                $("#overlay").hide();
+                            },
                         });
                     }
                 });
@@ -391,6 +396,7 @@ $(document).on("click", "#detailNego", function () {
             $(document).on('click', '.btn-app[data-text="Tolak"]', function(event) {
                 event.preventDefault();
                 var id_nego = $(this).data('id');
+                $("#overlay").show();
 
                 swal.fire({
                     title: 'Apakah kamu yakin?',
@@ -424,7 +430,10 @@ $(document).on("click", "#detailNego", function () {
                             },
                             error: function(xhr, status, error) {
                                 console.error(xhr.responseText);
-                            }
+                            },
+                            complete: function () {
+                                $("#overlay").hide();
+                            },
                         });
                     }
                 });
@@ -436,6 +445,9 @@ $(document).on("click", "#detailNego", function () {
                 "Terjadi kesalahan saat Pindah Data Nego",
                 "error"
             );
+        },
+        complete: function () {
+            $("#overlay").hide();
         },
     });
 });
@@ -489,6 +501,7 @@ $(document).ready(function() {
 $(document).ready(function() {
     $('#negoUlangForm').on('submit', function(event) {
         event.preventDefault();
+        $("#overlay").show();
 
         // Ambil nilai asli dari input hargaSatuan dan hargaResponSatuan
         var hargaSatuanVal = unformatRupiah($('#hargaSatuan').val());
@@ -518,6 +531,9 @@ $(document).ready(function() {
             error: function(xhr, status, error) {
                 console.error(error);
                 // Handle error jika terjadi
+            },
+            complete: function() {
+                $("#overlay").hide();
             }
         });
     });

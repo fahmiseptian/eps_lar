@@ -278,7 +278,7 @@ class ProductController extends Controller
     // Ambil Data Product lama
     public function productAll($id)
     {
-        $idAkhir=$id + 199;
+        $idAkhir=$id + 1999;
 
         // Gambar rusak
         // id= 630,631,632,634,
