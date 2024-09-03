@@ -120,12 +120,7 @@ body {
   /* Garis pemisah antar baris */
 }
 
-.table-detail-order tr:hover {
-  background-color: #f5f5f5;
-  /* Warna latar saat hover */
-}
-
-.table-detail-order td:last-child {
+.table-detail-order th:last-child, .table-detail-order td:last-child {
   text-align: right;
   /* Rata kanan untuk sel terakhir */
 }
@@ -220,11 +215,11 @@ body {
   height: 180px;
   /* Tinggi kartu */
   border-radius: 12px;
-  background: linear-gradient(135deg, #2193b0, #6dd5ed);
+  background: linear-gradient(135deg, #E58B03, #F9AC4D);
   color: white;
   padding: 20px;
   margin: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 8px 8px 12px 0 #000000;
   font-family: 'Arial', sans-serif;
   margin-right: 10px;
   /* Memberikan jarak antara kartu */
@@ -1199,7 +1194,7 @@ a:focus {
   width: 0;
   height: 0;
 }
-
+/*
 .slider {
   position: absolute;
   cursor: pointer;
@@ -1224,6 +1219,18 @@ a:focus {
   transition: .4s;
 }
 
+#slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 10px;
+    left: 0px;
+    bottom: 1px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+
 input:checked+.slider {
   background-color: #2196F3;
 }
@@ -1236,7 +1243,7 @@ input:checked+.slider:before {
   -webkit-transform: translateX(26px);
   -ms-transform: translateX(26px);
   transform: translateX(26px);
-}
+} */
 
 /* Style the checkbox container */
 .checkbox-container {
@@ -1324,7 +1331,7 @@ input:checked+.slider:before {
 }
 
 .list-sidebar>a {
-  color: #000;
+  color: white !important;
 }
 
 .seller-balance {
@@ -5732,7 +5739,6 @@ Gradient Background colors
 
 
 #google-icon {
-    font-family: 'Material Icons';
     font-size: 18px;
     vertical-align: middle; /* Mengatur posisi vertikal ikon */
     line-height: 18px; /* Mengatur ketinggian baris agar ikon berada di tengah */

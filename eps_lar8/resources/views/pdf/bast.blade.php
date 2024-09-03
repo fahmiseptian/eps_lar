@@ -28,7 +28,7 @@ function numberFormatID($id)
         $data->nama_pemilik = $data->sellername;
     }
     $no_bast = numberFormatID($data->id_cart_shop) . '/LO/ST/' . date('m/Y', strtotime($data->created_date));
-    
+
     ?>
     <meta charset="utf-8" />
     <title>B.A.S.T</title>
@@ -165,7 +165,7 @@ function numberFormatID($id)
         ];
         return $hari[$day] ?? null;
     }
-    
+
     function getBulanIndo($month)
     {
         $bulan = [
@@ -185,17 +185,17 @@ function numberFormatID($id)
         return $bulan[$month] ?? null;
     }
     $created_date = $bast->detail->created_date;
-    
+
     // Mengambil tanggal, hari, dan bulan dari created_date
     $tgl = date('d', strtotime($created_date));
     $day = date('l', strtotime($created_date));
     $month = date('F', strtotime($created_date));
     $tahun = date('Y', strtotime($created_date));
-    
+
     // Mengonversi nama hari dan bulan ke bahasa Indonesia
     $nama_hari = getHariIndo($day);
     $nama_bulan = getBulanIndo($month);
-    
+
     // Menampilkan tanggal dalam format bahasa Indonesia
     echo "Pada hari ini, $nama_hari, tanggal $tgl $nama_bulan $tahun, sesuai dengan :";
     ?>
@@ -314,15 +314,12 @@ function numberFormatID($id)
         <tbody>
             @foreach ($bast->detail->details as $index => $pr)
                 <?php
-                if ($pr->gambar != null) {
-                    $foto = $pr->gambar;
-                } else {
-                    $foto = 'https://eliteproxy.co.id/' . $pr->image;
-                }
+                $relativePath = str_replace(url('/storage'), 'public', $pr->gambar);
+                $filePath = storage_path('app/' . $relativePath);
                 ?>
                 <tr>
-                    <td><?php echo $no++; ?></td>
-                    <td style="height:70px"><img src="{{ $foto }}" width='50px'> {{ $pr->name }}</td>
+                    <td><?= $no++ ?></td>
+                    <td style="height:70px"><img src="{{ $filePath }}" width='50px'> {{ $pr->name }}</td>
                     <td>Unit</td>
                     @if (isset($data_qty[$index]))
                         <td>{{ $data_qty[$index]->qty }}</td>

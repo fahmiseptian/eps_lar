@@ -1,6 +1,6 @@
 <!-- jQuery -->
+
 {{-- <script src="{{ asset('/plugins/jQuery/jQuery-2.1.3.min.js') }}"></script> --}}
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <!-- Bootstrap 3.3.2 JS -->
 <script src="{{ asset('/bootstraps/js/bootstrap.min.js') }}"></script>
 <!-- SlimScroll -->
@@ -21,11 +21,10 @@
 <!-- iCheck -->
 <script src="{{ asset('/plugins/iCheck/icheck.min.js') }}"></script>
 <!-- DATA TABES SCRIPT -->
-<script src="https://cdn.datatables.net/1.11.4/js/jquery.dataTables.min.js"></script>
 <script src="{{ asset('/plugins/datatables/jquery.dataTables.js') }}"></script>
 <script src="{{ asset('/plugins/datatables/dataTables.bootstrap.js') }}"></script>
 <!-- ChartJS -->
-<script src="{{ asset('/plugins/chartjs/Chart.min.js') }}"></script>
+{{-- <script src="{{ asset('/plugins/chartjs/Chart.min.js') }}"></script> --}}
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
 <script src="{{ asset('/js/pages/dashboard2.js') }}"></script>
 <!-- AdminLTE for demo purposes -->
@@ -42,12 +41,10 @@
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {
-                // Memanggil route logout dengan metode GET
                 $.ajax({
                     url: logoutUrl,
-                    type: 'GET', // Menggunakan metode GET
+                    type: 'GET',
                     success: function(response) {
-                        // Redirect ke halaman logout atau lakukan tindakan lain sesuai respons dari controller
                         window.location.href = "{{ route('seller.login') }}";
                     },
                     error: function(xhr, status, error) {
@@ -58,6 +55,30 @@
             }
         });
     }
+
+    $('.list-sidebar > a').on('click', function(e) {
+        // Check if the clicked item has a submenu
+        let $submenu = $(this).next('.treeview-menu');
+
+        if ($submenu.length > 0) {
+            e.preventDefault(); // Prevent navigation for items with submenus
+
+            // Toggle the clicked treeview menu
+            $submenu.slideToggle(300);
+
+            // Change arrow direction
+            let $arrow = $(this).find('.pull-right');
+            if ($submenu.is(':visible')) {
+                $arrow.text('arrow_drop_up');
+            } else {
+                $arrow.text('arrow_drop_down');
+            }
+
+            // Close other treeview menus
+            $('.treeview-menu').not($submenu).slideUp(300);
+            $('.list-sidebar > a').not(this).find('.pull-right').text('arrow_drop_down');
+        }
+    });
 
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
 </script>

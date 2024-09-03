@@ -10,7 +10,10 @@
         </a>
         <div>
             <div class="notif">
-                <a href="#" class="fa fa-bell-o" role="button" style="color:#039be5 "></a>
+                <a href="{{ route('seller.notification') }}" style="color: #039be5; position: relative; display: inline-block;">
+                    <i class="fa fa-bell-o"></i>
+                    <span class="badge" style="background-color: red; color: white; border-radius: 100%; width: 5px; height: 10px; font-size: 5px; position: absolute; top: 18px; right: 7px; display: flex; justify-content: center; align-items: center;"></span>
+                </a>
                 <a href="#" class="fa fa-bullhorn" role="button" style="color:#039be5 "></a>
                 <a href="#" onclick="confirmLogout(this)" role="button" style="color:#039be5 ">
                     <img style="width: 20px" src="{{ asset('/img/app/logo eps.png') }}"
@@ -28,6 +31,11 @@
       <img src="{{ asset('/img/app/loader_eps.gif') }}" width="400px">
 </div>
 
+<script>
+    const appUrl = "{{ env('APP_URL') }}";
+    window.appUrl = appUrl;
+</script>
+
 <div id="overlay" style="display: none;">
     <div class="overlay-content">
         <div id="loader" class="loader" role="status">
@@ -35,8 +43,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    const appUrl = "{{ env('APP_URL') }}";
-    window.appUrl = appUrl;
-</script>

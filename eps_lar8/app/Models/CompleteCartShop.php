@@ -25,33 +25,35 @@ class CompleteCartShop extends Model implements HasMedia
 
 
     public function getFilePdfUrlAttribute()
-        {
-            $pdfMedia = $this->getFirstMedia('file_DO');
-            if (!$pdfMedia) {
-                // Jika tidak ada file PDF, kembalikan URL default atau pesan error
-                return null; // Misalnya, return asset('path/to/default/pdf.png');
-            } else {
-                return $pdfMedia->getFullUrl();
-            }
+    {
+        $pdfMedia = $this->getFirstMedia('file_DO');
+        if (!$pdfMedia) {
+            // Jika tidak ada file PDF, kembalikan URL default atau pesan error
+            return null; // Misalnya, return asset('path/to/default/pdf.png');
+        } else {
+            return $pdfMedia->getFullUrl();
         }
+    }
 
 
-    public function countAllorder($id_shop){
+    public function countAllorder($id_shop)
+    {
         return self::where('id_shop', $id_shop)
             ->count();
     }
 
-    public function get_count_order($id_shop, $status) {
+    public function get_count_order($id_shop, $status)
+    {
         $query = self::where('id_shop', $id_shop)
-                    ->join('complete_cart as cc', 'cc.id', '=', 'complete_cart_shop.id_cart')
-                    ->where('complete_cart_shop.id_shop', $id_shop);
+            ->join('complete_cart as cc', 'cc.id', '=', 'complete_cart_shop.id_cart')
+            ->where('complete_cart_shop.id_shop', $id_shop);
 
         if ($status == 'pending') {
             $query->where('cc.status', 'pending');
         } else {
             $query->where('cc.status', '!=', 'pending');
             if ($status == 'cancel_by_seller') {
-                $query->where('cc.status','cancel');
+                $query->where('cc.status', 'cancel');
             } else {
                 $query->where('complete_cart_shop.status', $status);
             }
@@ -59,17 +61,19 @@ class CompleteCartShop extends Model implements HasMedia
         return  $query->count();
     }
 
-    public function getCountOrderByIdshop($id_shop, $status) {
+    public function getCountOrderByIdshop($id_shop, $status)
+    {
         return self::where('id_shop', $id_shop)
-                ->where('status', $status)
-                ->count();
+            ->where('status', $status)
+            ->count();
     }
 
-    public function getDetailOrderbyId($shopId, $id_cart_shop) {
+    public function getDetailOrderbyId($shopId, $id_cart_shop)
+    {
         return self::select(
             'complete_cart_shop.*',
             'complete_cart_shop.id as id_cart_shop',
-            'm.id',
+            'm.id as member_id',
             'm.email',
             'm.npwp',
             'm.instansi',
@@ -95,6 +99,7 @@ class CompleteCartShop extends Model implements HasMedia
             'cc.status as invoice_status',
             'cc.created_date',
             'cc.status_pembayaran_top',
+            'cc.due_date_payment as work_limit',
             'pm.name as pembayaran',
             'sp.deskripsi',
             'sp.id_courier',
@@ -104,27 +109,29 @@ class CompleteCartShop extends Model implements HasMedia
             'sh.is_top',
             'sh.name as nama_seller'
         )
-        ->join('complete_cart as cc', 'cc.id', '=', 'complete_cart_shop.id_cart')
-        ->join('complete_cart_address as cca','cca.id_cart','complete_cart_shop.id_cart')
-        ->join('payment_method as pm', 'pm.id', '=', 'cc.id_payment')
-        ->join('member as m', 'm.id', '=', 'cc.id_user')
-        ->join('member_address as ma', 'cca.id_address', '=', 'ma.member_address_id')
-        ->join('shipping as sp', 'sp.id', '=', 'complete_cart_shop.id_shipping')
-        ->join('shop as sh', 'sh.id', '=', 'complete_cart_shop.id_shop')
-        ->join('province as p', 'p.province_id', '=', 'ma.province_id')
-        ->join('city as c', 'ma.city_id', '=', 'c.city_id')
-        ->join('subdistrict as s', 's.subdistrict_id', '=', 'ma.subdistrict_id')
-        ->where('complete_cart_shop.id', '=', $id_cart_shop)
-        ->where('complete_cart_shop.id_shop', $shopId)
-        ->where('cca.id_billing_address', '!=', null)
-        ->first();
+            ->join('complete_cart as cc', 'cc.id', '=', 'complete_cart_shop.id_cart')
+            ->join('complete_cart_address as cca', 'cca.id_cart', 'complete_cart_shop.id_cart')
+            ->join('payment_method as pm', 'pm.id', '=', 'cc.id_payment')
+            ->join('member as m', 'm.id', '=', 'cc.id_user')
+            ->join('member_address as ma', 'cca.id_address', '=', 'ma.member_address_id')
+            ->join('shipping as sp', 'sp.id', '=', 'complete_cart_shop.id_shipping')
+            ->join('shop as sh', 'sh.id', '=', 'complete_cart_shop.id_shop')
+            ->join('province as p', 'p.province_id', '=', 'ma.province_id')
+            ->join('city as c', 'ma.city_id', '=', 'c.city_id')
+            ->join('subdistrict as s', 's.subdistrict_id', '=', 'ma.subdistrict_id')
+            ->where('complete_cart_shop.id', '=', $id_cart_shop)
+            ->where('complete_cart_shop.id_shop', $shopId)
+            ->where('cca.id_billing_address', '!=', null)
+            ->first();
     }
 
 
-    public function getDetailProduct($shopId,$id_cart_shop){
+    public function getDetailProduct($shopId, $id_cart_shop)
+    {
         return self::select(
             'ccsd.nama as nama_produk',
             'pi.image50 as gambar_produk',
+            'b.name as nama_brand',
             'ccsd.price as harga_satuan_produk',
             'ccsd.total as harga_total_produk',
             'ccsd.qty as qty_produk',
@@ -132,15 +139,18 @@ class CompleteCartShop extends Model implements HasMedia
             'ccsd.price as base_price',
             'ccsd.*',
         )
-        ->join('complete_cart_shop_detail as ccsd', 'ccsd.id_cart', '=', 'complete_cart_shop.id_cart')
-        ->join('product_image as pi', 'pi.id_product', '=', 'ccsd.id_product')
-        ->where('pi.is_default', '=', 'yes')
-        ->where('complete_cart_shop.id', '=', $id_cart_shop)
-        ->where('complete_cart_shop.id_shop', $shopId)
-        ->get();
+            ->join('complete_cart_shop_detail as ccsd', 'ccsd.id_cart', '=', 'complete_cart_shop.id_cart')
+            ->join('product_image as pi', 'pi.id_product', '=', 'ccsd.id_product')
+            ->join('products as p', 'p.id', '=', 'ccsd.id_product')
+            ->join('brand as b', 'b.id', 'p.id_brand')
+            ->where('pi.is_default', '=', 'yes')
+            ->where('complete_cart_shop.id', '=', $id_cart_shop)
+            ->where('complete_cart_shop.id_shop', $shopId)
+            ->get();
     }
 
-    public function getorderbyidcartshop($shopId, $id_cart_shop) {
+    public function getorderbyidcartshop($shopId, $id_cart_shop)
+    {
         return self::select(
             'complete_cart_shop.*',
             'sp.id_courier',
@@ -152,46 +162,48 @@ class CompleteCartShop extends Model implements HasMedia
     }
 
 
-    public function filterorder($id_shop, $data) {
+    public function filterorder($id_shop, $data)
+    {
         $orders = DB::table('complete_cart_shop as ccs')
-        ->select(
-            'ccs.id',
-            'cc.invoice',
-            'cc.status_pembayaran_top',
-            'cc.created_date',
-            'm.instansi as member_instansi',
-            'c.city_name as city',
-            'ccs.total',
-            'ccs.qty',
-            'ccs.status',
-        )
-        ->join('complete_cart as cc', 'ccs.id_cart', '=', 'cc.id')
-        ->join('complete_cart_address as cca', 'ccs.id_cart', '=', 'cca.id_cart')
-        ->join('member as m', 'cc.id_user', '=', 'm.id')
-        ->join('member_address as ma', 'm.id', '=', 'ma.member_id')
-        ->join('city as c', 'cca.city_id', '=', 'c.city_id')
-        ->where('ccs.id_shop', '=', $id_shop)
-        ->where('cca.id_billing_address','!=',null)
-        ->where($data)
-        ->groupBy(
-            'ccs.id',
-            'cc.invoice',
-            'cc.status_pembayaran_top',
-            'cc.created_date',
-            'm.instansi',
-            'c.city_name',
-            'ccs.total',
-            'ccs.qty',
-            'ccs.status',
-        )
-        ->orderBy('ccs.id', 'desc')
-        ->get();
+            ->select(
+                'ccs.id',
+                'cc.invoice',
+                'cc.status_pembayaran_top',
+                'cc.created_date',
+                'm.instansi as member_instansi',
+                'c.city_name as city',
+                'ccs.total',
+                'ccs.qty',
+                'ccs.status',
+            )
+            ->join('complete_cart as cc', 'ccs.id_cart', '=', 'cc.id')
+            ->join('complete_cart_address as cca', 'ccs.id_cart', '=', 'cca.id_cart')
+            ->join('member as m', 'cc.id_user', '=', 'm.id')
+            ->join('member_address as ma', 'm.id', '=', 'ma.member_id')
+            ->join('city as c', 'cca.city_id', '=', 'c.city_id')
+            ->where('ccs.id_shop', '=', $id_shop)
+            ->where('cca.id_billing_address', '!=', null)
+            ->where($data)
+            ->groupBy(
+                'ccs.id',
+                'cc.invoice',
+                'cc.status_pembayaran_top',
+                'cc.created_date',
+                'm.instansi',
+                'c.city_name',
+                'ccs.total',
+                'ccs.qty',
+                'ccs.status',
+            )
+            ->orderBy('ccs.id', 'desc')
+            ->get();
 
         return $orders;
     }
 
 
-    function getorderbyIdCart($idcart) {
+    function getorderbyIdCart($idcart)
+    {
         $orders = DB::table('complete_cart_shop as ccs')
             ->select(
                 's.nama_pt',
@@ -220,7 +232,8 @@ class CompleteCartShop extends Model implements HasMedia
     }
 
 
-    public function receiveOrder($order_id, $id_cart_shop) {
+    public function receiveOrder($order_id, $id_cart_shop)
+    {
         $top_idp = ["23", "24", "25"];
         $date = Carbon::createFromFormat('Y-m-d', '2024-06-07');
 
@@ -255,7 +268,7 @@ class CompleteCartShop extends Model implements HasMedia
             ];
             $insert_revenue = $this->insertRevenue($array_data);
 
-			$count_sold = $this->countSold($d->id_cart);
+            $count_sold = $this->countSold($d->id_cart);
         }
 
         // Mengecek jumlah data cart shop dan jumlah yang telah complete
@@ -277,16 +290,18 @@ class CompleteCartShop extends Model implements HasMedia
         return true;
     }
 
-    private function insertRevenue($data) {
+    private function insertRevenue($data)
+    {
         $insert = DB::table('revenue')->insertGetId($data);
         return $insert;
     }
 
-    public function countSold($id_cart) {
+    public function countSold($id_cart)
+    {
         $products = DB::table('complete_cart_shop_detail')
-                      ->select('id_product')
-                      ->where('id_cart', $id_cart)
-                      ->get();
+            ->select('id_product')
+            ->where('id_cart', $id_cart)
+            ->get();
 
         foreach ($products as $product) {
             $this->_countSold($product->id_product);
@@ -295,7 +310,8 @@ class CompleteCartShop extends Model implements HasMedia
         return true;
     }
 
-    private function _countSold($id_product) {
+    private function _countSold($id_product)
+    {
         DB::table('product')
             ->where('id', $id_product)
             ->increment('count_sold', 1);
@@ -303,7 +319,8 @@ class CompleteCartShop extends Model implements HasMedia
         return true;
     }
 
-    public function getTotalHargaInput($id_cart, $id_shop) {
+    public function getTotalHargaInput($id_cart, $id_shop)
+    {
         $data = DB::table('complete_cart_shop_detail')
             ->select('input_price', 'qty')
             ->where('id_cart', $id_cart)
@@ -321,9 +338,9 @@ class CompleteCartShop extends Model implements HasMedia
     public function setRestOrder($id, $id_shop, $data)
     {
         $updated = DB::table('complete_cart_shop')
-                        ->where('id', $id)
-                        ->where('id_shop', $id_shop)
-                        ->update($data);
+            ->where('id', $id)
+            ->where('id_shop', $id_shop)
+            ->update($data);
 
         if ($updated) {
             return true;
@@ -332,63 +349,116 @@ class CompleteCartShop extends Model implements HasMedia
         }
     }
 
-    function getUserById_cart_shop($id_cart_shop) {
+    function getUserById_cart_shop($id_cart_shop)
+    {
         $query  = DB::table('complete_cart_shop as ccs')
-        ->select(
-            'm.instansi',
-            'm.satker',
-            'm.npwp',
-            'ma.*',
-            'p.province_name',
-            'c.city_name',
-            'sub.subdistrict_name',
-        )
-        ->join('complete_cart as cc','cc.id','ccs.id_cart')
-        ->join('member as m','m.id','cc.id_user')
-        ->join('member_address as ma','ma.member_id','m.id')
-        ->join('province as p', 'p.province_id', '=', 'ma.province_id')
-        ->join('city as c', 'c.city_id', '=', 'ma.city_id')
-        ->join('subdistrict as sub', 'sub.subdistrict_id', '=', 'ma.subdistrict_id')
-        ->where('ccs.id',$id_cart_shop)
-        ->where('ma.is_default_billing','yes')
-        ->first();
+            ->select(
+                'm.instansi',
+                'm.satker',
+                'm.npwp',
+                'ma.*',
+                'p.province_name',
+                'c.city_name',
+                'sub.subdistrict_name',
+            )
+            ->join('complete_cart as cc', 'cc.id', 'ccs.id_cart')
+            ->join('member as m', 'm.id', 'cc.id_user')
+            ->join('member_address as ma', 'ma.member_id', 'm.id')
+            ->join('province as p', 'p.province_id', '=', 'ma.province_id')
+            ->join('city as c', 'c.city_id', '=', 'ma.city_id')
+            ->join('subdistrict as sub', 'sub.subdistrict_id', '=', 'ma.subdistrict_id')
+            ->where('ccs.id', $id_cart_shop)
+            ->where('ma.is_default_billing', 'yes')
+            ->first();
 
         return $query;
     }
 
-    function getSellerById_cart_shop($id_cart_shop) {
+    function getSellerById_cart_shop($id_cart_shop)
+    {
         $query  = DB::table('complete_cart_shop as ccs')
-        ->select(
-            's.nama_pt',
-            's.npwp',
-            'ma.*',
-            'p.province_name',
-            'c.city_name',
-            'sub.subdistrict_name',
-        )
-        ->join('shop as s','s.id','ccs.id_shop')
-        ->join('member as m','m.id','s.id_user')
-        ->join('member_address as ma','ma.member_id','m.id')
-        ->join('province as p', 'p.province_id', '=', 'ma.province_id')
-        ->join('city as c', 'c.city_id', '=', 'ma.city_id')
-        ->join('subdistrict as sub', 'sub.subdistrict_id', '=', 'ma.subdistrict_id')
-        ->where('ccs.id',$id_cart_shop)
-        ->where('ma.is_shop_address','yes')
-        ->first();
+            ->select(
+                's.nama_pt',
+                's.npwp',
+                'ma.*',
+                'p.province_name',
+                'c.city_name',
+                'sub.subdistrict_name',
+            )
+            ->join('shop as s', 's.id', 'ccs.id_shop')
+            ->join('member as m', 'm.id', 's.id_user')
+            ->join('member_address as ma', 'ma.member_id', 'm.id')
+            ->join('province as p', 'p.province_id', '=', 'ma.province_id')
+            ->join('city as c', 'c.city_id', '=', 'ma.city_id')
+            ->join('subdistrict as sub', 'sub.subdistrict_id', '=', 'ma.subdistrict_id')
+            ->where('ccs.id', $id_cart_shop)
+            ->where('ma.is_shop_address', 'yes')
+            ->first();
 
         return $query;
     }
 
-    function GetIdSellerAndId_memeber($id_cart_shop) {
+    function GetIdSellerAndId_memeber($id_cart_shop)
+    {
         $query = DB::table('complete_cart_shop as ccs')
-        ->select(
-            'ccs.id_shop',
-            'cc.id_user'
-        )
-        ->join('complete_cart as cc','cc.id','ccs.id_cart')
-        ->where('ccs.id',$id_cart_shop)
-        ->first();
+            ->select(
+                'ccs.id_shop',
+                'cc.id_user'
+            )
+            ->join('complete_cart as cc', 'cc.id', 'ccs.id_cart')
+            ->where('ccs.id', $id_cart_shop)
+            ->first();
         return $query;
     }
 
+    function getSummaryCompleteCartShop($where = null)
+    {
+        // Daftar status yang diinginkan
+        $statuses = [
+            'complete',
+            'waiting_accept_order',
+            'on_packing_process',
+            'send_by_seller',
+            'refund',
+            'cancel_manual_by_user',
+            'cancel_time_by_user'
+        ];
+
+        // Membuat query menggunakan DB::table
+        $query = DB::table('complete_cart_shop')
+            ->select(DB::raw('SUM(total) as grandtotal, COUNT(id) as count'))
+            ->whereIn('status', $statuses);
+
+        // Menambahkan kondisi where tambahan jika diberikan
+        if ($where !== null) {
+            $query->where($where);
+        }
+
+        // Mendapatkan hasil
+        $data = $query->first();
+
+        return $data;
+    }
+
+    public function getCountViewShop($id_shop)
+    {
+        $query = DB::table('log_view_shop')
+            ->where('id_shop', $id_shop);
+
+        $data = $query->get();
+
+        return $data->count();
+    }
+
+    public function getCountViewProduct($id_shop)
+    {
+        // Menyusun query
+        $query = DB::table('log_last_view as llv')
+            ->select(DB::raw('SUM(llv.count_view) as cv'))
+            ->join('products as p', 'p.id', '=', 'llv.id_product')
+            ->where('p.id_shop', $id_shop);
+
+        $data = $query->first();
+        return $data->cv;
+    }
 }

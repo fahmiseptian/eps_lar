@@ -12,16 +12,23 @@ class Member extends Model
     protected $table = 'member';
     public $timestamps = false;
 
-    protected $visible = ['nama', 'no_hp', 'alamat', 'email', 'instansi', 'satker','npwp','npwp_address'];
+    protected $visible = ['nama', 'no_hp', 'alamat', 'email', 'instansi', 'satker', 'npwp', 'npwp_address'];
     protected $fillable = [
-        'email', 'nama', 'no_hp', 'npwp', 'alamat', 'member_status', 'registered_member'
+        'email',
+        'nama',
+        'no_hp',
+        'npwp',
+        'alamat',
+        'member_status',
+        'registered_member'
     ];
 
-    public function checkemail($email){
+    public function checkemail($email)
+    {
         $data = self::select('member_status')
-                ->where('email', $email)
-                ->where('registered_member', '1')
-                ->get();
+            ->where('email', $email)
+            ->where('registered_member', '1')
+            ->get();
         if ($data) {
             $count = $data->count();
             if ($count > 0) {
@@ -35,16 +42,18 @@ class Member extends Model
         }
     }
 
-    public function checkpassword($email) {
+    public function checkpassword($email)
+    {
         $data = self::select('password')
-        ->where('email', $email)
-        ->where('member_status', 'active')
-        ->get();
-    $passwords = $data->pluck('password')->toArray();
-    return $passwords;
-	}
+            ->where('email', $email)
+            ->where('member_status', 'active')
+            ->get();
+        $passwords = $data->pluck('password')->toArray();
+        return $passwords;
+    }
 
-    public static function getInstansiBYeamil($email) {
+    public static function getInstansiBYeamil($email)
+    {
         $new_data = [];
 
         $data = self::where('email', $email)
@@ -57,7 +66,8 @@ class Member extends Model
         return $new_data;
     }
 
-    public function get_instansi($list_instansi = []) {
+    public function get_instansi($list_instansi = [])
+    {
         $new_data = [];
 
         $query = DB::table('m_lpse_instansi')
@@ -79,14 +89,15 @@ class Member extends Model
         return ['success' => $data->isNotEmpty(), 'data' => $new_data];
     }
 
-    public function get_satker($instansi) {
+    public function get_satker($instansi)
+    {
         $new_data = [];
 
         $query = DB::table('m_lpse_satker')
             ->select('id as id_satker', 'nama as nama_satker')
             ->where('id_instansi', $instansi)
             ->whereNotNull('nama')
-            ->where('nama', '!=' , '')
+            ->where('nama', '!=', '')
             ->orderBy('nama', 'ASC');
 
         $data = $query->get();
@@ -98,14 +109,15 @@ class Member extends Model
         return ['success' => $data->isNotEmpty(), 'data' => $new_data];
     }
 
-    public function get_bidang($satker) {
+    public function get_bidang($satker)
+    {
         $new_data = [];
 
         $query = DB::table('m_lpse_bidang')
             ->select('id as id_bidang', 'nama as nama_bidang')
             ->where('id_satker', $satker)
             ->whereNotNull('nama')
-            ->where('nama', '!=' , '')
+            ->where('nama', '!=', '')
             ->orderBy('nama', 'ASC');
 
         $data = $query->get();
@@ -117,15 +129,16 @@ class Member extends Model
         return ['success' => $data->isNotEmpty(), 'data' => $new_data];
     }
 
-    public function checkAccount($email, $instansi, $satker, $bidang) {
+    public function checkAccount($email, $instansi, $satker, $bidang)
+    {
 
-		$data = self::select('member_status')
-                ->where('email', $email)
-                ->where('id_instansi', $instansi)
-		        ->where('id_satker', $satker)
-		        ->where('id_bidang', $bidang)
-                ->where('registered_member', '1')
-                ->get();
+        $data = self::select('member_status')
+            ->where('email', $email)
+            ->where('id_instansi', $instansi)
+            ->where('id_satker', $satker)
+            ->where('id_bidang', $bidang)
+            ->where('registered_member', '1')
+            ->get();
         if ($data) {
             $count = $data->count();
             if ($count > 0) {
@@ -137,9 +150,10 @@ class Member extends Model
         } else {
             return null;
         }
-	}
+    }
 
-    public function checkDecPass($email, $instansi, $satker, $bidang) {
+    public function checkDecPass($email, $instansi, $satker, $bidang)
+    {
         $result = DB::table('member')
             ->select('password')
             ->where(function ($query) use ($email) {
@@ -189,7 +203,7 @@ class Member extends Model
             ->where('id_bidang', $bidang)
             ->get()
             ->toArray();
-        return $data ;
+        return $data;
     }
 
     public static function getWishlist($member_id)
@@ -207,49 +221,52 @@ class Member extends Model
         return $data;
     }
 
-    function getaddressDefaultbyIdMember($id_member){
+    function getaddressDefaultbyIdMember($id_member)
+    {
         $data = DB::table('member as m')
-        ->select(
-            'ma.member_address_id',
-            'ma.phone',
-            'ma.address_name',
-            'ma.address',
-            'ma.postal_code',
-            'p.province_name',
-            's.subdistrict_name',
-            'c.city_name as city',
-        )
-        ->join('member_address as ma','m.id','ma.member_id')
-        ->join('province as p', 'p.province_id','ma.province_id')
-        ->join('city as c', 'ma.city_id','c.city_id')
-        ->join('subdistrict as s', 's.subdistrict_id','ma.subdistrict_id')
-        ->where('m.id',$id_member)
-        ->where('ma.is_default_shipping','yes')
-        ->first();
+            ->select(
+                'ma.member_address_id',
+                'ma.phone',
+                'ma.address_name',
+                'ma.address',
+                'ma.postal_code',
+                'p.province_name',
+                's.subdistrict_name',
+                'c.city_name as city',
+            )
+            ->join('member_address as ma', 'm.id', 'ma.member_id')
+            ->join('province as p', 'p.province_id', 'ma.province_id')
+            ->join('city as c', 'ma.city_id', 'c.city_id')
+            ->join('subdistrict as s', 's.subdistrict_id', 'ma.subdistrict_id')
+            ->where('m.id', $id_member)
+            ->where('ma.is_default_shipping', 'yes')
+            ->first();
         return $data;
     }
-    function getaddressbyIdMember($id_member){
+    function getaddressbyIdMember($id_member)
+    {
         $data = DB::table('member as m')
-        ->select(
-            'ma.member_address_id',
-            'ma.phone',
-            'ma.address_name',
-            'ma.address',
-            'ma.postal_code',
-            'p.province_name',
-            's.subdistrict_name',
-            'c.city_name as city',
-        )
-        ->join('member_address as ma','m.id','ma.member_id')
-        ->join('province as p', 'p.province_id','ma.province_id')
-        ->join('city as c', 'ma.city_id','c.city_id')
-        ->join('subdistrict as s', 's.subdistrict_id','ma.subdistrict_id')
-        ->where('m.id',$id_member)
-        ->get();
+            ->select(
+                'ma.member_address_id',
+                'ma.phone',
+                'ma.address_name',
+                'ma.address',
+                'ma.postal_code',
+                'p.province_name',
+                's.subdistrict_name',
+                'c.city_name as city',
+            )
+            ->join('member_address as ma', 'm.id', 'ma.member_id')
+            ->join('province as p', 'p.province_id', 'ma.province_id')
+            ->join('city as c', 'ma.city_id', 'c.city_id')
+            ->join('subdistrict as s', 's.subdistrict_id', 'ma.subdistrict_id')
+            ->where('m.id', $id_member)
+            ->get();
         return $data;
     }
 
-    public function getDataMember($id) {
+    public function getDataMember($id)
+    {
         $result = DB::table('member as a')
             ->select('a.id AS id_member', 'a.nama', 'a.email', 'b.id AS id_instansi', 'c.id AS id_satker', 'd.id AS id_bidang', 'b.id_instansi AS id_instansi_lpse', 'c.id_satker AS id_satker_lpse', 'd.id_bidang AS id_bidang_lpse', 'b.nama AS nm_instansi', 'c.nama AS nm_satker', 'd.nama AS nm_bidang', 'a.id_member_type', 'e.created_user', 'e.limit_start', 'e.limit_end')
             ->leftJoin('m_lpse_instansi as b', 'a.id_instansi_lpse', '=', 'b.id_instansi')
@@ -262,4 +279,15 @@ class Member extends Model
         return $result;
     }
 
+    function checkUser($email)
+    {
+        $check = DB::table('member')
+            ->where('email', $email)
+            ->first();
+
+        if ($check) {
+            return true;
+        }
+        return false;
+    }
 }

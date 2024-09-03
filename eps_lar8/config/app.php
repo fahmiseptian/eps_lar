@@ -233,6 +233,7 @@ return [
         // Libraries
         'Encryption' => App\Libraries\Encryption::class,
         'PDF' => Barryvdh\DomPDF\Facade::class,
+        'Agent' => Jenssegers\Agent\Facades\Agent::class,
     ],
 
 ];

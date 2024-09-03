@@ -2,113 +2,57 @@
 <html>
 @include('seller.asset.header')
 
-<body class="skin-blue">
-    <div class="wrapper">
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            @include('seller.asset.desktop.sidebar')
+            <div class="col-middle">
+                {{-- content --}}
+                <div id="view-data-product">
+                    <div id="notif">
+                        <img src="{{ asset('/img/app/icon_lonceng.png') }}" width="50px" style="margin-left: 10px;">
+                        <img src="{{ asset('/img/app/icon_chat.png') }}" width="50px">
+                    </div>
 
-        @include('seller.asset.topbar')
-        @include('seller.asset.sidebar')
-
-        <!-- Right side column. Contains the navbar and content of the page -->
-        <div class="content-wrapper">
-            <!-- Content Header (Page header) -->
-
-            <section class="content">
-                <div class="row">
-                    <div class="col-md-1"></div>
-                    <div class="col-md-10">
-                        <h3 style="color:black;  margin-bottom:-5px"> <b>Informasi Saldo Toko</b></h3>
-                        <br>
-                        <div class="box box-info">
-                            <table style="width: 100%; text-align: left; border-collapse: collapse;">
-                                <tr>
-                                    <th style="padding: 10px; border-bottom: 1px solid #ccc;">Saldo</th>
-                                    <th style="padding: 10px; border-bottom: 1px solid #ccc;">Rekening</th>
-                                    <td style="padding: 10px; border-bottom: 1px solid #ccc; text-align: right;">No
-                                        Rekening
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 10px; ">Rp {{ number_format($saldo, 0, ',', '.') }}
-                                        <span class="btn btn-info" id="tarikTrx">Tarik</span>
-                                    </td>
-                                    @if ($rekening != null)
-                                        <td style="padding: 10px;">{{ $rekening->name }} <span class="btn btn-info">Utama</span></td>
-                                        <td style="padding: 10px; text-align: right;">  ****{{ substr($rekening->rek_number, -4) }}</td>
-                                    @else
-                                        <td style="padding: 10px;"> </td>
-                                        <td style="padding: 10px; text-align: right;"> </td>
-                                    @endif
-
-                                </tr>
-                            </table>
-                            <br>
-                        </div>
-                        <br>
-                        <h3 style="color:black;  margin-bottom:-5px"> <b>Transaksi Terakhir</b></h3>
-                        <br>
-                        <div class="box box-info">
-                            <div>
-                                <table id="example2" class="table table-bordered table-hover" style="width: 100%">
-                                    <!-- Konten tabel untuk 'Sudah Dilepas' -->
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>ID Penarikan</th>
-                                            <th class="detail-full">Rekening</th>
-                                            <th>Dana</th>
-                                            <th>Status</th>
-                                            <th class="detail-full">Tanggal Dipebaharui</th>
-                                            <th>Detail</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- Baris data -->
-                                        @php $i = 1 @endphp
-                                        @foreach ($PenarikanDana as $Penarikan)
-                                            <tr>
-                                                <td>{{ $i++ }}</td>
-                                                <td>TR {{ $Penarikan->id }}</td>
-                                                <td class="detail-full">**** {{ substr($rekening->rek_number, -4) }}
-                                                </td>
-                                                <td>Rp {{ number_format($Penarikan->total, 0, ',', '.') }} </td>
-                                                <td class="detail-full">
-                                                    @if ($Penarikan->status == 'success')
-                                                        Selesai
-                                                    @else
-                                                        Pengecekan
-                                                    @endif
-                                                </td>
-                                                <td class="detail-full">{{ \Carbon\Carbon::parse($Penarikan->last_update)->format('Y-m-d') }}
-                                                </td>
-                                                <td>Detail</td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>ID Penarikan</th>
-                                            <th class="detail-full">Rekening</th>
-                                            <th>Dana</th>
-                                            <th>Status</th>
-                                            <th class="detail-full">Tanggal Dipebaharui</th>
-                                            <th>Detail</th>
-                                        </tr>
-                                    </tfoot>
-                                </table>
+                    <div id="text-pesanan">
+                        <h2><b><i>Keuangan</i></b></h2>
+                        <div id="box-filter-pesanan">
+                            <div class="item-box-filter-pesanan" data-tipe="penghasilan">
+                                <b style="margin-left:20px">Penghasilan <i style="margin-top:2px"
+                                        class="material-icons pull-right">arrow_drop_down</i></b>
+                            </div>
+                            <div class="item-box-filter-pesanan" data-tipe="saldo">
+                                <b style="margin-left:20px"> Saldo <i style="margin-top:2px"
+                                        class="material-icons pull-right">arrow_drop_down</i></b>
+                            </div>
+                            <div class="item-box-filter-pesanan" data-tipe="rekening">
+                                <b style="margin-left:20px"> Rekening <i style="margin-top:2px"
+                                        class="material-icons pull-right">arrow_drop_down</i></b>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-1"></div>
+
+                    <div id="table-content">
+                    </div>
                 </div>
-            </section>
-        </div><!-- /.content-wrapper -->
-    </div><!-- ./wrapper -->
+                {{-- end Content --}}
+            </div>
+        </div>
+    </div>
     @include('seller.finance.modal-tarik-saldo')
+    @include('seller.finance.modal')
+    @include('seller.asset.footer')
+    <script src="{{ asset('/js/function/seller/finance.js') }}" type="text/javascript"></script>
+    <script>
+        loadData('saldo')
+
+        $('.item-box-filter-pesanan[data-tipe="saldo"]').addClass("open");
+        $('.item-box-filter-pesanan[data-tipe="saldo"]').addClass("active");
+        activeItem = $('.item-box-filter-pesanan[data-tipe="saldo"]');
+        allItems.slideUp();
+        activeItem.slideDown();
+
+    </script>
 </body>
-{{-- footer --}}
-@include('seller.asset.footer')
-<!-- page script -->
-<script src="{{ asset('/js/function/seller/finance.js') }}" type="text/javascript"></script>
 
 </html>

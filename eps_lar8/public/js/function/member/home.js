@@ -1469,7 +1469,7 @@ $(document).on("click", "#request-checkout", function () {
     Swal.fire({
         title: 'Syarat dan Ketentuan',
         html: `
-            <p>Dengan melakukan checkout, Anda setuju dengan <a href="http://127.0.0.1:8001/info-term-and-condition" target="_blank">Syarat dan Ketentuan</a>.</p>
+            <p>Dengan melakukan checkout, Anda setuju dengan <a href="http://eliteproxy.co.id/info-term-and-condition" target="_blank">Syarat dan Ketentuan</a>.</p>
             <div>
                 <input type="checkbox" id="terms-checkbox">
                 <label for="terms-checkbox">Saya setuju dengan Syarat dan Ketentuan</label>

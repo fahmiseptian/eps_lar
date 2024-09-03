@@ -7,7 +7,7 @@ class Fungsi
 {
 // get seoname
 
-    public function getSeoName($firstname, $lastname) {
+    public function getSeoName($firstname, $lastname = null) {
 
         $nama = $firstname . ' ' . $lastname;
 

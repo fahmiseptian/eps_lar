@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Brand extends Model
 {
-    protected $visible = ['status'];
     protected $table = 'brand';
-    protected $primaryKey = 'id'; 
+    protected $primaryKey = 'id';
 }

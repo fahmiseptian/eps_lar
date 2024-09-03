@@ -57,4 +57,19 @@ class CompleteCartShopDetail extends Model
 
         return $result;
     }
+
+    function getLastProductByIdShop($id_shop) {
+        $query = DB::table('complete_cart_shop_detail as ccsd')
+            ->select(
+                'ccsd.nama',
+                'ccsd.image'
+            )
+            ->where('ccsd.id_shop', $id_shop)
+            ->orderBy('ccsd.id', 'desc')
+            ->limit(3)
+            ->get();
+
+        return $query;
+    }
+
 }

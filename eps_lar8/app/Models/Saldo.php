@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\DB;
 
 class Saldo extends Model
 {
-    protected $visible = ['total_diterima_seller'];
     protected $table = 'revenue';
     protected $primaryKey = 'id';
 
@@ -95,6 +94,20 @@ class Saldo extends Model
 
         return $data;
     }
+
+    function getTotalPendapatanSeller($id_shop) {
+        $revenue = self::from('revenue')
+            ->where('id_shop', $id_shop);
+
+        $total_diterima_seller = $revenue->sum('total_diterima_seller');
+        $order = $revenue->count('invoice');
+
+        return [
+            'total_diterima_seller' => $total_diterima_seller,
+            'order' => $order,
+        ];
+    }
+
 
     function requestRevenue($id_shop, $ids_trx){
         $ids_trx = explode(',', $ids_trx);

@@ -10,6 +10,7 @@ use App\Models\Courier;
 use App\Models\Shop_courier;
 use App\Models\Province;
 use App\Models\FreeOngkir;
+use App\Models\ShopOperational;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -26,18 +27,45 @@ class SettingController extends Controller
         $saldoPending   = Saldo::calculatePendingSaldo($this->seller);
 
         // Membuat $this->data
-        $this->data['title'] = 'Nego Pengadaan';
         $this->data['seller_type'] = $sellerType;
         $this->data['saldo'] = $saldoPending;
 
         // Model
         $this->Model['Shop'] = new Shop();
+        $this->Model['ShopOperational'] = new ShopOperational();
+    }
+
+    public function index()
+    {
+        $operationals = $this->Model['ShopOperational']->getShopOperational($this->seller);
+        return view('seller.setting.index',$this->data,['operationals'=>$operationals]);
+    }
+
+    function getOprasional() {
+        $config_shop = DB::table('shop_config')->select('*')->where('id_shop',$this->seller)->first();
+        $operationals = $this->Model['ShopOperational']->getShopOperational($this->seller);
+
+        return response()->json(['operationals'=>$operationals,'config_shop'=>$config_shop]);
+    }
+
+    function updateConfig_cuti(Request $request) {
+        $update = DB::table('shop_config')
+        ->where('id_shop', $this->seller)
+        ->update(['is_libur' => $request->is_active]);
+
+        return response()->json(200);
     }
 
     public function address()
     {
         $address    = $this->Model['Shop']->AddressByIdshop($this->seller);
         return view('seller.setting.address',$this->data,['address' => $address]);
+    }
+
+    function getaddress() {
+        $address    = $this->Model['Shop']->AddressByIdshop($this->seller);
+        return response()->json($address);
+
     }
 
     function setDefaultAddress(Request $request) {
@@ -63,7 +91,7 @@ class SettingController extends Controller
     }
 
 
-    function getAddress(Request $request) {
+    function getDetailAddress(Request $request) {
         $id_address = $request->id_address;
         $address    = $this->Model['Shop']->AddressByIdshop($this->seller,$id_address);
         return response()->json(['address' => $address], 200);
@@ -105,5 +133,32 @@ class SettingController extends Controller
         } else {
             return response()->json(['message' => 'Gagal Menambahkan Alamat'], 500);
         }
+    }
+
+    public function updateOprasional(Request $request)
+    {
+        // Validate the incoming request data
+        $request->validate([
+            'operasional.*.id' => 'required|integer|exists:shop_operational,id',
+            'operasional.*.day' => 'required|string',
+            'operasional.*.is_active' => 'required|in:Y,N',
+        ]);
+
+        // Retrieve the data from the request
+        $operasionalData = $request->input('operasional');
+
+        // Loop through each record and update the database
+        foreach ($operasionalData as $data) {
+            $operasional = ShopOperational::find($data['id']);
+            if ($operasional) {
+                $operasional->start_time = $data['start_time'];
+                $operasional->end_time = $data['end_time'];
+                $operasional->is_active = $data['is_active'];
+                $operasional->save();
+            }
+        }
+
+        // Return a response
+        return response()->json(['message' => 'Operasional updated successfully!'], 200);
     }
 }

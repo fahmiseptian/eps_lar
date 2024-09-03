@@ -114,7 +114,7 @@
                 </a>
                 <ul class="treeview-menu">
                     <li><a style="color: #eee" href="{{route('seller.setting.address')}}"><i class="fa fa-circle-o"></i> Alamat</a></li>
-                    <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Pengaturan Toko</a></li>
+                    <li><a style="color: #eee" href="{{route('seller.setting')}}"><i class="fa fa-circle-o"></i> Pengaturan Toko</a></li>
                     </li>
                 </ul>
             </li>

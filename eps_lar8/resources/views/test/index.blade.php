@@ -1,313 +1,263 @@
 <!DOCTYPE html>
 <html>
+<style>
+    .dataTables_paginate .paginate_button:not(.previous):not(.next):not(.first):not(.last) {
+        display: none;
+    }
+</style>
+@include('seller.asset.header')
 
-<head>
-    <meta charset="UTF-8">
-    <title>TEST</title>
-    <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
-    <link href="{{ asset('/bootstraps/css/bootstrap.css') }}" rel="stylesheet" type="text/css" />
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet"
-        type="text/css" />
-    <link href="http://code.ionicframework.com/ionicons/2.0.0/css/ionicons.min.css" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('/plugins/morris/morris.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('/plugins/jvectormap/jquery-jvectormap-1.2.2.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('/plugins/daterangepicker/daterangepicker-bs3.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('/plugins/datatables/dataTables.bootstrap.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('/css/Seller_center.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('/css/skins/_all-skins.min.css') }}" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <!-- Sweet Alert -->
-    <script src="{{ asset('/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
-    <link href="{{ asset('/plugins/sweetalert2/sweetalert2.min.css') }}" rel="stylesheet" type="text/css" />
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-</head>
-
-<body class="skin-blue">
-    <div class="wrapper">
-
-        @include('seller.asset.topbar')
-
-
-        <aside class="main-sidebar">
-            <!-- sidebar: style can be found in sidebar.less -->
-            <section class="sidebar">
-                <!-- Sidebar user panel -->
-
-                <div class="user-panel">
-                    {{-- <div class="pull-left image">
-                        <img src="" class="img-circle" alt="User Image" />
-                    </div> --}}
-                    <div class="pull-left info">
-                        <a href="#" class="seller_type">
-                            <img src="{{ asset('/img/app/trusted-seller.png') }}" />
-                        </a>
-                        <h5> <b><?= session()->get('seller') ?></b></h5>
-
-                    </div>
-                    <hr width="95%" align="center">
-                </div>
-                <div class="seller-balance">
-                    <div class="info">
-                        <p>Saldo Anda</p>
-                        <h4>Rp {{ number_format(2131212, 0, ',', '.') }}</h4>
-                        <hr width="100%" align="center">
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            @include('seller.asset.desktop.sidebar')
+            <div class="col-middle">
+                {{-- content --}}
+                <div id="view-data-product">
+                    <div id="notif">
+                        <img src="{{ asset('/img/app/icon_lonceng.png') }}" width="50px" style="margin-left: 10px;">
+                        <img src="{{ asset('/img/app/icon_chat.png') }}" width="50px">
                     </div>
 
-                </div>
-                <!-- sidebar menu: : style can be found in sidebar.less -->
-                <ul class="sidebar-menu">
-                    <li class="list-sidebar">
-                        <a href="{{ route('seller') }}">
-                            <i class="fa fa-dashboard"></i> <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="list-sidebar">
-                        <a href="#">
-                            <i class="fa fa-truck"></i> <span>Pengiriman</span> <i
-                                class="fa fa-angle-left pull-right"></i>
-                        </a>
-                        <ul class="treeview-menu">
-                            <li><a style="color: #eee" href="{{ route('seller.delivery') }}"><i
-                                        class="fa fa-circle-o"></i> Jasa Pengiriman</a>
-                            </li>
-                            <li><a style="color: #eee" href="{{ route('seller.delivery.free-ongkir') }}"><i
-                                        class="fa fa-circle-o"></i> Free Ongkir</a></li>
-                        </ul>
-                    </li>
-                    <li class="list-sidebar">
-                        <a href="{{ route('seller.order') }}">
-                            <i class="fa fa-tasks"></i> <span>Pesanan Saya</span>
-                        </a>
-                    </li>
-                    <li class="list-sidebar">
-                        <a href="#">
-                            <i class="fa fa-dropbox"></i> <span>Produk Saya</span> <i
-                                class="fa fa-angle-left pull-right"></i>
-                        </a>
-                        <ul class="treeview-menu">
-                            <li><a style="color: #eee" href="{{ route('seller.product') }}"><i
-                                        class="fa fa-circle-o"></i> Produk</a></li>
-                            <li><a style="color: #eee" href="{{ route('seller.product.add') }}"><i
-                                        class="fa fa-circle-o"></i> Tambah Produk</a></li>
-                            <li><a style="color: #eee" href="{{ route('seller.product.violation') }}"><i
-                                        class="fa fa-circle-o"></i> Pelanggaran Saya</a></li>
-                        </ul>
-                    </li>
-                    <li class="list-sidebar">
-                        <a href="#">
-                            <i class="fa fa-tags"></i> <span>Promosi</span>
-                        </a>
-                    </li>
-                    <li class="list-sidebar">
-                        <a href="{{ route('seller.nego') }}">
-                            <i class="fa fa-comments"></i> <span>Nego Bela Pengadaan</span>
-                        </a>
-                    </li>
-                    <li class="list-sidebar">
-                        <a href="#">
-                            <i class="fa fa-money"></i> <span>Keuangan</span> <i
-                                class="fa fa-angle-left pull-right"></i>
-                        </a>
-                        <ul class="treeview-menu">
-                            <li><a style="color: #eee" href="{{ route('seller.finance') }}"><i
-                                        class="fa fa-circle-o"></i> Penghasilan</a></li>
-                            <li><a style="color: #eee" href="{{ route('seller.finance.saldo') }}"><i
-                                        class="fa fa-circle-o"></i> Saldo</a></li>
-                            <li><a style="color: #eee" href="{{ route('seller.finance.rekening') }}"><i
-                                        class="fa fa-circle-o"></i> Rekening</a></li>
-                            <li><a style="color: #eee" href="{{ route('seller.finance.pembayaran') }}"><i
-                                        class="fa fa-circle-o"></i> Pembayaran</a></li>
-                        </ul>
-                    </li>
-                    <li class="list-sidebar">
-                        <a href="#">
-                            <i class="fa fa-share"></i> <span>Layanan Pembeli</span> <i
-                                class="fa fa-angle-left pull-right"></i>
-                        </a>
-                        <ul class="treeview-menu">
-                            <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Asistent
-                                    Chat</a></li>
-                        </ul>
-                    </li>
-                    <li class="list-sidebar">
-                        <a href="#">
-                            <i class="fa fa-pie-chart"></i> <span>Data</span> <i
-                                class="fa fa-angle-left pull-right"></i>
-                        </a>
-                        <ul class="treeview-menu">
-                            <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Kesehatan
-                                    Toko</a></li>
-                            <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Bisnis</a>
-                            </li>
-                    </li>
-                </ul>
-                </li>
-                <li class="list-sidebar">
-                    <a href="#">
-                        <i class="fa fa-book"></i> <span>Toko</span> <i class="fa fa-angle-left pull-right"></i>
-                    </a>
-                    <ul class="treeview-menu">
-                        <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Penilaian</a>
-                        </li>
-                        <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Profil</a></li>
-                        <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Etalase</a>
-                        </li>
-                    </ul>
-                </li>
-                <li class="list-sidebar">
-                    <a href="#">
-                        <i class="fa fa-cog"></i> <span>Pengaturan</span> <i class="fa fa-angle-left pull-right"></i>
-                    </a>
-                    <ul class="treeview-menu">
-                        <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Alamat</a></li>
-                        <li><a style="color: #eee" href="index.html"><i class="fa fa-circle-o"></i> Pengaturan
-                                Toko</a></li>
-                </li>
-                </ul>
-                </li>
-                </ul>
-            </section>
-            <!-- /.sidebar -->
-        </aside>
-
-
-        <!-- Right side column. Contains the navbar and content of the page -->
-        <div class="content-wrapper">
-            <!-- Content Header (Page header) -->
-
-            <section class="content">
-                <div class="row">
-                    <div class="col-md-1"></div>
-                    <div class="col-md-10">
-                        <h3 style="margin-left: 15px; margin-bottom:-5px"> <b> Kontrak </b></h3>
-                        <hr>
-                        <div class="box box-warning">
-                            <div class="box-body">
-                                <form id="tambahProdukpromosiForm">
-                                    <table class="table table-bordered">
-                                        <tr>
-                                            <td colspan="2">
-                                                <div class="form-group">
-                                                    <p style="font-size: 14px">No Kontrak</p>
-                                                    <input type="text" class="form-control" id="noKontrak"
-                                                        name="noKontrak" required>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="form-group">
-                                                    <p style="font-size: 14px">Total Harga</p>
-                                                    <input type="text" class="form-control" id="totalHarga"
-                                                        name="totalHarga" readonly required>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="form-group">
-                                                    <p style="font-size: 14px">Nilai Kontrak</p>
-                                                    <input type="text" class="form-control" id="nilaiSayang"
-                                                        name="nilaiSayang" readonly required>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="form-group">
-                                                    <p style="font-size: 14px">Tanggal Kontrak</p>
-                                                    <input type="text" class="form-control" id="tanggalKontrak"
-                                                        name="tanggalKontrak" required>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="form-group">
-                                                    <p style="font-size: 14px">Catatan</p>
-                                                    <input type="text" class="form-control" id="catatan"
-                                                        name="catatan" required hidden>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2">
-                                                <div class="form-group">
-                                                    <p style="font-size: 14px">Document</p>
-                                                    <textarea id="document" name="document"></textarea>
-                                                    <embed src="" type="application/pdf" width="100%" >
-                                                </div>
-
-                                            </td>
-                                        </tr>
-                                    </table>
-                                    <button type="submit" class="btn btn-primary">Kirim</button>
-                                </form>
-
+                    <div id="text-pesanan">
+                        <h2><b><i>Toko Saya</i></b></h2>
+                        <div id="box-filter-pesanan">
+                            <div class="item-box-filter-pesanan" data-tipe="rates_shop">
+                                <b style="margin-left:20px">Penilaian <i style="margin-top:2px"
+                                        class="material-icons pull-right">arrow_drop_down</i></b>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-1"></div>
-                </div>
-            </section>
-        </div><!-- /.content-wrapper -->
-    </div><!-- ./wrapper -->
+                    <div id="content">
+                        <div class="detail-transaksi">
 
+                            <div class="batas-pengerjaan">
+                                <b class="warning-text">
+                                    <i class="material-symbols-outlined">warning</i>
+                                    Pesanan Belum Diterima Seller
+                                </b>
+                                <div class="date-pengerjaan">
+                                    <span class="left-text">Batas Proses Penerimaan 2 x 24 jam</span>
+                                    <span class="right-text">13 July 2025</span>
+                                </div>
+                            </div>
 
-    <!-- Modal -->
-    <div id="negoUlangModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="negoUlangModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="negoUlangModalLabel">Nego Ulang</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <!-- Form atau konten modal Anda di sini -->
-                    <form id="negoUlangForm">
-                        <!-- Form fields -->
-                        <div class="form-group">
-                            <label for="negoPrice">Harga Baru</label>
-                            <input type="number" class="form-control" id="negoPrice" name="negoPrice" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="negoNote">
-                                <div style="display: flex">
-                                    <span id="google-icon" class="material-icons">contract_edit</span>
+                            <div class="aksi-invoice">
+                                <table style="width: 100%">
+                                    <tr>
+                                        <th>No </th>
+                                        <th>Tanggal Pesanan</th>
+                                        <th>Status</th>
+                                        <th>Pembayaran</th>
+                                        <th rowspan="2" class="btn-container" >
+                                            <a class="btn btn-warning fa fa-copy">&nbsp;Copy Resi </a>
+                                            <a class="btn btn-warning fa fa-map-marker">&nbsp;Lacak </a>
+                                            <a class="btn btn-warning fa fa-upload">&nbsp;Upload DO </a>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            PRFINV-20240827707-788
+                                        </td>
+                                        <td>
+                                            27 Agustus 2024
+                                        </td>
+                                        <td>
+                                            Pesanan Baru
+                                        </td>
+                                        <td>
+                                            Belum Dibayar
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div class="detail-pengiriman">
+                                <table class="table-detail-order" style="width: 100%">
+                                    <tr>
+                                        <th>Informasi Pengiriman</th>
+                                        <th></th>
+                                        <th class="btn-container">
+                                            <a class="btn btn-danger fa fa-print">&nbsp;Cetak Lebel</a>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th>Nama Penerima</th>
+                                        <th>Nomor Telepon</th>
+                                        <th>Alamat</th>
+                                    </tr>
+                                    <tr>
+                                        <td>USER</td>
+                                        <td>087386474948</td>
+                                        <td>NAMA<br>
+                                            Test,Kabupaten Tangerang-Cikupa,Banten
+                                            <br> 14939
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Email</th>
+                                        <th>NPWP</th>
+                                        <th>Keperluan</th>
+                                    </tr>
+                                    <tr>
+                                        <td>ppmerdeka@gmail.com</td>
+                                        <td></td>
+                                        <td>sas</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Pengiriman</th>
+                                        <th>Resi</th>
+                                        <th>Pesan Pembeli</th>
+                                    </tr>
+                                    <tr>
+                                        <td>JNE - REG23</td>
+                                        <td>456787654</td>
+                                        <td> TEXT </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div class="aksi-file-transaksi">
+                                <a class="btn btn-warning fa fa-file">&nbsp;INVOICE</a>
+                                <a class="btn btn-warning fa fa-file">&nbsp;KWITANSI</a>
+                                <a class="btn btn-warning fa fa-plus">&nbsp;KONTRAK</a>
+                                <a class="btn btn-warning fa fa-file">&nbsp;SURAT PESANAN</a>
+                                <a class="btn btn-warning fa fa-file">&nbsp;BAST</a>
+                                <a class="btn btn-warning fa fa-upload">&nbsp;Upload Faktur</a>
+                            </div>
+
+                            <div class="detail-produk-transaksi">
+                                <table class="table-detail-order" style="width: 100%">
+                                    <div class="detailproduct">
+                                        <tr>
+                                            <td colspan="2"><b>Produk Dipesan</b></td>
+                                            <td>Harga Satuan</td>
+                                            <td>Jumlah</td>
+                                            <td>Subtotal</td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="https://eliteproxy.co.id/seller_center/upload/product/50-product_0_Shinpo-Hercules-Container-Box-150-Liter_.jpg" alt="produk"></td>
+                                            <td> nama barang</td>
+                                            <td>
+                                                Rp.
+                                                {{ str_replace(',', '.', number_format(20000)) }}
+                                            </td>
+                                            <td>22</td>
+                                            <td>
+                                                Rp.
+                                                {{ str_replace(',', '.', number_format(200000)) }}
+                                            </td>
+                                        </tr>
+                                    </div>
+                                </table>
+                            </div>
+
+                            <div class="detail-seller-transaksi">
+                                <div class="detailbiaya">
+                                    <table class="table-detail-order">
+                                        <tr>
+                                            <td><span class="fa fa-truck">&nbsp; Biaya Pengiriman :</span></td>
+                                            <td>Rp.
+                                                {{ str_replace(',', '.', number_format(200000)) }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><span class="fa fa-shield">&nbsp; Asuransi Pengiriman :</span></td>
+                                            <td>Rp.
+                                                {{ str_replace(',', '.', number_format(200000)) }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <span class="fa fa-money">
+                                                    &nbsp; Total Pesanan
+                                                    (2) :
+                                                </span>
+                                            </td>
+                                            <td>
+                                                Rp. {{ str_replace(',', '.', number_format(200000)) }}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="detail-pembayaran-transaksi">
+                                <div>
+                                    <table class="table-detail-order" style="width: 100%">
+                                        <tr>
+                                            <th>Pembayaran : Transfer Bank </th>
+                                            <th></th>
+                                        </tr>
+                                        <tr>
+                                            <th>Pilihan TOP : 30 hari</th>
+                                            <th></th>
+                                        </tr>
+                                    </table>
                                 </div>
 
-                            </label>
-                            <textarea class="form-control" id="negoNote" name="negoNote" required></textarea>
+                                <br>
+                                <div class="detailbiayaorder">
+                                    <table class="table-detail-order">
+                                        <tr>
+                                            <th style="font-size:20px" colspan="3">
+                                                Detail Pembayaran
+                                            </th>
+                                            <th></th>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">Subtotal belum PPN:</th>
+                                            <td>Rp.
+                                                {{ str_replace(',', '.', number_format(20000)) }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">Total Ongkos Kirim belum PPN :</td>
+                                            <td style="color: :orangered">Rp.
+                                                {{ str_replace(',', '.', number_format(20000)) }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">Total Asuransi Pengiriman belum PPN :</td>
+                                            <td style="color: :orangered">Rp.
+                                                {{ str_replace(',', '.', number_format(20000)) }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">PPN 11% :</td>
+                                            <td style="color: :orangered">Rp.
+                                                {{ str_replace(',', '.', number_format(20000)) }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">Total Diskon :</td>
+                                            <td style="color: :orangered">Rp.
+                                                {{ str_replace(',', '.', number_format(20000)) }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th style=" font-size:15px" colspan="2">
+                                                Total Pembayaran :
+                                            </th>
+                                            <td><b> Rp.
+                                                    {{ str_replace(',', '.', number_format(20000)) }}
+                                                </b>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
-                        <!-- Add other form fields as needed -->
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
+                    </div>
+                    {{-- end Content --}}
                 </div>
             </div>
         </div>
-    </div>
-
+        @include('seller.asset.footer')
+        <script src="{{ asset('/js/function/seller/shop.js') }}" type="text/javascript"></script>
+        <script>
+            // initialize()
+        </script>
 </body>
-{{-- footer --}}
-@include('seller.asset.footer')
-
-<!-- page script -->
-<script src="{{ asset('/js/function/seller/nego.js') }}" type="text/javascript"></script>
-<script>
-    $(document).ready(function() {
-        // Handle modal display when the link is clicked
-        $('.btn-app[data-text="Nego Ulang"]').on('click', function(event) {
-            event.preventDefault(); // Prevent default link behavior
-            $('#negoUlangModal').modal('show'); // Show the modal
-        });
-
-        // Handle form submission
-        $('#negoUlangForm').on('submit', function(event) {
-            event.preventDefault();
-            console.log($(this).serialize());
-        });
-    });
-</script>
 
 </html>

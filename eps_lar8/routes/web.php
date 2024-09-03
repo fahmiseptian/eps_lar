@@ -25,7 +25,8 @@ use App\Http\Controllers\Seller\OrederController;
 use App\Http\Controllers\Seller\ProductController;
 use App\Http\Controllers\Seller\PromotionController;
 use App\Http\Controllers\Seller\SettingController;
-use App\Http\Controllers\seller\ShophealthController;
+use App\Http\Controllers\Seller\ShophealthController;
+use App\Http\Controllers\Seller\ShopSettingController;
 use Illuminate\Support\Facades\Artisan;
 
 /*
@@ -146,6 +147,8 @@ Route::group(['middleware' => ['admin', 'activity']], function () {
 
 Route::group(['middleware' => 'seller'], function () {
     Route::get('/seller', [HomesellerController::class, 'index'])->name('seller');
+    Route::get('/seller/notification', [HomesellerController::class, 'notification'])->name('seller.notification');
+    Route::get('/seller/notification/test', [HomesellerController::class, 'test']);
 
     // pengiriman
     Route::get('/seller/delivery', [DeliveryController::class, 'pengaturan_jasa'])->name('seller.delivery');
@@ -178,7 +181,7 @@ Route::group(['middleware' => 'seller'], function () {
     Route::get('/seller/product/edit/{id}', [ProductController::class, 'EditProduct'])->name('seller.product.edit');
     Route::post('/seller/product/addProduct', [ProductController::class, 'addProduct'])->name('seller.product.addProduct');
     Route::get('/seller/product/{status}', [ProductController::class, 'filterProduct'])->name('seller.product.filter');
-    Route::get('/seller/product/category/level2/{id_level1}', [ProductController::class, 'getCategoryLevel2']);
+
 
     // Finance
     Route::get('/seller/finance/', [FinanceController::class, 'index'])->name('seller.finance');
@@ -202,9 +205,17 @@ Route::group(['middleware' => 'seller'], function () {
 
     // Shop health
     Route::get('/seller/health/', [ShophealthController::class, 'index'])->name('seller.health');
+    Route::get('/seller/health/info-toko', [ShophealthController::class, 'info_toko'])->name('seller.health.info-toko');
 
     // Setting
+    Route::get('/seller/setting', [SettingController::class, 'index'])->name('seller.setting');
     Route::get('/seller/setting/address', [SettingController::class, 'address'])->name('seller.setting.address');
+
+    // Toko
+    Route::get('/seller/shop', [ShopSettingController::class, 'index'])->name('seller.shop');
+    Route::get('/seller/shop/asistent-chat', [ShopSettingController::class, 'v_aasistent_chat'])->name('seller.shop.asistent-chat');
+    Route::get('/seller/shop/profile', [ShopSettingController::class, 'v_profile'])->name('seller.shop.profile');
+    Route::get('/seller/shop/etalase', [ShopSettingController::class, 'v_etalase'])->name('seller.shop.etalase');
 
     // Pengetesan
     Route::get('/seller/product/test/{id}', [ProductController::class, 'test']); //Test Get Json Product
@@ -231,3 +242,6 @@ Route::get('tester/', [HomememberController::class, 'fetchCompleteCartShop']);
 Route::get('test/view', function () {
     return view('test.index');
 });
+
+
+Route::get('seller/test/view', [HomesellerController::class, 'testView']);

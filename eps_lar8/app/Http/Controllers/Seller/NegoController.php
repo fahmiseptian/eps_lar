@@ -8,6 +8,7 @@ use App\Models\Cart;
 use App\Models\Lpse_config;
 use App\Models\Nego;
 use App\Models\ProductCategory;
+use App\Models\Products;
 use App\Models\Saldo;
 use App\Models\Shop;
 use App\Models\ShopCategory;
@@ -93,6 +94,17 @@ class NegoController extends Controller
         $cf         = Lpse_config::first();
         $ppn        = $cf->ppn;
 
+        $product = Products::Find($id_product);
+
+        $id_kategori = $product->id_category;
+        $idtipeProduk = $product->id_tipe;
+
+        // PPh menggunkan default barang
+        $pph            = 1.5;
+
+        // cek Jenis PPh
+        $checkPPh         = $this->Model['ProductCategory']->jenisProduct($id_kategori);
+
         // check PPN
         $CheckppnProduct   = $this->Model['ProductCategory']->check_ppn($id_product);
         $checkShop         = $this->Model['Shop']->getShopCategory($this->seller);
@@ -116,9 +128,21 @@ class NegoController extends Controller
             }
         }
 
+        // Set PPh
+        if ($checkPPh == 1) {
+            // Jasa biasa
+            $pph = 2;
+        }
+
+        if ($idtipeProduk == 3 && $checkPPh == 1) {
+            // untuk jasa sewa ruangan
+            $pph = 10;
+        }
+
         $dataArr = [
             'harga' => $harga,
-            'ppn' => $ppn
+            'ppn' => $ppn,
+            'pph' => $pph,
         ];
 
         // Perhitungan

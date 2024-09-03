@@ -15,6 +15,75 @@ $(function () {
     });
 });
 
+var allItems = $(".item-box-filter-pesanan");
+var activeItem;
+function loadData(tipe) {
+    $("#overlay").show();
+
+    $.ajax({
+        type: "GET",
+        url: appUrl + "/api/seller/delivery/" + tipe,
+        xhrFields: {
+            withCredentials: true,
+            loadData,
+        },
+        success: function (response) {
+            var body = $("#content");
+            body.empty();
+            if (tipe == 'jasa-ongkir') {
+                var view =viewJasaPengiriman(response);
+                body.append(view);
+            } else {
+                var view =viewFreeOngkir(response);
+                body.append(view);
+            }
+        },
+        error: function (xhr, status, error) {
+            Swal.fire("Error", "Terjadi kesalahan", "error");
+        },
+        complete: function () {
+            $("#overlay").hide();
+        },
+    });
+}
+$(document).on("click", allItems.filter(".open"), function () {
+    setupEvents();
+});
+function setupEvents() {
+    // Handle click on the active item
+    allItems
+        .filter(".active")
+        .off("click")
+        .on("click", function () {
+            allItems.slideDown();
+        });
+
+    allItems
+        .not(".active")
+        .off("click")
+        .on("click", function () {
+            var tipe = $(this).data("tipe");
+
+            loadData(tipe);
+            console.log(tipe);
+            allItems.removeClass("active open").hide();
+            $(this).addClass("open");
+            $(this).addClass("active");
+            activeItem = $(this);
+
+            allItems.slideUp();
+            activeItem.slideDown();
+        });
+}
+function initialize() {
+    allItems.hide();
+    activeItem = allItems.first();
+    activeItem.show().addClass("active");
+    loadData("jasa-ongkir");
+    setupEvents();
+}
+
+
 function showDescription(description, berat) {
     if (window.innerWidth > 800) {
         // Tampilan desktop
@@ -221,8 +290,8 @@ $(document).on("click", "#ubahestimasi", function () {
             Swal.fire({
                 title: 'Ubah Estimasi Packing',
                 html: `
-                    <div style="display: flex; align-items: center; justify-content: center;">
-                        <input id="estimasi-input" type="number" class="swal2-input" value="${estimasi_lama}" min="1" max="7" style="width: 60%; display: inline-block;">
+                    <div class="form-group" style="display: flex; align-items: center; justify-content: center;">
+                        <input id="estimasi-input" type="number" class="swal2-input" value="${estimasi_lama}" min="1" max="7" style="width: 50%; display: inline-block;">
                         <span style="margin-left: 10px;">hari</span>
                     </div>
                 `,
@@ -288,3 +357,87 @@ $(document).on("click", "#ubahestimasi", function () {
     });
 });
 
+function viewJasaPengiriman(dataArray) {
+    view = "";
+    var data = listJasaPengiriman(dataArray);
+    view +=`
+        <div id="view-jasa-pengiriman">
+            <div>
+                <b>Jasa Kirim Yang Didukung</b> <br>
+                <small>
+                    Nikmati pelayanan jasa kirim yang lebih cepat dan handal dengan Jasa Kirim yang
+                    Didukung. <br>
+                    Perlu diingat bahwa kamu membutuhkan printer untuk mencetak label pengiriman secara
+                    otomatis.
+                </small>
+            </div>
+        </div>
+        <div id="detail-jasa">
+            ${data}
+        </div>
+    `;
+    return view;
+}
+
+function listJasaPengiriman(data) {
+    var listJasaPengiriman= "";
+    data.forEach(function(pengiriman) {
+        const isChecked = pengiriman.checked === true ? 'checked' : '';
+        listJasaPengiriman += `
+        <div id="view-oprasional">
+            <div>
+                <h2>${pengiriman.name}</h2>
+                <small>
+                    ${pengiriman.description} </br>
+                    Batasan <br>
+                    ${pengiriman.max_weight} gr
+                </small>
+            </div>
+            <div>
+                <label class="switch">
+                    <input type="checkbox" ${isChecked} data-courier-id="${pengiriman.id}" onchange="toggleCourier(this)">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+        `;
+    });
+    return listJasaPengiriman;
+}
+
+
+function viewFreeOngkir(dataArray) {
+    var data = listProvinsi(dataArray);
+    view =`
+        <div id="view-free-pengiriman">
+            <p style="font-size: 20px;"><b>Provinsi</b></p>
+            <small>Pilih provinsi yang kamu inginkan untuk gratis ongkir.</small>
+            <hr>
+            <div class="row">
+                ${data}
+            </div>
+        </div>
+    `;
+
+    return view;
+}
+
+
+function listProvinsi(data) {
+    var listProvinsi= "";
+    data.forEach(function(province) {
+        const isChecked = province.checked === true ? 'checked' : '';
+        listProvinsi += `
+        <div class="col-md-3" style="margin-bottom:10px">
+            <div style="display: flex; align-item:center">
+                <label class="switch">
+                    <input type="checkbox" data-province-id="${province.province_id}" onchange="togglefreeCourier(this)" ${isChecked}>
+                    <span class="slider round"></span>
+                </label>
+                <span class="switch-label">${province.province_name}</span>
+            </div>
+        </div>
+        `;
+    });
+    return listProvinsi;
+}

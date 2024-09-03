@@ -1,0 +1,1677 @@
+body{
+    background-color: #F9AC4D;
+    font-family: 'Roboto', sans-serif;
+}
+
+.container-fluid{
+    width: 100%;
+    font-style: italic;
+}
+
+.tooltip-text {
+    visibility: hidden;
+    width: max-content; /* Menyesuaikan lebar tooltip dengan konten */
+    max-width: 400px; /* Membatasi lebar maksimum tooltip */
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -150%); /* Memusatkan tooltip secara sempurna */
+    opacity: 0;
+    transition: opacity 0.3s;
+    white-space: normal;
+}
+
+.material-icons:hover + .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+.col-left {
+    background-color: #F9AC4D;
+    left: 0;
+    width: 15%;
+    float: left;
+    font-size: 20px;
+}
+
+.col-middle {
+    background-color: #C2F2FB;
+    display: flex;
+    float: right;
+    height: 100%;
+    padding-bottom: 5%;
+    width: 85%;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    height: auto;
+    box-shadow: 0 4px 4px #000000; /* Shadow biru lebih muda */
+}
+
+#notif{
+    display: flex;
+    margin-top: 20px;
+}
+
+#box-right {
+    background-color: #429EBD;
+    height: 80%;
+    padding: 10px;
+    border-radius: 20px;
+    width: 33%;
+    padding-top: 7%;
+    padding-left: 3%;
+    padding-right: 3%;
+    color: #F0FBFF;
+}
+
+#box-left{
+    width: 65%;
+    margin-top: 30px;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%; /* Atur lebar sesuai kebutuhan */
+}
+.profile img {
+    display: block;
+    width: 104px;
+    height: 104px;
+    margin: 5px;
+}
+.sidebar-menu{
+    color: white;
+}
+#google-icon {
+    font-size: 20px;
+    vertical-align: middle; /* Mengatur posisi vertikal ikon */
+    line-height: 18px; /* Mengatur ketinggian baris agar ikon berada di tengah */
+    margin-right: 5px;
+}
+
+.treeview-menu {
+    padding-left: 0;
+    list-style-type: none;
+    display: none;
+}
+
+.treeview-menu li {
+    list-style-type: none;
+    padding-left: 5px; /* Adjust padding as needed */
+}
+
+.treeview-menu li a {
+    color: #eee;
+    padding-left: 5px;
+}
+
+.list-sidebar{
+    margin: 20px;
+}
+
+.list-sidebar>a {
+    color: white !important;
+}
+
+.sidebar-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#mini-box{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+#box{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+#box-item {
+    border: 3px solid #8AC5EF;
+    background-color: #429EBD;
+    width: 180px;
+    height: 180px;
+    margin: 20px;
+    border-radius: 20%;
+    color: #DFF7FF;
+    text-align: center;
+    box-shadow: 0 0 25px rgba(36, 61, 68, 0.5);
+
+    /* Flexbox properties */
+    display: flex;
+    align-items: center; /* Vertically centers the content */
+    justify-content: center; /* Horizontally centers the content */
+}
+
+
+#mini-box-item{
+    color: #DFF7FF;
+    border: 3px solid #8AC5EF;
+    background-color: #429EBD;
+    width: 125px ;
+    height: 125px;
+    margin: 20px;
+    border-radius: 20%;
+    text-align: center;
+    box-shadow: 0 0 25px rgba(36, 61, 68, 0.5);
+
+    /* Flexbox properties */
+    display: flex;
+    align-items: center; /* Vertically centers the content */
+    justify-content: center; /* Horizontally centers the content */
+}
+
+#dashboard-nego{
+    display: grid;
+}
+
+#dashboard-nego > b{
+    margin-left: 20px;
+}
+
+#box-info{
+    border: 2px solid #8AC5EF;
+    background-color: #429EBD;
+    width: 100%;
+    height: 115px;
+    border-radius: 21px;
+    color: #DFF7FF;
+    text-align: center;
+    box-shadow: 0 0 25px rgba(36, 61, 68, 0.5);
+    margin-top: 35px;
+
+    /* Flexbox properties */
+    display: flex;
+    align-items: center; /* Vertically centers the content */
+    justify-content: center; /* Horizontally centers the content */
+}
+
+#info-order{
+    margin-top: 15%;
+}
+
+#dashboard-image-order{
+    display: flex;
+    margin-top: 5%;
+}
+
+#big-image-order {
+    background-color: #FFFFFF;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 130%; /* Sesuaikan ukuran kontainer */
+    height: 180%; /* Sesuaikan ukuran kontainer */
+    border-radius: 20%; /* Sesuaikan nilai jika ingin mengatur border-radius kontainer */
+    overflow: hidden; /* Pastikan gambar tidak keluar dari kontainer */
+}
+
+#big-image-order > img {
+    width: 100%; /* Mengatur lebar gambar sesuai dengan lebar kontainer */
+    height: 100%; /* Mengatur tinggi gambar sesuai dengan tinggi kontainer */
+    object-fit: cover; /* Memastikan gambar tetap proporsional */
+    border-radius: 20%; /* Sesuaikan nilai jika ingin mengatur border-radius gambar */
+}
+
+#item-mini-image-order{
+    background-color: #FFFFFF;
+    display: flex;
+    margin: 20px;
+    margin-top: 0;
+    justify-content: center;
+    align-items: center;
+    width: 60%; /* Sesuaikan ukuran kontainer */
+    height: 30%; /* Sesuaikan ukuran kontainer */
+    border-radius: 20%; /* Sesuaikan nilai jika ingin mengatur border-radius kontainer */
+    overflow: hidden; /
+}
+
+#item-mini-image-order> img {
+    width: 100px; /* Mengatur lebar gambar sesuai dengan lebar kontainer */
+    height: 100px; /* Mengatur tinggi gambar sesuai dengan tinggi kontainer */
+    object-fit: cover; /* Memastikan gambar tetap proporsional */
+    border-radius: 20%; /* Sesuaikan nilai jika ingin mengatur border-radius gambar */
+}
+
+#info-saldo>span{
+    font-size:210% ;
+    font-style: italic;
+}
+
+#info-saldo>p{
+    font-style: italic;
+    text-align: left;
+    color: #8FDEF9;
+    margin: 0;
+}
+
+#info-saldo-order{
+    color: #FFFFFF ;
+    font-size: 12px;
+    margin-top: 0;
+}
+
+#button-exit{
+    border: 3px solid #FFFFFF;
+    background-color: #FFFFFF;
+    width: 45%;
+    height: 20px;
+    border-radius: 21px;
+    color: #F9AC4D;
+    text-align: center;
+    margin-top: 35px;
+    margin-left: 60px;
+
+    /* Flexbox properties */
+    display: flex;
+    align-items: center; /* Vertically centers the content */
+    justify-content: center; /* Horizontally centers the content */
+}
+
+
+#view-pesanan{
+    display: grid;
+    width: 90%;
+}
+
+#text-pesanan{
+    margin-left: 20px;
+    font-size: 32px;
+}
+
+.item-box-filter-pesanan{
+    color: #F9AC4D;
+    border-radius:12px ;
+    border-color: #F9AC4D;
+    width: 200px;
+    background-color: #FFFFFf;
+    font-size: 18px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    cursor: pointer;
+    box-shadow: 0 4px 4px #000000;
+}
+
+#box-filter-pesanan {
+    display: flex;
+    flex-direction: column;
+}
+
+.item-box-filter-pesanan.active {
+    background-color: #F9AC4D;
+    color: #DFF7FF;
+}
+
+#table-content{
+    width: 100%;
+    border-collapse: collapse;
+    margin-left: 10px;
+}
+
+#example2,#example1{
+    background-color: #429EBD;
+    border-radius: 25px;
+    color: #FFFFFF;
+    margin-left: 20px;
+}
+
+.text-shadow {
+    display: inline-block;
+    font-size: 14px;
+    text-shadow: 1px 5px 12px rgba(0, 0, 0, 0.5); /* Shadow teks */
+}
+
+#view-data-product{
+    display: grid;
+    width: 90%;
+}
+
+#view-tambah-produk{
+    background-color: #429EBD;
+    width: 100%;
+    margin-left: 20px;
+    border-radius: 25px;
+    margin-top: 10px;
+    box-shadow: 0 4px 4px #000000;
+    color:#FFFFFF;
+}
+
+#form-product{
+    padding: 10px;
+    padding-top: 40px;
+    font-style: italic;
+    font-size: 18px;
+}
+
+#table-data-produk{
+    width: 100%;
+}
+
+#table-data-produk td input{
+    background-color: transparent; /* Menghapus background color untuk input dan textarea */
+    border: 4px solid #F9AC4D; /* Warna border oranye */
+    border-radius: 8px; /* Radius border */
+    padding: 5px 10px; /* Padding untuk input dan textarea */
+    width: 100%; /* Memastikan input dan textarea mengisi lebar sel */
+    box-sizing: border-box; /* Menghitung border dan padding dalam lebar elemen */
+}
+#table-data-produk td textarea {
+    height: 200px; /* Tinggi textarea */
+    color: #000; /* Warna teks hitam */
+    width: 100%;
+    padding: 10px; /* Padding di dalam textarea */
+    font-size: 14px; /* Ukuran font untuk textarea */
+}
+#table-data-produk td {
+    padding: 10px 15px; /* Menambahkan jarak atas dan bawah, serta kiri dan kanan */
+}
+
+#table-data-produk td p {
+    border-bottom: 2px solid #FFFFFF; /* Border bawah oranye */
+    padding-bottom: 5px; /* Jarak antara teks dan border */
+    margin: 0; /* Menghapus margin default */
+    color: #fff; /* Warna teks putih */
+}
+
+#table-data-produk td select {
+    width: 25%; /* Memastikan dropdown mengisi lebar sel */
+    border: 4px solid #F9AC4D; /* Warna border oranye */
+    border-radius: 15px; /* Radius border untuk dropdown */
+    padding: 5px 10px; /* Padding di dalam dropdown */
+    background-color: transparent; /* Warna latar belakang dropdown */
+    color: #FFFFFF; /* Warna teks dropdown */
+    box-sizing: border-box; /* Menghitung border dan padding dalam lebar elemen */
+}
+
+.vidio-produk-add,
+.foto-produk-add {
+    border: 5px solid #F9AC4D;
+    border-radius: 20px;
+    width: 100px;
+    height: 100px;
+    margin-right: 10px;
+    display: flex;
+    align-items: center; /* Vertikal center */
+    justify-content: center; /* Horizontal center */
+    background-color: transparent; /* Opsional: latar belakang putih untuk lebih kontras */
+}
+
+.vidio-produk-add{
+    margin-top: 30px;
+}
+.vidio-produk-add i,
+.foto-produk-add i {
+    color: #fff; /* Warna ikon sesuai dengan border */
+}
+
+#text-aturan-upload {
+    font-size: 14px;
+    color: #333;
+    padding: 10px;
+    background-color: transparent;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+#text-aturan-upload ul {
+    list-style-type: disc; /* Bullet points */
+    padding-left: 20px;
+}
+
+#text-aturan-upload li {
+    margin-bottom: 10px;
+}
+
+.custom-radio {
+    position: relative;
+    align-items: center;
+    margin-right: 80px;
+}
+
+.custom-radio input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.custom-radio .radio-label {
+    position: relative;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.custom-radio .radio-label:before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: -30px; /* Adjust according to label padding */
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    border: 4px solid #F9AC4D; /* Orange border */
+    border-radius: 50%;
+    background-color: transparent;
+    box-sizing: border-box;
+}
+
+.custom-radio input[type="radio"]:checked + .radio-label:before {
+    background-color: #F9AC4D; /* Orange fill */
+    border-color: #F9AC4D;
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px; /* Spasi antar tombol di sebelah kanan */
+}
+
+.button-container button {
+    padding: 10px 20px; /* Menambahkan padding pada tombol */
+    border-radius: 15px;
+    border: 4px solid #F9AC4D;
+    background-color: transparent;
+}
+
+.button-container .cancel-button {
+    margin-right: auto; /* Menempatkan tombol Batal di kiri */
+    background-color: transparent;
+    border-radius: 15px;
+    border: 4px solid #F9AC4D;
+}
+
+
+.button-container button:hover {
+    background-color: greenyellow; /* Warna latar belakang saat di hover */
+}
+
+.button-container .cancel-button:hover {
+    background-color: red; /* Warna latar belakang saat di hover untuk tombol Batal */
+}
+
+.category-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.category-column {
+    width: 45%;
+}
+
+.category-final {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#view-nego-produk{
+    color: #FFFFFF;
+    font-style: italic;
+}
+
+.info-detail-nego {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    padding: 10px; /* Adjust padding as needed */
+    margin-bottom: 30px;
+    box-sizing: border-box; /* Ensure padding is included in the width */
+    height: 50px; /* Adjust the height as needed */
+}
+
+#header-detail-nego,
+#body-detail-nego,
+#footer-detail-nego {
+    background-color: #429EBD;
+    box-shadow: 0 2px 3px 0 #000000;
+    border-radius: 15px;
+    padding: 20px;
+    position: relative;
+    border: none;
+}
+#header-detail-nego {
+    z-index: 4; /* Ensure header is on top */
+    margin-bottom: -10px; /* Overlap body */
+}
+#body-detail-nego {
+    z-index: 2; /* Ensure body is between header and footer */
+    margin-top: 10px; /* Fix overlap with header */
+    margin-bottom: -10px; /* Overlap footer */
+    border-radius: 0 0 15px 15px; /* Rounded bottom corners only */
+}
+#footer-detail-nego {
+    z-index: 1; /* Ensure footer is on bottom */
+    margin-top: 10px; /* Fix overlap with body */
+    border-radius: 0 0 15px 15px;
+}
+
+#detail-nego-view{
+    margin-left: 20px;
+    background-color: #429EBD;
+    box-shadow: 0 4px 4px 0 #000000;
+    border-radius: 25px;
+    padding: 0;
+    padding-bottom: 80px;
+    margin-top: 20px;
+}
+
+
+.table-histori-nego{
+    border-color: transparent !important;
+    width: 100%;
+}
+
+.text-histori-aksi{
+    width: 135px !important;
+    margin: 5px;
+    background-color: #000;
+    border-radius: 5px !important;
+    text-align: center;
+    box-shadow: 2px 5px 4px 0 #000;
+}
+
+#setuju_nego,
+#setuju-nego{
+    background-color: #138900;
+}
+
+#tolak_nego,
+#batal-nego{
+    background-color: #9A0000;
+}
+
+#proses_nego,
+#nego-ulang{
+    background-color: #E58B03;
+}
+
+#view-informasi-penghasilan{
+    margin-left: 20px;
+    background-color: #429EBD;
+    box-shadow: 0 4px 4px 0 #000000;
+    border-radius: 25px;
+    padding: 0;
+    margin-top: 20px;
+    z-index: 4; /* Ensure header is on top */
+    margin-bottom: -10px; /* Overlap body */
+    font-style: italic;
+    color: #FFFFFF;
+    padding-top: 10px;
+    position: relative;
+    padding-bottom: 20px;
+}
+
+.informasi-penghasilan {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+}
+
+.informasi-penghasilan > div {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+}
+
+.informasi-penghasilan > div:nth-child(1) {
+    text-align: left;
+}
+
+.informasi-penghasilan > div:nth-child(2) {
+    text-align: left;
+}
+
+.container > div:nth-child(3) {
+}
+
+.rincian-penghasilan{
+    margin-left: 20px;
+    background-color: #429EBD;
+    box-shadow: 0 4px 4px 0 #000000;
+    border-radius: 0 0 15px 15px;
+    margin-top: 10px;
+    z-index: 10;
+    padding: 10px;
+    margin-top: -15px;
+    padding-bottom: 40px;
+    font-style: italic;
+}
+
+.dataRician{
+    margin-top: 20px;
+    color: #FFFFFF;
+}
+
+.tipe-penghasilan {
+    margin: 20px;
+    background-color: transparent;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: box-shadow 0.3s;
+}
+
+.tipe-penghasilan.active {
+    box-shadow: 0 3px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.tableDataKeuangan{
+    width: 95%;
+}
+
+.Card-rekening,.pin-rekening,
+.add-Card-rekening{
+    margin-left: 20px;
+    background-color: #429EBD;
+    box-shadow: 4px 4px 4px 0 #000000;
+    color: #FFFFFF;
+    padding: 10px;
+}
+
+.add-Card-rekening {
+    border-radius: 15px;
+    margin-top: 20px;
+    margin-bottom: -20px; /* Overlap body */
+    z-index: 5; /* Ensure it's above .Card-rekening */
+    position: relative; /* Ensure z-index works */
+}
+
+.Card-rekening {
+    border-radius: 0 0 15px 15px;
+    margin-top: 10px;
+    z-index: 4; /* Ensure body is between header and footer */
+    position: relative; /* Ensure z-index works */
+    margin-bottom: -20px; /* Overlap body */
+    display: grid;
+}
+
+.item-rekening{
+    display: flex;
+}
+
+.pin-rekening{
+    margin-top: 10px;
+    border-radius: 0 0 15px 15px;
+    position: relative; /* Ensure z-index works */
+    z-index: 3;
+}
+
+.tombol-update-pin {
+    background-color: #F9AC4D;
+    margin-right: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 4px 0 #746969;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.tombol-update-pin:hover {
+    background-color: #E89B3C;
+    box-shadow: 0 6px 6px 0 #746969;
+}
+
+.pin-input .pin-digit {
+    background-color: #e0e0e0;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 4px 4px 0 #000000;
+    font-size: 20px;
+    width: 40px;
+    margin-right: 5px;
+    margin-bottom: 10px;
+    display: inline-block;
+    border: 1px solid #ccc;
+}
+
+.pin-input {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-body .form-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#modal-update-pin{
+    background-color: #429EBD;
+    color: #FFFFFF;
+    font-style: italic;
+}
+
+#view-free-pengiriman,
+#view-address{
+    background-color: #429EBD;
+    border-radius: 15px;
+    padding: 20px;
+    margin-left: 20px;
+    margin-top: 20px;
+
+}
+
+#view-free-pengiriman{
+    color: #FFFFFF;
+    font-style: italic;
+}
+
+#simpan-oprasional,
+#header-address {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 10px; /* Optional: adjust spacing as needed */
+}
+
+#simpan-oprasional{
+    background-color: #429EBD;
+    border-radius: 0 0 15px 15px;
+    padding: 20px;
+    padding-top: 40px;
+    z-index: 2;
+    margin-left: 20px;
+    margin-top: -20px;
+    box-shadow: 0 4px 4px 0 #000;
+}
+
+.save-oprasional,.aksi-Address,.add-Address {
+    background-color: #F9AC4D; /* Example background color */
+    border: none;
+    color: white; /* Example text color */
+    padding: 5px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-style: italic;
+    font-size: 16px; /* Example font size */
+    transition: background-color 0.3s;
+}
+
+.add-Address:hover {
+    background-color: #E89B3C; /* Darker shade on hover */
+}
+
+.save-oprasional{
+    padding: 5px 10px;
+    font-size: small;
+    background-color: #F9AC4D;
+}
+
+.save-oprasional:hover{
+    background-color: #75FB4C;
+}
+
+hr {
+    border: none;
+    height: 1px;
+    width: 100%;
+    background-color: white;
+    margin-top: 0; /* Optional: adjust spacing as needed */
+}
+
+#list-aksi-address{
+    font-style: italic;
+}
+
+.aksi-Address{
+    text-align: center;
+    width: 250px;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+    margin-right: 20px;
+}
+
+#main-address{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; /* Optional: Align items at the start of the flex container */
+    margin-bottom: 20px; /* Optional: Adjust spacing as needed */
+}
+
+#list-address{
+    font-style: italic;
+    color: #FFFFFf;
+}
+
+#view-jasa-pengiriman,
+#view-toko-cuti {
+    color: #FFFFFF;
+    font-style: italic;
+    background-color: #429EBD;
+    border-radius: 15px;
+    padding: 20px;
+    margin-left: 20px;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    z-index: 10;
+    box-shadow: 0 4px 4px 0 #000;
+    justify-content: space-between;
+    position: relative; /* Add relative positioning */
+}
+
+#detail-jasa{
+    font-style: italic;
+    color: #FFFFFF;
+    z-index: 2;
+    background-color: #429EBD;
+    border-radius: 0 0 15px 15px;
+    padding: 20px;
+    margin-left: 20px;
+    margin-top: -10px;
+    top: -20px;
+    box-shadow: 0 4px 4px 0 #000;
+}
+
+#detail-oprasional {
+    font-style: italic;
+    color: #FFFFFF;
+    z-index: 2;
+    background-color: #429EBD;
+    border-radius: 0 0 15px 15px;
+    padding: 20px;
+    margin-left: 20px;
+    box-shadow: 0 4px 4px 0 #000;
+    justify-content: space-between;
+    position: relative; /* Add relative positioning */
+    top: -10px; /* Adjust positioning to stack elements */
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    height: 13px; /* Tinggi pointernya */
+    width: 52px; /* Lebar pointernya */
+    top: 7px;
+    left: -1px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    background-color: transparent;
+    border: 4px solid #ccc;
+    transition: .4s;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 25px; /* Tinggi pointernya */
+    width: 22px; /* Lebar pointernya */
+    left: -2px;
+    bottom: -10px;
+    background-color: white;
+    transition: .3s;
+  }
+
+  input:checked + .slider {
+    border-color: #75FB4C;
+  }
+
+  input:checked + .slider:before {
+    transform: translateX(26px);
+    background-color: #75FB4C;
+  }
+
+  input:not(:checked) + .slider {
+    border-color: red;
+  }
+
+  input:not(:checked) + .slider:before {
+    background-color: red;
+  }
+
+  .slider.round {
+    border-radius: 34px;
+  }
+
+  .slider.round:before {
+    border-radius: 50%;
+  }
+
+  #item-oprasional,
+  #view-oprasional {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+#item-oprasional{
+    padding:0 20px;
+}
+
+#item-oprasional > div,
+#view-oprasional > div {
+    margin-right: 20px; /* Optional, for spacing between left items */
+}
+
+#item-oprasional > div:last-child,
+#view-oprasional > div:last-child {
+    margin-right: 0; /* Ensure no margin on the last item */
+    margin-left: auto; /* Push the last item to the far right */
+}
+
+.input-underline {
+    border: none;
+    border-bottom: 2px solid white;
+    padding: 5px;
+    outline: none;
+    background-color: transparent;
+}
+
+.input-underline:focus {
+    border-bottom: 2px solid black;
+}
+
+ /* Text Next to Slider */
+ .switch-label {
+    margin-left: 5px;
+    font-size: 18px;
+}
+
+.container-health {
+    font-style: italic;
+    margin-top: 20px;
+    color: #FFFFFF;
+}
+
+.top-view-info, .top-view-health, .center-view-health, .bottom-view-health {
+    background-color: #429EBD;
+    border-radius: 15px;
+    margin-left: 20px;
+    box-shadow: 0 4px 4px 0 #000;
+    padding: 20px;
+    width: calc(100% - 40px); /* Adjust width as needed */
+}
+
+.top-view-health {
+    position: relative; /* or absolute if it needs to be positioned relative to the nearest positioned ancestor */
+    z-index: 20; /* Ensure header is on top */
+    top: 0; /* Adjust to the desired position */
+    display: flex;
+    /* justify-content: center; */
+    /* align-items: center; */
+    flex-wrap: wrap;
+}
+
+.top-view-info {
+    position: relative; /* or absolute if it needs to be positioned relative to the nearest positioned ancestor */
+    z-index: 20; /* Ensure header is on top */
+    top: 0; /* Adjust to the desired position */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* flex-wrap: wrap; */
+}
+
+.center-view-health {
+    position: relative; /* or absolute depending on your layout needs */
+    z-index: 16; /* Ensure body is between header and footer */
+    margin-top: -20px; /* Pull up to create the overlap with .top-view-health */
+    border-radius: 0 0 15px 15px;
+}
+
+.bottom-view-health {
+    position: relative; /* or absolute depending on your layout needs */
+    z-index: 12; /* Place behind .center-view-health */
+    margin-top: -25px; /* Pull up to create the overlap with .center-view-health */
+    border-radius: 0 0 15px 15px;
+    top: 20px; /* Adjust to create the desired overlap, or remove if positioning via margin-top */
+}
+
+
+select#satuan, select#kondisi, select#jenis_produk {
+    background-color: #429EBD !important;
+    color: white !important; /* Atur warna teks agar terlihat di background biru */
+    padding: 5px !important; /* Beri sedikit padding */
+}
+
+.info-data {
+    display: flex;
+    justify-content: space-between; /* Membuat ruang antara elemen kiri dan kanan */
+    align-items: flex-start; /* Menyelaraskan elemen di atas */
+    flex-wrap: wrap; /* Memastikan elemen tidak hancur pada ukuran layar yang lebih kecil */
+    gap: 20px; /* Memberikan jarak antara elemen kiri dan kanan */
+    /* margin-left: 10px; */
+    margin-top: 20px;
+}
+
+.view-info-left, .view-info-right {
+    background-color: #429EBD;
+    margin-top: -30px;
+    box-shadow: 4px 4px 4px 0 #000;
+    padding: 20px;
+    border-radius: 0 0 15px 15px;
+    font-style: italic;
+    color: white;
+    font-size: 16px;
+    height: 800px;
+    min-height: 700px;
+    overflow: auto;
+}
+
+.view-info-left {
+    z-index: 16;
+    flex: 1 1 54%;
+    margin-left: 20px;
+}
+
+.view-info-right {
+    z-index: 12; /* Tetap lebih rendah dari .view-info-left */
+    flex: 1 1 40%; /* Mengatur lebar elemen kanan agar menyesuaikan dengan ukuran layar */
+    margin-left: -30px;
+    margin-right: 20px;
+}
+
+.card-item--info {
+    background-color: #F9AC4D;
+    width: 180px;
+    align-items: center;
+    padding: 10px;
+    margin-right: 20px;
+    box-shadow: 0 4px 6px 0 #000;
+    border-radius: 10px;
+    color: #FFFFFF;
+    font-style: italic;
+    font-size: 18px;
+}
+
+
+.horizontal-list-shadow {
+    list-style-type: none; /* Remove default bullet points */
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 0; /* Remove default padding */
+    margin: 0; /* Remove default margin */
+    display: flex; /* Use flexbox to arrange items horizontally */
+    height: 50px;
+    align-items: center; /* Center items vertically */
+}
+
+.horizontal-list-shadow li {
+    display: inline-block;
+    padding: 10px 20px; /* Adjust padding for better spacing */
+    margin-right: 10px; /* Add spacing between items */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    color: #ffffff; /* Default text color */
+    transition: all 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.horizontal-list-shadow li.active {
+    font-weight: bold; /* Make the active item more prominent */
+    color: #ffffff; /* Change text color for the active item */
+    /* background-color: #F9AC4D; Background color for active item */
+    border-radius: 5px; /* Rounded corners for active item */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3); /* Add shadow below the active item */
+}
+
+
+.horizontal-list-shadow li:hover {
+    font-weight: bold; /* Make the active item more prominent */
+    color: #ffffff; /* Change text color for the active item */
+    /* background-color: #F9AC4D; Background color for active item */
+    border-radius: 5px; /* Rounded corners for active item */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3); /* Add shadow below the active item */
+}
+
+.data-faq{
+    border-radius: 25px !important;
+    background-color: #429EBD;
+    padding: 10px ;
+    margin-left: 20px;
+    margin-top: 10px;
+    color: #ffffff;
+}
+
+.text-faq{
+    margin-left: 10px;
+}
+
+.text-faq >p {
+    font-size: small;
+}
+
+.text-faq > h6 {
+    font-size: 20px;
+}
+
+.garis-putih {
+    border: 0;
+    height: 1px;
+    background: white;
+    margin: 20px 0; /* Adjust margin as needed */
+}
+
+.bintang {
+    cursor: pointer;
+    color: gold;
+}
+
+.list-rates{
+    margin-left: 40px;
+    margin-top: 10px;
+}
+
+.data-rate{
+    margin-left: 20px;
+    margin-top: 30px;
+}
+
+.data-auto-reply, .data-auto-reply-offline {
+    background-color: #429EBD;
+    margin-left: 20px;
+    padding: 10px;
+    box-shadow: 4px 4px 4px 0 #000;
+    border-radius: 25px;
+    color: #FFFFFF;
+    position: relative; /* Set position relative for z-index to work */
+}
+
+.message-chat {
+    margin-left: 20px;
+    width: 100%;
+}
+
+.data-auto-reply {
+    margin-top: 20px;
+    z-index: 16;
+}
+
+.data-auto-reply-offline {
+    margin-top: -20px; /* Overlap with .data-auto-reply */
+    z-index: 14; /* Lower z-index to sit below .data-auto-reply */
+    border-radius: 0 0 25px 25px; /* Adjust border-radius to match overlap effect */
+    padding-top: 30px;
+}
+
+.button-yellow {
+    background-color: #F9AC4D; /* Warna kuning */
+    color: #FFFFFF; /* Warna teks putih */
+    border: none; /* Menghilangkan border */
+    padding: 10px 20px; /* Jarak dalam tombol */
+    border-radius: 5px; /* Sudut melengkung */
+    cursor: pointer; /* Pointer saat hover */
+    font-size: 16px; /* Ukuran font */
+    margin-left: 90%; /* Geser tombol ke kanan */
+    display: inline-block; /* Menjaga tombol dalam satu baris */
+}
+
+/* Tombol Simpan - Hijau */
+.button-green {
+    background-color: #28A745; /* Warna hijau */
+    color: #FFFFFF; /* Warna teks putih */
+    border: none; /* Menghilangkan border */
+    padding: 10px 20px; /* Jarak dalam tombol */
+    border-radius: 5px; /* Sudut melengkung */
+    cursor: pointer; /* Pointer saat hover */
+    font-size: 16px; /* Ukuran font */
+    margin-left: 10px; /* Spasi antar tombol */
+}
+
+/* Tombol Batal - Merah */
+.button-red {
+    background-color: #DC3545; /* Warna merah */
+    color: #FFFFFF; /* Warna teks putih */
+    border: none; /* Menghilangkan border */
+    padding: 10px 20px; /* Jarak dalam tombol */
+    border-radius: 5px; /* Sudut melengkung */
+    cursor: pointer; /* Pointer saat hover */
+    font-size: 16px; /* Ukuran font */
+    margin-left: 10px; /* Spasi antar tombol */
+}
+
+/* Efek hover untuk semua tombol */
+.button-yellow:hover,
+.button-green:hover,
+.button-red:hover {
+    opacity: 0.8; /* Efek transparansi saat hover */
+}
+
+.data-alamat-toko {
+    position: relative; /* Mengatur posisi relatif untuk mendukung z-index */
+    z-index: 12;
+    margin-top: -20px; /* Mengatur jarak vertikal */
+    border-radius: 0 0 25px 25px; /* Radius border hanya di bagian bawah */
+    background-color: #429EBD;
+    border-radius: 0 0 25px 25px;
+    padding-right: 10px !important;
+    box-shadow: 4px 4px 4px 0 #000;
+    margin-left: 20px !important;
+    color: #FFFFFF;
+}
+
+.data-profile,.etalase-toko {
+    position: relative; /* Mengatur posisi relatif untuk mendukung z-index */
+    z-index: 16; /* Lebih tinggi dari .data-alamat-toko */
+    background-color: #429EBD;
+    border-radius: 25px;
+    padding-right: 10px !important;
+    box-shadow: 4px 4px 4px 0 #000;
+    margin-left: 20px !important;
+}
+
+.profile-toko {
+    display: flex;
+    margin-top: 0px !important;
+    justify-content: space-between;
+}
+
+.profile-toko > div {
+    padding: 10px;
+}
+
+.profile-toko > div:first-child {
+    background-color: #429EBD; /* Gaya tambahan untuk memvisualisasikan */
+    width: 40%;
+    box-shadow: 4px 4px 4px 0 #000;
+    border-radius: 25px !important;
+    margin: 0px !important;
+}
+
+.profile-toko > div:last-child {
+    width: 55%;
+}
+
+.card-profile-priview, .card-profile {
+    width: 100%;
+    box-shadow: 4px 4px 4px 0 #000;
+    position: relative;
+    top: 0;
+    left: 0;
+    background-size: cover;
+    border-radius: 25px !important;
+    background-color: rgba(255, 255, 255, 0.6); /* Transparansi hanya pada background-color */
+    overflow: hidden; /* Agar elemen tidak keluar dari radius border */
+}
+
+.card-profile-priview::before, .card-profile::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 25px !important;
+    width: 100%;
+    height: 100%;
+    z-index: 1; /* Menempatkan layer transparan di belakang teks */
+    background-color: rgba(255, 255, 255, 0.6);
+}
+
+.text-profile {
+    position: relative;
+    z-index: 2; /* Agar teks tetap berada di atas lapisan transparan */
+    display: flex;
+    color: #000; /* Warna teks tetap hitam agar kontras dengan background */
+    padding: 15px; /* Menambahkan padding agar teks tidak mepet */
+    background-color: rgba(255, 255, 255, 0.8); /* Tambahkan background semi-transparan untuk teks agar lebih terbaca */
+    border-radius: 15px; /* Berikan sedikit radius pada konten teks */
+}
+
+.text-profile img {
+    margin-right: 15px; /* Berikan jarak antara gambar dan teks */
+    height: 80%;
+}
+
+.text-profile h2 {
+    margin: 0;
+}
+
+.text-profile p, .text-profile span {
+    margin: 0;
+    line-height: 1.4;
+}
+
+.info-toko-profile {
+    display: flex;
+    justify-content: space-between; /* Elemen pertama di kiri, elemen terakhir di kanan */
+    align-items: center; /* Menyelaraskan elemen secara vertikal */
+    width: 90%;
+    margin-left: 20px;
+    color: white;
+    font-size: large;
+    margin-right: 20px;
+}
+
+.garisPutihPoint {
+    position: relative;
+    width: 100%;
+    height: 2px;
+    background-color: white;
+}
+
+.garisPutihPoint::before, .garisPutihPoint::after {
+    content: '';
+    position: absolute;
+    width: 10px;  /* Ukuran point */
+    height: 10px; /* Ukuran point */
+    background-color: white;
+    border-radius: 50%; /* Membuatnya menjadi lingkaran */
+}
+
+.garisPutihPoint::before {
+    left: 0; /* Point di ujung kiri */
+    top: -4px; /* Sesuaikan posisi vertikal agar tepat berada di tengah garis */
+}
+
+.garisPutihPoint::after {
+    right: 0; /* Point di ujung kanan */
+    top: -4px; /* Sesuaikan posisi vertikal agar tepat berada di tengah garis */
+}
+
+.list-data-diri-toko{
+    color: #fff !important;
+}
+
+.large-bullet-list {
+    list-style: none; /* Hapus bullet default */
+    padding-left: 0; /* Hilangkan padding default */
+}
+
+.large-bullet-list li {
+    position: relative;
+    margin-bottom: 35px;
+    padding-left: 25px; /* Beri ruang untuk bullet point kustom */
+}
+
+.large-bullet-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 4px; /* Sesuaikan posisi vertikal */
+    width: 18px; /* Ukuran bullet point */
+    height: 18px; /* Ukuran bullet point */
+    background-color: white; /* Warna bullet point */
+    border-radius: 50%; /* Membuatnya menjadi lingkaran */
+}
+
+.large-bullet-list li > h4{
+    font-size: x-large;
+}
+
+.document-profile-toko{
+    margin-top: 40px;
+    margin-left: 20px;
+    color: white;
+}
+
+.box-shadow {
+    font-weight: bold; /* Make the active item more prominent */
+    border-radius: 5px; /* Rounded corners for active item */
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.3); /* Adjust shadow to be below the item */
+    display: inline-block;
+    margin-right: 10px; /* Add spacing between items */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    color: #ffffff; /* Default text color */
+    transition: all 0.3s ease; /* Smooth transition for hover effect */
+    background-color: transparent;
+}
+
+.box-shadow:hover {
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.4); /* Make shadow larger on hover */
+}
+
+
+.file-profile-toko {
+    background-color: #E58B03;
+    border-radius: 15px;
+    padding: 0 15px; /* Menggunakan padding horizontal saja */
+    margin-right: 10px !important;
+    height: 40px;
+    font-size: larger;
+    width: 150px;
+    line-height: 40px; /* Set line-height sama dengan height untuk vertikal center */
+    text-align: center; /* Horizontal center */
+    color: white; /* Warna teks agar kontras dengan latar belakang */
+    cursor: pointer; /* Menambahkan kursor pointer untuk interaktivitas */
+}
+
+
+.profile-alamat-toko{
+    margin-left: 20px;
+    padding: 20px;
+    padding-top: 60px;
+}
+
+.img-banner-toko{
+    height: 120px;
+    width: 320px;
+    border-radius: 15px;
+    background-color: #F9AC4D;
+    margin-right: 20px;
+}
+
+.mini-banner-toko{
+    display: flex;
+    justify-content: space-between; /* Elemen pertama di kiri, elemen terakhir di kanan */
+    align-items: center;
+}
+
+.box-shadow >a{
+    color: white !important;;
+    text-decoration: none;
+}
+
+.password-container {
+    position: relative;
+    display: inline-block;
+}
+.password-container input {
+    padding-right: 30px; /* Space for the eye icon */
+}
+.password-container .toggle-eye {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.btn-tambah-etalase{
+    background-color: #F9AC4D;
+    border-radius: 10px;
+    padding: 10px 20px;
+    border: none;
+    margin-right: 40px;
+    color: #DFF7FF; /* Tambahan agar teks terlihat lebih baik */
+    cursor: pointer;
+    margin-bottom: 20px;
+    margin-left: 88%;
+    font-size: 18px;
+    box-shadow: 0px 4px 6px 0px #000;
+}
+
+.btn-etalase{
+    background-color: #F9AC4D;
+    width: 170px !important;
+    border-radius: 10px;
+    padding: 5px 10px;
+    border: none;
+    margin-left: 10px;
+    color: #DFF7FF;
+    box-shadow: 0px 4px 6px 0px #000;
+}
+
+.detail-transaksi{
+    /* background-color: #429EBD; */
+    border-radius: 15px;
+    position: relative; /* Tambahkan ini untuk mengatur posisi */
+    margin-left: 20px;
+    padding: 0 0 10px 0;
+    margin-top: 20px;
+}
+
+.batas-pengerjaan{
+    margin: 5px;
+    background-color: yellow !important;
+    border: #ffffff;
+    padding: 5px;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px 0px #000;
+}
+
+.warning-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.warning-text i {
+    font-size: 24px;
+}
+
+.date-pengerjaan {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.right-text {
+    text-align: right;
+}
+
+.aksi-invoice {
+    position: relative;
+    background-color: #429EBD;
+    /* border: 1px solid #dddddd; */
+    padding: 10px;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px 0px #000;
+    color: #fff;
+    z-index: 5; /* Pastikan di atas .detail-pengiriman */
+}
+
+.detail-pengiriman {
+    position: relative; /* Posisi relatif untuk tumpukan */
+    background-color: #429EBD;
+    /* border: 1px solid #dddddd; */
+    padding: 20px;
+    border-radius: 0 0 15px 15px;
+    margin-top: -10px;
+    box-shadow: 0 4px 6px 0px #000;
+    color: #ffff;
+    z-index: 4; /* Pastikan di bawah .aksi-invoice */
+}
+
+.aksi-file-transaksi{
+    position: relative; /* Posisi relatif untuk tumpukan */
+    background-color: #429EBD;
+    /* border: 1px solid #dddddd; */
+    padding: 25px;
+    border-radius: 0 0 15px 15px;
+    margin-top: -10px;
+    box-shadow: 0 4px 6px 0px #000;
+    color: #ffff;
+    z-index: 3; /* Pastikan di bawah .aksi-invoice */
+    display: flex; /* Gunakan Flexbox untuk tata letak tombol */
+    justify-content: center; /* Pusatkan tombol secara horizontal */
+    gap: 10px; /* Jarak antar tombol */
+}
+
+.aksi-file-transaksi a {
+    color: #fff; /* Pastikan teks tombol berwarna putih */
+    text-decoration: none; /* Hapus garis bawah pada teks */
+    padding: 10px 15px; /* Tambahkan padding pada tombol */
+    border-radius: 5px; /* Sudut membulat pada tombol */
+}
+
+.detail-produk-transaksi{
+    position: relative; /* Posisi relatif untuk tumpukan */
+    background-color: #429EBD;
+    /* border: 1px solid #dddddd; */
+    padding: 20px;
+    border-radius: 0 0 15px 15px;
+    margin-top: -10px;
+    box-shadow: 0 4px 6px 0px #000;
+    color: #ffff;
+    z-index: 2; /* Pastikan di bawah .aksi-invoice */
+}
+
+.detail-seller-transaksi{
+    position: relative; /* Posisi relatif untuk tumpukan */
+    background-color: #429EBD;
+    /* border: 1px solid #dddddd; */
+    padding: 20px;
+    border-radius: 0 0 15px 15px;
+    margin-top: -10px;
+    box-shadow: 0 4px 6px 0px #000;
+    color: #ffff;
+    z-index: 1; /* Pastikan di bawah .aksi-invoice */
+}
+
+.detail-pembayaran-transaksi{
+    position: relative; /* Posisi relatif untuk tumpukan */
+    background-color: #429EBD;
+    /* border: 1px solid #dddddd; */
+    padding: 20px;
+    border-radius: 0 0 15px 15px;
+    margin-top: -10px;
+    box-shadow: 0 4px 6px 0px #000;
+    color: #ffff;
+    z-index: 0; /* Pastikan di bawah .aksi-invoice */
+}
+
+.groups-register{
+    display: flex;
+    gap: 20px;
+    width: 100%;
+}
+.custom-file-upload {
+    display: inline-block;
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border-radius: 4px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.custom-file-upload:hover {
+    background-color: #0056b3;
+}
+
+.position-relative {
+    position: relative;
+}
+
+.position-absolute {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}

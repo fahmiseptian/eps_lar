@@ -14,10 +14,11 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 class Products extends Model implements HasMedia
 {
     use HasFactory, Notifiable, InteractsWithMedia;
-    protected $appends = ['artwork_url_lg','artwork_url_md','artwork_url_sm'];
+    protected $appends = ['artwork_url_lg', 'artwork_url_md', 'artwork_url_sm'];
 
     protected $table = 'products';
     protected $hidden = ['media'];
+    public $timestamps = false;
     protected $fillable = [
         'name',
         'sku',
@@ -34,6 +35,12 @@ class Products extends Model implements HasMedia
         'status_delete',
         'status_lpse',
         'is_pdn',
+        'id_satuan',
+        'id_tipe',
+        'dimension_length',
+        'dimension_width',
+        'dimension_high	',
+        'spesifikasi',
     ];
 
     public function registerMediaCollections(): void
@@ -136,16 +143,22 @@ class Products extends Model implements HasMedia
         return $artworkUrls;
     }
 
-    public function countProductByIdShop($id_shop, $where) {
+    public function countProductByIdShop($id_shop, $where = null)
+    {
+        $query = self::where('id_shop', $id_shop)
+            ->where('status_delete', 'N');
 
-		return self::where('id_shop', $id_shop)
-                   ->where('status_delete', 'N')
-                   ->where($where)
-                   ->select('id')
-                   ->count();
-	}
+        if ($where !== null) {
+            // Tambahkan kondisi tambahan jika $where tidak null
+            $query->where($where);
+        }
 
-    public function getproduct($perPage = 10) {
+        return $query->select('id')->count();
+    }
+
+
+    public function getorderproduct($perPage = 10)
+    {
         return self::select(
             'products.*',
             'lp.price_lpse as hargaTayang',
@@ -153,29 +166,64 @@ class Products extends Model implements HasMedia
             's.id as idToko',
             'p.province_name'
         )
-        ->leftJoin('lpse_price as lp', 'products.id', '=', 'lp.id_product')
-        ->leftJoin('shop as s', 'products.id_shop', '=', 's.id')
-        ->leftJoin('member_address as ma', 's.id_address', '=', 'ma.member_address_id')
-        ->leftJoin('province as p', 'ma.province_id', '=', 'p.province_id')
-        ->where('products.status_display', 'Y')
-        ->where('products.status_delete', 'N')
-        ->where('s.status', 'active')
-        ->orderBy('products.id', 'DESC')
-        ->distinct()
-        ->paginate($perPage);
+            ->leftJoin('lpse_price as lp', 'products.id', '=', 'lp.id_product')
+            ->leftJoin('shop as s', 'products.id_shop', '=', 's.id')
+            ->leftJoin('member_address as ma', 's.id_address', '=', 'ma.member_address_id')
+            ->leftJoin('province as p', 'ma.province_id', '=', 'p.province_id')
+            ->where('products.status_display', 'Y')
+            ->where('products.status_delete', 'N')
+            ->where('s.status', 'active')
+            ->orderBy('products.id', 'DESC')
+            ->distinct()
+            ->paginate($perPage);
     }
 
-    function getDataProduct($id_product){
+    function getDataProduct($id_product)
+    {
         return self::select(
             'products.*',
             'lp.price_lpse as hargaTayang',
+            'pc.name'
         )
-        ->join('lpse_price as lp', 'products.id', '=', 'lp.id_product')
-        ->where('products.id',$id_product)
-        ->first();
+            ->join('lpse_price as lp', 'products.id', '=', 'lp.id_product')
+            ->join('product_category as pc', 'products.id_category', '=', 'pc.id')
+            ->where('products.id', $id_product)
+            ->first();
     }
 
-    public function getProductByIdShop($id_shop) {
+    function getproduct($id_product)
+    {
+        // Query utama
+        $query = DB::table('products as p')
+            ->select(
+                'p.*',
+                'pc.barang_kena_ppn',
+                'lp.price_lpse',
+                'pv.id as id_video',
+                'pv.link',
+                'b.name as brand_name',
+                DB::raw('(select GROUP_CONCAT(image300) from product_image where id_product = p.id) as images'),
+                DB::raw('(select name from product_category where id = p.id_category) as name_lvl3'),
+                DB::raw('(select parent_id from product_category where id = p.id_category) as id_lvl2'),
+                DB::raw('(select code from product_category where id = id_lvl2) as code_lvl2'),
+                DB::raw('(select name from product_category where id = id_lvl2) as name_lvl2'),
+                DB::raw('(select parent_id from product_category where id = id_lvl2) as id_lvl1'),
+                DB::raw('(select code from product_category where id = id_lvl1) as code_lvl1'),
+                DB::raw('(select name from product_category where id = id_lvl1) as name_lvl1')
+            )
+            ->leftJoin('brand as b', 'b.id', 'p.id_brand')
+            ->leftJoin('product_video as pv', 'pv.id_product', '=', 'p.id')
+            ->leftJoin('product_category as pc', 'pc.id', '=', 'p.id_category')
+            ->leftJoin('lpse_price as lp', 'lp.id_product', '=', 'p.id')
+            ->where('p.status_delete', 'N')
+            ->where('p.id', $id_product);
+
+        $results = $query->first();
+        return $results;
+    }
+
+    public function getProductByIdShop($id_shop)
+    {
         return self::select(
             'products.*',
             'lp.price_lpse as hargaTayang',
@@ -183,18 +231,19 @@ class Products extends Model implements HasMedia
             's.id as idToko',
             'p.province_name'
         )
-        ->join('lpse_price as lp', 'products.id', '=', 'lp.id_product')
-        ->join('shop as s', 'products.id_shop', '=', 's.id')
-        ->join('member_address as ma', 's.id_address', '=', 'ma.member_address_id')
-        ->join('province as p', 'ma.province_id', '=', 'p.province_id')
-        ->where('products.status_display','Y')
-        ->where('products.status_delete','N')
-        ->where('s.status','active')
-        ->where('s.id', $id_shop)
-        ->get();
+            ->join('lpse_price as lp', 'products.id', '=', 'lp.id_product')
+            ->join('shop as s', 'products.id_shop', '=', 's.id')
+            ->join('member_address as ma', 's.id_address', '=', 'ma.member_address_id')
+            ->join('province as p', 'ma.province_id', '=', 'p.province_id')
+            ->where('products.status_display', 'Y')
+            ->where('products.status_delete', 'N')
+            ->where('s.status', 'active')
+            ->where('s.id', $id_shop)
+            ->get();
     }
 
-    public function getproductById($id){
+    public function getproductById($id)
+    {
         return self::select(
             'products.*',
             'lp.price_lpse as hargaTayang',
@@ -204,30 +253,31 @@ class Products extends Model implements HasMedia
             'p.province_name',
             'b.name as merek'
         )
-        ->join('lpse_price as lp', 'products.id', '=', 'lp.id_product')
-        ->join('shop as s', 'products.id_shop', '=', 's.id')
-        ->join('member_address as ma', 's.id_address', '=', 'ma.member_address_id')
-        ->join('province as p', 'ma.province_id', '=', 'p.province_id')
-        ->join('brand as b', 'products.id_brand', '=', 'b.id')
-        ->where('products.id',$id)
-        ->first();
+            ->join('lpse_price as lp', 'products.id', '=', 'lp.id_product')
+            ->join('shop as s', 'products.id_shop', '=', 's.id')
+            ->join('member_address as ma', 's.id_address', '=', 'ma.member_address_id')
+            ->join('province as p', 'ma.province_id', '=', 'p.province_id')
+            ->join('brand as b', 'products.id_brand', '=', 'b.id')
+            ->where('products.id', $id)
+            ->first();
     }
 
-    public function get5ProductByIdShop($id_shop) {
+    public function get5ProductByIdShop($id_shop)
+    {
         return self::select(
             'products.*',
         )
-        ->join('shop as s', 'products.id_shop', '=', 's.id')
-        ->where('s.id', $id_shop)
-        ->inRandomOrder() // Urutkan hasil secara acak
-        ->take(5) // Ambil 5 data
-        ->get();
+            ->join('shop as s', 'products.id_shop', '=', 's.id')
+            ->where('s.id', $id_shop)
+            ->inRandomOrder() // Urutkan hasil secara acak
+            ->take(5) // Ambil 5 data
+            ->get();
     }
 
     public function countproductTerjualbyId($id_shop)
     {
         return self::where('id_shop', $id_shop)
-                ->sum('count_sold');
+            ->sum('count_sold');
     }
 
     public function getProductbyEtalase($id_etalase)
@@ -241,20 +291,21 @@ class Products extends Model implements HasMedia
             's.id as idToko',
             'p.province_name'
         )
-        ->join('lpse_price as lp', 'products.id', '=', 'lp.id_product')
-        ->join('shop as s', 'products.id_shop', '=', 's.id')
-        ->join('member_address as ma', 's.id_address', '=', 'ma.member_address_id')
-        ->join('province as p', 'ma.province_id', '=', 'p.province_id')
-        ->where('products.status_display','Y')
-        ->where('products.status_delete','N')
-        ->where('s.status','active')
-        ->whereIn('products.id', $productIds)
-        ->get();
+            ->join('lpse_price as lp', 'products.id', '=', 'lp.id_product')
+            ->join('shop as s', 'products.id_shop', '=', 's.id')
+            ->join('member_address as ma', 's.id_address', '=', 'ma.member_address_id')
+            ->join('province as p', 'ma.province_id', '=', 'p.province_id')
+            ->where('products.status_display', 'Y')
+            ->where('products.status_delete', 'N')
+            ->where('s.status', 'active')
+            ->whereIn('products.id', $productIds)
+            ->get();
 
         return $products;
     }
 
-    public function getProductTerbaruByIdshop($id_shop) {
+    public function getProductTerbaruByIdshop($id_shop)
+    {
         $products = self::select(
             'products.*',
             'lp.price_lpse as hargaTayang',
@@ -262,21 +313,22 @@ class Products extends Model implements HasMedia
             's.id as idToko',
             'p.province_name'
         )
-        ->join('lpse_price as lp', 'products.id', '=', 'lp.id_product')
-        ->join('shop as s', 'products.id_shop', '=', 's.id')
-        ->join('member_address as ma', 's.id_address', '=', 'ma.member_address_id')
-        ->join('province as p', 'ma.province_id', '=', 'p.province_id')
-        ->where('products.status_display','Y')
-        ->where('products.status_delete','N')
-        ->where('s.status','active')
-        ->where('products.id_shop',$id_shop)
-        ->orderBy('products.created_at', 'desc')
-        ->get();
+            ->join('lpse_price as lp', 'products.id', '=', 'lp.id_product')
+            ->join('shop as s', 'products.id_shop', '=', 's.id')
+            ->join('member_address as ma', 's.id_address', '=', 'ma.member_address_id')
+            ->join('province as p', 'ma.province_id', '=', 'p.province_id')
+            ->where('products.status_display', 'Y')
+            ->where('products.status_delete', 'N')
+            ->where('s.status', 'active')
+            ->where('products.id_shop', $id_shop)
+            ->orderBy('products.created_at', 'desc')
+            ->get();
 
         return $products;
     }
 
-    public function GetKategoryProductByIdshoplavel1($id_shop) {
+    public function GetKategoryProductByIdshoplavel1($id_shop)
+    {
         $categories = DB::table('products')
             ->select('pc.id', 'pc.name')
             ->join('product_category as pc', 'products.id_category', '=', 'pc.id')
@@ -288,7 +340,8 @@ class Products extends Model implements HasMedia
         return $categories;
     }
 
-    public function GetKategoryProductByIdshoplavel2($id_shop) {
+    public function GetKategoryProductByIdshoplavel2($id_shop)
+    {
         $categories = DB::table('products')
             ->select('pc.id', 'pc.name')
             ->join('product_category as pc', 'products.id_category', '=', 'pc.id')
@@ -300,7 +353,8 @@ class Products extends Model implements HasMedia
         return $categories;
     }
 
-    public function GetKategoryProductByIdshoplavel3($id_shop) {
+    public function GetKategoryProductByIdshoplavel3($id_shop)
+    {
         $categories = DB::table('products')
             ->select('pc.id', 'pc.name')
             ->join('product_category as pc', 'products.id_category', '=', 'pc.id')
@@ -312,7 +366,8 @@ class Products extends Model implements HasMedia
         return $categories;
     }
 
-    public function GetProductByKategoriandIdShop($id_kategori,$id_shop){
+    public function GetProductByKategoriandIdShop($id_kategori, $id_shop)
+    {
         $products = self::select(
             'products.*',
             'lp.price_lpse as hargaTayang',
@@ -320,57 +375,184 @@ class Products extends Model implements HasMedia
             's.id as idToko',
             'p.province_name'
         )
-        ->join('lpse_price as lp', 'products.id', '=', 'lp.id_product')
-        ->join('shop as s', 'products.id_shop', '=', 's.id')
-        ->join('member_address as ma', 's.id_address', '=', 'ma.member_address_id')
-        ->join('province as p', 'ma.province_id', '=', 'p.province_id')
-        ->where('products.status_display','Y')
-        ->where('products.status_delete','N')
-        ->where('s.status','active')
-        ->where('products.id_shop',$id_shop)
-        ->where('products.id_category',$id_kategori)
-        ->get();
+            ->join('lpse_price as lp', 'products.id', '=', 'lp.id_product')
+            ->join('shop as s', 'products.id_shop', '=', 's.id')
+            ->join('member_address as ma', 's.id_address', '=', 'ma.member_address_id')
+            ->join('province as p', 'ma.province_id', '=', 'p.province_id')
+            ->where('products.status_display', 'Y')
+            ->where('products.status_delete', 'N')
+            ->where('s.status', 'active')
+            ->where('products.id_shop', $id_shop)
+            ->where('products.id_category', $id_kategori)
+            ->get();
 
         return $products;
     }
 
-    function getProductDetail($id_product){
+    function getProductDetail($id_product)
+    {
         $query = self::select(
             'products.*',
             'pc.barang_kena_ppn'
         )
-        ->leftJoin('product_category as pc', 'pc.id', '=', 'products.id_category')
-        ->where('products.id', $id_product)
-        ->first();
+            ->leftJoin('product_category as pc', 'pc.id', '=', 'products.id_category')
+            ->where('products.id', $id_product)
+            ->first();
 
         $image = $query->artwork_url_sm['0'];
-        $query->image =$image;
-
-        return $query ;
-    }
-
-    function getproductactivebyId_shop($id_shop){
-        return self::select(
-            'products.name',
-            'products.id'
-        )
-        ->where('products.status_display','Y')
-        ->where('products.status_delete','N')
-        ->where('products.id_shop', $id_shop)
-        ->get();
-    }
-
-    function getPricewithProduct($id_product) {
-        $query  = DB::table('products as p')
-        ->select(
-            'p.price',
-            'lp.price_lpse as harga_tayang'
-        )
-        ->join('lpse_price as lp','lp.id_product','p.id')
-        ->where('p.id',$id_product)
-        ->first();
+        $query->image = $image;
 
         return $query;
     }
 
+    function getproductactivebyId_shop($id_shop)
+    {
+        return self::select(
+            'products.name',
+            'products.id'
+        )
+            ->where('products.status_display', 'Y')
+            ->where('products.status_delete', 'N')
+            ->where('products.id_shop', $id_shop)
+            ->get();
+    }
+
+    function getPricewithProduct($id_product)
+    {
+        $query  = DB::table('products as p')
+            ->select(
+                'p.price',
+                'lp.price_lpse as harga_tayang'
+            )
+            ->join('lpse_price as lp', 'lp.id_product', 'p.id')
+            ->where('p.id', $id_product)
+            ->first();
+
+        return $query;
+    }
+
+    function get_rank_produk_bySelling($id_shop)
+    {
+        $query = DB::table('products')
+            ->select([
+                'id',
+                'name as info',
+                'id_shop',
+                // 'seoname',
+                DB::raw('(SELECT SUM(qty) FROM complete_cart_shop_detail WHERE id_product = products.id) as count'),
+                'price',
+                'last_update'
+            ])
+            ->where('status_delete', 'N')
+            ->where('id_shop', $id_shop)
+            ->orderBy('count', 'desc')
+            ->get();
+
+        return $query;
+    }
+
+    function get_rank_produk_bySeen($id_shop)
+    {
+        $query = DB::table('products as p')
+            ->select([
+                'p.id',
+                'p.name as info',
+                'p.id_shop',
+                // 'p.seoname',
+                'p.price',
+                'p.last_update',
+                DB::raw('(SELECT SUM(count_view) FROM log_last_view WHERE id_product = p.id) as count')
+            ])
+            ->where('status_delete', 'N')
+            ->where('p.id_shop', $id_shop)
+            ->orderBy('count', 'desc')
+            ->get();
+
+        return $query;
+    }
+
+    public function getReviewsByIdshop($id_shop, $rating = null)
+    {
+        // Mulai query builder
+        $query = DB::table('product_review_detail as prd')
+            ->select(
+                'pr.id as id_review',
+                'prd.message',
+                'prd.created',
+                'cc.invoice',
+                'ccs.id as id_ccs',
+                'p.name',
+                'prd.send_by',
+                'pr.rating',
+                'pr.id_product'
+            )
+            ->leftJoin('product_review as pr', 'pr.id', '=', 'prd.id_product_review')
+            ->leftJoin('product as p', 'p.id', '=', 'pr.id_product')
+            ->leftJoin('complete_cart as cc', 'cc.id', '=', 'pr.id_complete_cart')
+            ->leftJoin('complete_cart_shop as ccs', 'ccs.id_cart', '=', 'cc.id')
+            ->where('p.id_shop', $id_shop);
+
+        // Tambahkan kondisi untuk rating jika ada
+        if ($rating !== null) {
+            $query->where('pr.rating', $rating);
+        }
+
+        // Ambil hasil dari query
+        $results = $query->get();
+
+        // Grupkan pesan berdasarkan id_review
+        $groupedReviews = [];
+
+        foreach ($results as $review) {
+            $id_review = $review->id_review;
+
+            // Jika id_review belum ada, buat array baru
+            if (!isset($groupedReviews[$id_review])) {
+                $groupedReviews[$id_review] = [
+                    'id_review' => $review->id_review,
+                    'name' => $review->name,
+                    'rating' => $review->rating,
+                    'invoice' => $review->invoice . '-' . $review->id_ccs,
+                    'id_product' => $review->id_product,
+                    'user_message' => null,  // Placeholder untuk user message
+                    'seller_message' => null, // Placeholder untuk seller message
+                ];
+            }
+
+            // Tentukan apakah pesan dari user atau seller
+            if ($review->send_by == 'user') {
+                $groupedReviews[$id_review]['user_message'] = [
+                    'message' => $review->message,
+                    'created' => $review->created,
+                ];
+            } elseif ($review->send_by == 'seller') {
+                $groupedReviews[$id_review]['seller_message'] = [
+                    'message' => $review->message,
+                    'created' => $review->created,
+                ];
+            }
+        }
+
+        // Ubah hasil menjadi array
+        $finalResult = array_values($groupedReviews);
+
+        // Return data sebagai JSON
+        return response()->json($finalResult);
+    }
+
+    function getCountRatingShop($id_shop)
+    {
+        $averageRatings = DB::table('product_review as pr')
+            ->leftJoin('products as p', 'pr.id_product', '=', 'p.id')
+            ->select(
+                DB::raw('ROUND(SUM(pr.rating) / NULLIF(COUNT(pr.rating), 0), 1) as average_rating')
+            )
+            ->where('p.id_shop', $id_shop)
+            ->value('average_rating');
+
+
+        return $averageRatings;
+    }
+
 }
+

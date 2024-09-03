@@ -33,7 +33,7 @@ class HomememberController extends Controller
     }
 
     public function index() {
-        $products= Products::getproduct(12);
+        $products= Products::getorderproduct(12);
         $this->data['id_user']=$this->user_id;
 
         // return response()->json(["products"=>$products]);

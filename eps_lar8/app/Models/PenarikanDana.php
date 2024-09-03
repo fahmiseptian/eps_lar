@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class PenarikanDana extends Model
 {
@@ -34,5 +35,21 @@ class PenarikanDana extends Model
         ]);
 
         return $penarikanDana->id;
+    }
+
+    public function detail_penarikan($id_penarikan, $id_shop){
+        $query = DB::table('penarikan_dana as pd')
+        ->select(
+            'pd.id as id_penarikan',
+            'pd.total',
+            'pd.status',
+            'r.invoice',
+        )
+        ->join('penarikan_dana_detail as pdd', 'pd.id', '=', 'pdd.id_penarikan_dana')
+        ->join('revenue as r', 'pdd.id_revenue', '=', 'r.id')
+        ->where('pd.id_shop', $id_shop)
+        ->where('pd.id', $id_penarikan)
+        ->get();
+        return $query;
     }
 }

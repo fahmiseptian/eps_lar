@@ -47,6 +47,18 @@ class DeliveryController extends Controller
         return view('seller.delivery.jasa-pengiriman', $this->data, ['datacourier'=>$datacourier]);
     }
 
+    function jasaPengiriman() {
+        $datacourier = Courier::where('status', 'Y')->get();
+
+        foreach ($datacourier as $courier) {
+            $is_checked = Shop_courier::where('id_shop', $this->seller)
+                                    ->where('id_courier', $courier->id)
+                                    ->exists();
+            $courier->checked = $is_checked;
+        }
+        return response()->json($datacourier);
+    }
+
     public function pengaturan_free()
     {
         $Province = Province::where('country_id', 1)
@@ -63,6 +75,19 @@ class DeliveryController extends Controller
         return view('seller.delivery.free-pengiriman', $this->data, ['Province' => $Province]);
     }
 
+    function freePengiriman() {
+        $Province = Province::where('country_id', 1)
+        ->orderBy('province_name', 'asc')
+        ->get();
+
+        foreach ($Province as $active) {
+            $is_check = FreeOngkir::where('id_shop', $this->seller)
+                ->where('id_province', $active->province_id)
+                ->exists();
+            $active->checked = $is_check;
+        }
+        return response()->json($Province);
+    }
 
 
     public function addCourier(Request $request)

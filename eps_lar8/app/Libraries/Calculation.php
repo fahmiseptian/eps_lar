@@ -245,7 +245,7 @@ class Calculation
         // $int_rounded = -3;
 
         // NOTE menggunakan ceil
-        $int_rounded = 1000;
+        // $int_rounded = 1000;
         $config = Lpse_config::first();
 
         $harga_input_vendor = $dataArr['harga'] ?? 0 ?: 0;
@@ -268,6 +268,12 @@ class Calculation
             $pph = $config->pph;
         } else {
             $pph = $dataArr['pph'];
+        }
+
+        if (!isset($dataArr['int_rounded'])) {
+            $int_rounded = 1000;
+        } else {
+            $int_rounded = $dataArr['int_rounded'];
         }
 
         $ppn = $ppn / 100;

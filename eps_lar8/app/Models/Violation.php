@@ -20,5 +20,5 @@ class Violation extends Model
             $query = $query->where($where);
         }
         return $query->count();
-    }   
+    }
 }

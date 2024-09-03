@@ -181,9 +181,6 @@ function updateTypeUp(id) {
 
 function updateTypeDown(id) {
     loading();
-
-    console.log("Shop ID:", id);
-
     $.ajax({
         url: baseUrl + "/admin/shop/" + id + "/update-type-down",
         type: "GET",
@@ -212,7 +209,7 @@ var toggleButtons = document.querySelectorAll(".is_top");
 toggleButtons.forEach(function(button) {
     button.addEventListener("click", function() {
         var shopId = this.getAttribute("data-shop-id");
-        
+
         loading();
 
         // Kirim permintaan AJAX untuk memperbarui nilai is_top
@@ -377,10 +374,10 @@ function showFormulaDialog(pphValue, ppnValue, feeMPValue) {
                 input.addEventListener('input', function(event) {
                     // Ambil nilai input saat ini
                     var value = event.target.value;
-                    
+
                     // Hilangkan karakter yang bukan angka atau koma dari nilai input
                     var sanitizedValue = value.replace(/[^0-9,]/g, '');
-                    
+
                     // Update nilai input dengan nilai yang sudah disaring
                     event.target.value = sanitizedValue;
                 });
@@ -465,7 +462,7 @@ $(document).on("click", "#formula-saved", function () {
                         var pphValue = parseFloat(formula.pph).toLocaleString('id-ID');
                         var ppnValue = parseFloat(formula.ppn).toLocaleString('id-ID');
                         var feeMPValue = parseFloat(formula.fee_mp_percent).toLocaleString('id-ID');
-        
+
                         // Memuat dialog "Formula Price" dengan nilai yang diperbarui
                         showFormulaDialog(pphValue, ppnValue, feeMPValue);
                     } else {
@@ -589,7 +586,7 @@ function detailProduct(id, name) {
 
     window.loadProducts = function(page) {
         loading();
-    
+
         $.ajax({
             url: baseUrl + "/admin/shop/" + id + "/product/",
             method: "GET",
@@ -611,7 +608,7 @@ function detailProduct(id, name) {
                     });
                     return;
                 }
-    
+
                 var htmlContent = '<table class="table">';
                 htmlContent +=
                     '<thead><tr><th rowspan="2">Nama</th><th rowspan="2">Tanggal Update</th><th rowspan="2">Stok</th><td align="center" colspan="2"> <b> Action </b> </td></tr>';
@@ -641,7 +638,7 @@ function detailProduct(id, name) {
                         "</tr>";
                 });
                 htmlContent += "</tbody></table>";
-    
+
                 Swal.fire({
                     title: "Detail Produk - " + name,
                     html: htmlContent,
@@ -675,9 +672,9 @@ function detailProduct(id, name) {
                             paginationHtml += '<button class="disabled">Next</button>';
                         }
                         paginationHtml += '</div>';
-                        
+
                         paginationHtml += '<p>Showing ' + ((currentPage - 1) * 10 + 1) + ' to ' + Math.min(currentPage * 10, totalRecords) + ' of ' + totalRecords + ' entries</p>';
-    
+
                         // Menambahkan tombol paginasi ke dalam SweetAlert
                         $(".swal2-html-container").append(paginationHtml);
                     }

@@ -80,6 +80,7 @@
     </div><!-- ./wrapper -->
 </body>
 {{-- footer --}}
+@include('seller.product.modal')
 @include('seller.asset.footer')
 
 <!-- page script -->

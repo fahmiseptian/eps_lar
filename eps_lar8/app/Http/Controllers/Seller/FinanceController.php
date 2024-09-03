@@ -23,17 +23,22 @@ class FinanceController extends Controller
     protected $seller;
     protected $data;
     protected $menu;
+    protected $Model;
     protected $verificationService;
 
     public function __construct(Request $request)
     {
-        $this->seller 	= $request->session()->get('seller_id');
+        $this->seller     = $request->session()->get('seller_id');
+
+        $this->Model['saldo'] = new Saldo();
+        $this->Model['Rekening'] = new Rekening();
+        $this->Model['shop'] = new Shop();
 
         $sellerType     = Shop::getTypeById($this->seller);
-        $saldoPending   = Saldo::calculatePendingSaldo($this->seller);
-        $saldoSuccess   = Saldo::calculateSuccessSaldo($this->seller);
-        $rekening       = Rekening::getDefaultRekeningByShop($this->seller);
-        $rekNdefault    = Rekening::JumlahRekeningIsDefaultN($this->seller);
+        $saldoPending   =  $this->Model['saldo']->calculatePendingSaldo($this->seller);
+        $saldoSuccess   =  $this->Model['saldo']->calculateSuccessSaldo($this->seller);
+        $rekening       = $this->Model['Rekening']->getDefaultRekeningByShop($this->seller);
+        $rekNdefault    = $this->Model['Rekening']->JumlahRekeningIsDefaultN($this->seller);
         $this->verificationService = new VerificationService;
 
         // Membuat $this->data
@@ -42,38 +47,68 @@ class FinanceController extends Controller
         $this->data['saldo'] = $saldoPending;
         $this->data['saldoSelesai'] = $saldoSuccess;
         $this->data['rekening'] = $rekening;
-        $this->data['jmlRekNdefault'] = $rekNdefault;
+        $this->data['jmlRekening'] = $rekNdefault;
+
+        $this->Model['Penarikan_Dana'] = new PenarikanDana();
     }
 
     public function index()
     {
-        $Pendingsaldo   = Saldo::Pendingsaldo($this->seller);
-        $Successsaldo   = Saldo::Successsaldo($this->seller);
-        return view('seller.finance.index',$this->data,['dataSuccess'=>$Successsaldo,'dataPending'=>$Pendingsaldo]);
+        return view('seller.finance.index');
+    }
+
+    public function showPenghasilan()
+    {
+        $Pendingsaldo   = $this->Model['saldo']->Pendingsaldo($this->seller);
+        return response()->json(['data' => $this->data, 'Pendingsaldo' => $Pendingsaldo]);
+    }
+
+    function Successsaldo()
+    {
+        $Successsaldo   = $this->Model['saldo']->Successsaldo($this->seller);
+        return response()->json(['data' => $this->data, 'Pendingsaldo' => $Successsaldo]);
+    }
+
+    function PenarikanDana()
+    {
+        $PenarikanDana   = $this->Model['Penarikan_Dana']->getPenarikanDana($this->seller);
+        return response()->json(['data' => $this->data, 'PenarikanDana' => $PenarikanDana]);
     }
 
     public function showSaldo()
     {
-        $PenarikanDana   = PenarikanDana::getPenarikanDana($this->seller);
-        return view('seller.finance.saldo',$this->data,['PenarikanDana'=>$PenarikanDana]);
+        $PenarikanDana   = $this->Model['Penarikan_Dana']->getPenarikanDana($this->seller);
+        return view('seller.finance.saldo', $this->data, ['saldo' => $PenarikanDana]);
     }
 
     public function showRekening()
     {
         $allBanks           = Bank::all();
         $rekeningNotdefault = Rekening::getRekeningByShopAndIsDefaultN($this->seller);
-        return view('seller.finance.rekening',$this->data,['rekeningNotdefault'=>$rekeningNotdefault,'Banks'=>$allBanks]);
+        return view('seller.finance.rekening', $this->data, ['rekeningNotdefault' => $rekeningNotdefault, 'Banks' => $allBanks]);
+    }
+
+    function getbank()
+    {
+        $allBanks           = Bank::all();
+        return response()->json($allBanks);
+    }
+
+    function rekeningNotdefault()
+    {
+        $rekeningNotdefault = $this->Model['Rekening']->getRekeningByShopAndIsDefaultN($this->seller);
+        return response()->json(['data' => $this->data, 'rekeningNotdefault' => $rekeningNotdefault]);
     }
 
     public function showPembayaran()
     {
-        return view('seller.finance.pembayaran',$this->data);
+        return view('seller.finance.pembayaran', $this->data);
     }
 
     public function getRekeningById($id)
     {
         $rekeningbyId       = Rekening::getRekeningById($id, $this->seller);
-        return response()->json(['data_rekening_seller' => $rekeningbyId ]);
+        return response()->json(['data_rekening_seller' => $rekeningbyId]);
     }
 
     public function updateRekening(Request $request)
@@ -96,8 +131,8 @@ class FinanceController extends Controller
 
         // Ambil data rekening berdasarkan ID yang diberikan
         $rekening = Rekening::where('id', $request->input('id'))
-                            ->where('id_shop', $this->seller) // Gantilah dengan ID shop yang sesuai
-                            ->first();
+            ->where('id_shop', $this->seller) // Gantilah dengan ID shop yang sesuai
+            ->first();
 
         // Perbarui data rekening
         if ($rekening) {
@@ -122,8 +157,8 @@ class FinanceController extends Controller
     public function deleteRekening($id)
     {
         $rekening = Rekening::where('id', $id)
-                        ->where('id_shop', $this->seller)
-                        ->first();
+            ->where('id_shop', $this->seller)
+            ->first();
         if ($rekening) {
             $rekening->is_deleted = 'Y';
             $rekening->save();
@@ -144,6 +179,8 @@ class FinanceController extends Controller
             'kotaKabupaten' => 'required|string|max:255',
         ]);
 
+        $update = DB::table('rekening')->where('id_shop', $this->seller)->update(['is_default' => 'N']);
+
         // Buat data rekening baru
         $rekening = new Rekening([
             'rek_owner' => $request->nama,
@@ -152,7 +189,8 @@ class FinanceController extends Controller
             'rek_location' => $request->cabangBank,
             'rek_city' => $request->kotaKabupaten,
             'id_shop' => $this->seller,
-            'created_dt'=>Carbon::now()
+            'is_default' => 'Y',
+            'created_dt' => Carbon::now()
         ]);
 
         // Simpan rekening baru
@@ -169,7 +207,7 @@ class FinanceController extends Controller
         $idShop = $this->seller;
 
         // Lakukan pembaruan dalam transaksi untuk menjaga konsistensi data
-        DB::transaction(function() use ($rekeningId, $idShop) {
+        DB::transaction(function () use ($rekeningId, $idShop) {
             Rekening::where('id_shop', $idShop)
                 ->where('is_default', 'Y')
                 ->update(['is_default' => 'N']);
@@ -188,9 +226,9 @@ class FinanceController extends Controller
     public function sendVerificationCode(Request $request)
     {
         $id_userbyShop = Shop::where('id', $this->seller)
-                        ->value('id_user');
+            ->value('id_user');
         $email = Member::where('id', $id_userbyShop)
-                ->value('email');
+            ->value('email');
         $result = $this->verificationService->sendVerificationCode($email);
         return response()->json($result);
     }
@@ -198,9 +236,9 @@ class FinanceController extends Controller
     public function verifyCode(Request $request)
     {
         $id_userbyShop = Shop::where('id', $this->seller)
-                        ->value('id_user');
+            ->value('id_user');
         $email = Member::where('id', $id_userbyShop)
-                ->value('email');
+            ->value('email');
         $code = $request->input('code');
         $isValid = $this->verificationService->verifyCode($email, $code);
 
@@ -214,9 +252,9 @@ class FinanceController extends Controller
     public function updatePin(Request $request)
     {
         $id_userbyShop = Shop::where('id', $this->seller)
-                        ->value('id_user');
+            ->value('id_user');
         $email = Member::where('id', $id_userbyShop)
-                ->value('email');
+            ->value('email');
         $newPin = $request->input('new_pin');
 
         $result = $this->verificationService->updateNewPin($id_userbyShop, $newPin);
@@ -252,36 +290,40 @@ class FinanceController extends Controller
         }
     }
 
-    function getTraxPending(){
-        $trx = Saldo::getRevenuePending($this->seller);
+    function getTraxPending()
+    {
+        $trx = $this->Model['saldo']->getRevenuePending($this->seller);
         return response()->json(['trx' => $trx]);
     }
 
-    function RequestRevenue(Request $request){
+    function RequestRevenue(Request $request)
+    {
         $pin        = base64_encode($request->pin);
         $ids_trx    = $request->idTrx;
 
         // Checking
-        $checkPin   = Shop::getPinSaldo($this->seller);
+        $checkPin   = $this->Model['shop']->getPinSaldo($this->seller);
         $rekening   = Rekening::getDefaultRekeningByShop($this->seller);
 
         if ($checkPin == null) {
-            return response()->json(['message' => 'Anda Belum Membuat PIN '], 500);
-            exit();
+            return response()->json(['message' => 'Anda Belum Membuat PIN'], 500);
         }
 
         if ($checkPin != $pin) {
-            return response()->json(['message' => $pin], 500);
-            exit();
+            return response()->json(['message' => 'PIN salah'], 500); // Adjusted to give more meaningful message
         }
 
         if ($rekening == null) {
             return response()->json(['message' => 'Anda Belum Memiliki Rekening'], 500);
-            exit();
         }
 
-        $action = Saldo::requestRevenue($this->seller, $ids_trx);
+        $action = $this->Model['saldo']->requestRevenue($this->seller, $ids_trx);
 
-        return response()->json(['success',$action], 200);
+        return response()->json(['success' => true, 'action' => $action], 200);
+    }
+
+    function getDetailPenarikan($id_trx){
+        $data = $this->Model['Penarikan_Dana']->detail_penarikan($id_trx, $this->seller);
+        return response()->json($data);
     }
 }

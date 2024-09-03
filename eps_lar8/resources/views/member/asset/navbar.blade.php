@@ -1,4 +1,5 @@
 <!-- Header / Navbar -->
+<link href="{{ asset('/css/Seller_center.css') }}" rel="stylesheet" type="text/css" />
 <header>
     <div class="navbar">
         <div class="logo">

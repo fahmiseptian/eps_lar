@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Rekening extends Model
 {
     protected $table = 'rekening';
-    protected $primaryKey = 'id'; 
+    protected $primaryKey = 'id';
     public $timestamps = false;
 
     protected $fillable = [
@@ -17,7 +17,8 @@ class Rekening extends Model
         'rek_number',
         'rek_location',
         'rek_city',
-        'created_dt'
+        'created_dt',
+        'is_default'
         // Tambahkan kolom lain yang diperlukan
     ];
 
@@ -28,7 +29,7 @@ class Rekening extends Model
                    ->where('is_default', 'Y')
                    ->join('bank as b', 'rekening.id_bank', '=', 'b.id')
                    ->select(
-                    'rekening.id as id_rekening', 
+                    'rekening.id as id_rekening',
                     'rekening.*',
                      'b.*')
                    ->first();
@@ -48,7 +49,6 @@ class Rekening extends Model
     public static function JumlahRekeningIsDefaultN($id_shop)
     {
         return self::where('id_shop', $id_shop)
-                   ->where('is_default', 'N')
                    ->where('is_deleted', 'N')
                    ->join('bank as b', 'rekening.id_bank', '=', 'b.id')
                    ->count();

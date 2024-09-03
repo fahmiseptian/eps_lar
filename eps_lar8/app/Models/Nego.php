@@ -113,6 +113,7 @@ class Nego extends Model
     }
 
 
+
     function DetailNego($id_shop, $id_nego)
     {
         $query = DB::table('nego as n')
@@ -169,7 +170,9 @@ class Nego extends Model
                 // Update nego status_nego
                 $updatedNego = DB::table('nego')
                     ->where('id', $data['id_nego'])
-                    ->update(['status_nego' => '2']);
+                    ->update([
+                        'status_nego' => '2',
+                    ]);
 
                 if ($updatedNego > 0) {
                     // Insert new data into product_nego
@@ -193,7 +196,8 @@ class Nego extends Model
         }
     }
 
-    function acc_nego($id) {
+    function acc_nego($id)
+    {
         $dataNego = DB::table('product_nego')
             ->select('id')
             ->where('id_nego', $id)
@@ -225,39 +229,40 @@ class Nego extends Model
         }
     }
 
-    function DetailNegoByid($id_nego) {
+    function DetailNegoByid($id_nego)
+    {
         $get_nego = DB::table('nego as n')
-        ->select(
-            'n.id as id_nego',
-            'pn.id as id_nego_product',
-            'pn.id_product',
-            'n.id_shop',
-            'n.member_id',
-            'n.status as n_status',
-            'pn.status as pn_status',
-            'n.complete_checkout',
-            'n.status_nego',
-            'n.qty',
-            'pn.harga_nego',
-            'pn.base_price',
-            'pn.nominal_didapat',
-            'n.harga_awal_satuan',
-            'n.harga_awal_total',
-            'n.harga_input_seller',
-            'pn.timestamp',
-            'n.created_date',
-            'pn.update_date'
-        )
-        ->join('product_nego as pn', 'pn.id_nego', '=', 'n.id', 'left')
-        // ->where('n.member_id', $id_user) // Uncomment if needed
-        ->where('n.status', '1')
-        ->where('n.id', $id_nego)
-        ->where('pn.status', '1')
-        ->where('n.complete_checkout', '0')
-        // ->where('pn.id_product', $id_product) // Uncomment if needed
-        // ->where('pn.qty', $qty) // Uncomment if needed
-        ->limit(1)
-        ->first();
+            ->select(
+                'n.id as id_nego',
+                'pn.id as id_nego_product',
+                'pn.id_product',
+                'n.id_shop',
+                'n.member_id',
+                'n.status as n_status',
+                'pn.status as pn_status',
+                'n.complete_checkout',
+                'n.status_nego',
+                'n.qty',
+                'pn.harga_nego',
+                'pn.base_price',
+                'pn.nominal_didapat',
+                'n.harga_awal_satuan',
+                'n.harga_awal_total',
+                'n.harga_input_seller',
+                'pn.timestamp',
+                'n.created_date',
+                'pn.update_date'
+            )
+            ->join('product_nego as pn', 'pn.id_nego', '=', 'n.id', 'left')
+            // ->where('n.member_id', $id_user) // Uncomment if needed
+            ->where('n.status', '1')
+            ->where('n.id', $id_nego)
+            ->where('pn.status', '1')
+            ->where('n.complete_checkout', '0')
+            // ->where('pn.id_product', $id_product) // Uncomment if needed
+            // ->where('pn.qty', $qty) // Uncomment if needed
+            ->limit(1)
+            ->first();
 
         return $get_nego;
     }

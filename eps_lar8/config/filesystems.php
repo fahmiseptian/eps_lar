@@ -64,18 +64,94 @@ return [
 
         'file_DO' => [
             'driver' => 'local',
-            'root' => storage_path('app/public/file_DO'), // Sesuaikan dengan lokasi penyimpanan yang Anda inginkan
-            'url' => env('APP_URL').'/storage/file_DO', // URL untuk mengakses file
+            'root' => storage_path('app/public/file_DO'),
+            'url' => env('APP_URL').'/storage/file_DO',
             'visibility' => 'public',
         ],
 
         'upload_payment' => [
             'driver' => 'local',
-            'root' => storage_path('app/public/payments'), // Sesuaikan dengan lokasi penyimpanan yang Anda inginkan
-            'url' => env('APP_URL').'/storage/payments', // URL untuk mengakses file
+            'root' => storage_path('app/public/payments'),
+            'url' => env('APP_URL').'/storage/payments',
             'visibility' => 'public',
         ],
 
+        'akta_perubahan' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/akta_perubahan'),
+            'url' => env('APP_URL').'/storage/akta_perubahan',
+            'visibility' => 'public',
+        ],
+
+        'akta' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/akta_perubahan'),
+            'url' => env('APP_URL').'/storage/akta_perubahan',
+            'visibility' => 'public',
+        ],
+
+        'akta_pendirian' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/akta_pendirian'),
+            'url' => env('APP_URL').'/storage/akta_pendirian',
+            'visibility' => 'public',
+        ],
+
+        'npwp' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/npwp'),
+            'url' => env('APP_URL').'/storage/npwp',
+            'visibility' => 'public',
+        ],
+
+        'pkp' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/pkp'),
+            'url' => env('APP_URL').'/storage/pkp',
+            'visibility' => 'public',
+        ],
+
+        'ktp' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/ktp'),
+            'url' => env('APP_URL').'/storage/ktp',
+            'visibility' => 'public',
+        ],
+
+        'nib' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/nib'),
+            'url' => env('APP_URL').'/storage/nib',
+            'visibility' => 'public',
+        ],
+
+        'avatar' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/avatar'),
+            'url' => env('APP_URL').'/storage/avatar',
+            'visibility' => 'public',
+        ],
+
+        'shop_banner' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/shop_banner'),
+            'url' => env('APP_URL').'/storage/shop_banner',
+            'visibility' => 'public',
+        ],
+
+        'vidio_product' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/vidio_product'),
+            'url' => env('APP_URL').'/storage/vidio_product',
+            'visibility' => 'public',
+        ],
+
+        'faktur' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/faktur'),
+            'url' => env('APP_URL').'/storage/faktur',
+            'visibility' => 'public',
+        ],
 
         's3' => [
             'driver' => 's3',
@@ -110,8 +186,8 @@ return [
 
         'upload_payment' => [
             'driver' => 'local',
-            'root' => storage_path('app/public/payments'), // Sesuaikan dengan lokasi penyimpanan yang Anda inginkan
-            'url' => env('APP_URL').'/storage/payments', // URL untuk mengakses file
+            'root' => storage_path('app/public/payments'),
+            'url' => env('APP_URL').'/storage/payments',
             'visibility' => 'public',
         ],
 

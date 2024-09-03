@@ -122,6 +122,7 @@
     </div><!-- ./wrapper -->
 </body>
 {{-- footer --}}
+@include('seller.product.modal')
 @include('seller.asset.footer')
 <!-- page script -->
 <script src="{{ asset('/js/function/seller/product.js') }}" type="text/javascript"></script>
