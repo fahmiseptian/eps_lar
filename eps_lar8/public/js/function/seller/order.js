@@ -1404,7 +1404,7 @@ $(document).on("click", "#UploadFaktur", function () {
             formData.append("id_order_shop", id_order_shop);
 
             $.ajax({
-                url: "/api/seller/order/upload-faktur",
+                url: appUrl +  "/api/seller/order/upload-faktur",
                 method: "POST",
                 data: formData,
                 contentType: false,
