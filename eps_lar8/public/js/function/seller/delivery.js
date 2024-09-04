@@ -136,7 +136,6 @@ function addCourier(courierId) {
                 timer: 1000,
                 showConfirmButton: false
             });
-            console.log('Kurir berhasil ditambahkan');
         },
         error: function(xhr, status, error) {
             Swal.fire({
@@ -145,7 +144,6 @@ function addCourier(courierId) {
                 text: 'Gagal menambahkan kurir',
                 showConfirmButton: true
             });
-            console.error('Gagal menambahkan kurir:', error);
         },
         complete: function () {
             $("#overlay").hide(); // Sembunyikan loader setelah selesai
@@ -173,19 +171,20 @@ function removeCourier(courierId) {
                 timer: 1000,
                 showConfirmButton: false
             });
-            console.log('Kurir berhasil dihapus');
         },
         error: function(xhr, status, error) {
             Swal.fire({
                 icon: 'error',
                 title: 'Eror!',
-                text: 'Gagal menghapus kurir',
+                text: xhr.responseJSON
+                        ? xhr.responseJSON.message
+                        : `Gagal menghapus kurir`,
                 showConfirmButton: true
             });
-            console.error('Gagal menghapus kurir:', error);
+            loadData('jasa-ongkir');
         },
         complete: function () {
-            $("#overlay").hide(); // Sembunyikan loader setelah selesai
+            $("#overlay").hide();
         },
     });
 

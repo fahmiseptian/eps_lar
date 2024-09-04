@@ -193,6 +193,7 @@ class LoginSellerController extends Controller
             'nama_pemilik' => $request->nama_pemilik,
             'autoreply_standar_text' => '',
             'autoreply_offline_text' => '',
+            'registered_seller' => 1,
             'created_date' => Carbon::now()
         ];
 
@@ -218,7 +219,9 @@ class LoginSellerController extends Controller
             'last_updated_dt' => Carbon::now(),
         ];
 
-        DB::table('member_address')->insert($data_address);
+        $id_address = DB::table('member_address')->insertGetId($data_address);
+
+        DB::table('shop')->where('id', $id_shop)->update(['id_address' => $id_address]);
 
         // Proses Documentation
         $files = [
@@ -255,6 +258,16 @@ class LoginSellerController extends Controller
         DB::table('shop_config')->insert([
             'id_shop' => $id_shop,
         ]);
+
+        $couriers = DB::table('courier')->select('*')->where('status','Y')->get();
+
+        foreach ($couriers as $courier) {
+            $data = [
+                'id_shop' => $id_shop,
+                'id_courier' => $courier->id,
+            ];
+            DB::table('shop_courier')->insert($data);
+        }
 
         return response()->json(['message' => 'Seller Berhasil Terdaftar'], 200);
     }

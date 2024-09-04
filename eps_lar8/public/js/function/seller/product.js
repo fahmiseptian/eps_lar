@@ -1124,53 +1124,96 @@ function activateEventListeners() {
     }
 
     function handleSave(status) {
-        var formData = new FormData();
+        // Collect all required data
+        var name = $("#nama").val();
+        var kategorilevel1 = $("#kategori").attr("data-idlv1");
+        var kategorilevel2 = $("#kategori").attr("data-idlv2");
+        var id_brand = $("#getbrands").data("id");
+        var spesifikasi = $("#spesifikasi").val();
+        var price = unformatRupiah($("#harga").val());
+        var price_exclude = unformatRupiah($("#tayangNPPn").val());
+        var PPn = unformatRupiah($("#tayangYPPn").val());
+        var price_lpse = unformatRupiah($("#tayangYPPn").val());
+        var stock = $("#stok").val();
+        var id_satuan = $("#satuan").val();
+        var id_jenis_produk = $("#jenis_produk").val();
+        var weight = $("#berat").val();
+        var dimension_length = $("#pangjang").val();
+        var dimension_width = $("#lebar").val();
+        var dimension_high = $("#tinggi").val();
+        var status_preorder = $('input[name="preorder"]:checked').val();
+        var is_pdn = $('input[name="pdn"]:checked').val();
+        var status_new_product = $("#kondisi").val();
+        var sku = $("#sku").val();
 
-        // Append text data
-        formData.append("name", $("#nama").val());
-        formData.append("kategorilevel1", $("#kategori").attr("data-idlv1"));
-        formData.append("kategorilevel2", $("#kategori").attr("data-idlv2"));
-        formData.append("id_brand", $("#getbrands").data("id"));
-        formData.append("spesifikasi", $("#spesifikasi").val());
-        formData.append("price", unformatRupiah($("#harga").val()));
-        formData.append(
-            "price_exclude",
-            unformatRupiah($("#tayangNPPn").val())
-        );
-        formData.append("PPn", unformatRupiah($("#tayangYPPn").val()));
-        formData.append("price_lpse", unformatRupiah($("#tayangYPPn").val()));
-        formData.append("stock", $("#stok").val());
-        formData.append("id_satuan", $("#satuan").val());
-        formData.append("id_jenis_produk", $("#jenis_produk").val());
-        formData.append("weight", $("#berat").val());
-        formData.append("dimension_length", $("#pangjang").val());
-        formData.append("dimension_width", $("#lebar").val());
-        formData.append("dimension_high", $("#tinggi").val());
-        formData.append(
-            "status_preorder",
-            $('input[name="preorder"]:checked').val()
-        );
-        formData.append("is_pdn", $('input[name="pdn"]:checked').val());
-        formData.append("status_new_product", $("#kondisi").val());
-        formData.append("sku", $("#sku").val());
-        formData.append("status_display", status);
-
-        // Append files
-        var videoInput = $("#vidio-input")[0].files;
+        // Validate required fields
+        if (
+            !name ||
+            !kategorilevel1 ||
+            !kategorilevel2 ||
+            !id_brand ||
+            !spesifikasi ||
+            !price ||
+            !stock ||
+            !id_satuan ||
+            !id_jenis_produk ||
+            !weight ||
+            !dimension_length ||
+            !dimension_width ||
+            !dimension_high ||
+            !status_preorder ||
+            !is_pdn ||
+            !status_new_product
+        ) {
+            Swal.fire({
+                icon: "warning",
+                title: "Lengkapi Data",
+                text: "Tolong lengkapi semua data yang diperlukan!",
+            });
+            return; // Stop further execution
+        }
 
         // Check if at least one image is uploaded
-        // if (photoInput.length === 0) {
-        //     Swal.fire({
-        //         icon: "error",
-        //         title: "Error",
-        //         text: "Please upload at least one image.",
-        //     });
-        //     return;
-        // }
+        if (Object.keys(uploadedFiles).length === 0) {
+            Swal.fire({
+                icon: "warning",
+                title: "Upload Foto",
+                text: "Tolong upload minimal satu foto!",
+            });
+            return; // Stop further execution
+        }
 
+        // Proceed with appending data and sending the AJAX request
+        var formData = new FormData();
+        formData.append("name", name);
+        formData.append("kategorilevel1", kategorilevel1);
+        formData.append("kategorilevel2", kategorilevel2);
+        formData.append("id_brand", id_brand);
+        formData.append("spesifikasi", spesifikasi);
+        formData.append("price", price);
+        formData.append("price_exclude", price_exclude);
+        formData.append("PPn", PPn);
+        formData.append("price_lpse", price_lpse);
+        formData.append("stock", stock);
+        formData.append("id_satuan", id_satuan);
+        formData.append("id_jenis_produk", id_jenis_produk);
+        formData.append("weight", weight);
+        formData.append("dimension_length", dimension_length);
+        formData.append("dimension_width", dimension_width);
+        formData.append("dimension_high", dimension_high);
+        formData.append("status_preorder", status_preorder);
+        formData.append("is_pdn", is_pdn);
+        formData.append("status_new_product", status_new_product);
+        formData.append("sku", sku);
+        formData.append("status_display", status);
+
+        // Append images
         for (const key in uploadedFiles) {
             formData.append("images[]", uploadedFiles[key]);
         }
+
+        // Append videos
+        var videoInput = $("#vidio-input")[0].files;
 
         for (var j = 0; j < videoInput.length; j++) {
             console.log("Video name:", videoInput[j].name);

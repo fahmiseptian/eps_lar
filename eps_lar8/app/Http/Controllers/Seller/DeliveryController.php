@@ -11,6 +11,7 @@ use App\Models\Shop_courier;
 use App\Models\Province;
 use App\Models\FreeOngkir;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DeliveryController extends Controller
 {
@@ -22,7 +23,7 @@ class DeliveryController extends Controller
 
     public function __construct(Request $request)
     {
-        $this->seller 	= $request->session()->get('seller_id');
+        $this->seller     = $request->session()->get('seller_id');
 
         $sellerType     = Shop::getTypeById($this->seller);
         $saldoPending   = Saldo::calculatePendingSaldo($this->seller);
@@ -39,21 +40,22 @@ class DeliveryController extends Controller
 
         foreach ($datacourier as $courier) {
             $is_checked = Shop_courier::where('id_shop', $this->seller)
-                                    ->where('id_courier', $courier->id)
-                                    ->exists();
+                ->where('id_courier', $courier->id)
+                ->exists();
             $courier->checked = $is_checked;
         }
 
-        return view('seller.delivery.jasa-pengiriman', $this->data, ['datacourier'=>$datacourier]);
+        return view('seller.delivery.jasa-pengiriman', $this->data, ['datacourier' => $datacourier]);
     }
 
-    function jasaPengiriman() {
+    function jasaPengiriman()
+    {
         $datacourier = Courier::where('status', 'Y')->get();
 
         foreach ($datacourier as $courier) {
             $is_checked = Shop_courier::where('id_shop', $this->seller)
-                                    ->where('id_courier', $courier->id)
-                                    ->exists();
+                ->where('id_courier', $courier->id)
+                ->exists();
             $courier->checked = $is_checked;
         }
         return response()->json($datacourier);
@@ -62,8 +64,8 @@ class DeliveryController extends Controller
     public function pengaturan_free()
     {
         $Province = Province::where('country_id', 1)
-        ->orderBy('province_name', 'asc')
-        ->get();
+            ->orderBy('province_name', 'asc')
+            ->get();
 
         foreach ($Province as $active) {
             $is_check = FreeOngkir::where('id_shop', $this->seller)
@@ -75,10 +77,11 @@ class DeliveryController extends Controller
         return view('seller.delivery.free-pengiriman', $this->data, ['Province' => $Province]);
     }
 
-    function freePengiriman() {
+    function freePengiriman()
+    {
         $Province = Province::where('country_id', 1)
-        ->orderBy('province_name', 'asc')
-        ->get();
+            ->orderBy('province_name', 'asc')
+            ->get();
 
         foreach ($Province as $active) {
             $is_check = FreeOngkir::where('id_shop', $this->seller)
@@ -110,14 +113,19 @@ class DeliveryController extends Controller
         $courierId = $request->input('courierId');
         $shopId = $this->seller;
 
-        Shop_courier::where('id_shop', $shopId)
-            ->where('id_courier', $courierId)
-            ->delete();
+        $jml_courier = DB::table('shop_courier')->select('*')->where('id_shop', $shopId)->count();
 
-        return response()->json(['success' => true]);
+        if ($jml_courier > 1) {
+            Shop_courier::where('id_shop', $shopId)
+                ->where('id_courier', $courierId)
+                ->delete();
+                return response()->json(['success' => true]);
+        }
+        return response()->json(['message' => 'Minimal 1 Jasa pengiriman'], 500);
     }
 
-    public function addfreeCourier(Request $request) {
+    public function addfreeCourier(Request $request)
+    {
         $id_province = $request->input('id_province');
         $shopId = $this->seller;
         $currentDateTime = Carbon::now();
@@ -144,7 +152,8 @@ class DeliveryController extends Controller
         return response()->json(['success' => true]);
     }
 
-    function get_packingDay(){
+    function get_packingDay()
+    {
         $id_shop = $this->seller;
         $packing = Shop::get_estimasiPacking($id_shop);
         return $packing;
@@ -164,5 +173,4 @@ class DeliveryController extends Controller
         $shop->save();
         return response()->json(['message' => 'Estimasi packing berhasil diperbarui'], 200);
     }
-
 }
