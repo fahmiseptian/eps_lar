@@ -64,19 +64,16 @@
                     <form id="login_form_step2_modal">
                         <div id="form_modal" data-email="0" data-password="0"></div>
                         <div class="mb-3">
-                            <label for="dropdown1" class="form-label">Dropdown 1</label>
                             <select class="form-select" id="instansi" name="instansi">
                                 <option value="" selected disabled>Pilih Instansi</option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="dropdown2" class="form-label">Dropdown 2</label>
                             <select class="form-select" id="satker" name="satker">
                                 <option value="" selected disabled>Pilih Satker</option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="dropdown3" class="form-label">Dropdown 3</label>
                             <select class="form-select" id="bidang" name="bidang">
                                 <option value="" selected>Pilih Bidang</option>
                             </select>

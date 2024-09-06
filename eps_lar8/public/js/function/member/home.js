@@ -2,6 +2,7 @@
 const bannerItems = document.querySelectorAll(".banner-item");
 const productItems = document.querySelectorAll(".productdetail-item");
 let slides;
+var timeout;
 
 // Pilih slides berdasarkan elemen yang ditemukan
 if (bannerItems.length > 0) {
@@ -147,19 +148,17 @@ images.forEach((image) => {
 });
 
 // detail toko
-$(document).ready(function () {
-    $("#menu-list li").click(function () {
-        $("#menu-list li").removeClass("active");
-        $(this).addClass("active");
+$("#menu-list li").click(function () {
+    $("#menu-list li").removeClass("active");
+    $(this).addClass("active");
 
-        if ($(this).attr("id") === "dashboard-tab") {
-            $("#dashboard-content").show();
-            $("#product-content").hide();
-        } else if ($(this).attr("id") === "product-tab") {
-            $("#dashboard-content").hide();
-            $("#product-content").show();
-        }
-    });
+    if ($(this).attr("id") === "dashboard-tab") {
+        $("#dashboard-content").show();
+        $("#product-content").hide();
+    } else if ($(this).attr("id") === "product-tab") {
+        $("#dashboard-content").hide();
+        $("#product-content").show();
+    }
 });
 
 $(document).on("click", "#list-etalase", function () {
@@ -463,114 +462,171 @@ function generateviewtransaksiheader() {
     return html;
 }
 
-
 function generateDataDetailorderHeader(data) {
     var html = '<div class="detail-transaksi">';
     data.detail.forEach(function (item) {
         html +=
             '<div id="nomor-inv">' +
-                '<b>' + data.invoice + '-' + item.id + '</b>' +
-            '</div>' +
+            "<b>" +
+            data.invoice +
+            "-" +
+            item.id +
+            "</b>" +
+            "</div>" +
             '<div id="status-payment">' +
-                '<p>' + data.status + '</p>' +
-            '</div>' +
-        '</div>' +
-        '<div class="alamat-penerima">' +
+            "<p>" +
+            data.status +
+            "</p>" +
+            "</div>" +
+            "</div>" +
+            '<div class="alamat-penerima">' +
             '<div id="header-alamat-penerima">' +
-                '<p><span class="material-icons">location_on</span> Alamat Pengiriman</p>' +
-            '</div>' +
+            '<p><span class="material-icons">location_on</span> Alamat Pengiriman</p>' +
+            "</div>" +
             '<div class="detail-alamat-penerima">' +
-                '<div class="item-alamat-penerima">' +
-                    '<b>' + (data.buyyer.instansi ? data.buyyer.instansi : 'No Department') + '</b>' +
-                    '<b>' + data.buyyer.nama_penerima + '&nbsp;| ' + data.buyyer.phone_penerima + '</b>' +
-                '</div>' +
-                '<div class="item-alamat-penerima">' +
-                    '<b>' + data.buyyer.nama + '</b>' +
-                    '<p>' +
-                        data.buyyer.alamat_penerima + '<br>' +
-                        data.buyyer.district_penerima + ', ' + data.buyyer.kota_penerima + '<br>' +
-                        data.buyyer.provinsi_penerima + ', ID ' + data.buyyer.kode_pos_penerima +
-                    '</p>' +
-                '</div>' +
-            '</div>' +
-        '</div>' +
-        '<div class="data-transaksi-penjual">' +
+            '<div class="item-alamat-penerima">' +
+            "<b>" +
+            (data.buyyer.instansi ? data.buyyer.instansi : "No Department") +
+            "</b>" +
+            "<b>" +
+            data.buyyer.nama_penerima +
+            "&nbsp;| " +
+            data.buyyer.phone_penerima +
+            "</b>" +
+            "</div>" +
+            '<div class="item-alamat-penerima">' +
+            "<b>" +
+            data.buyyer.nama +
+            "</b>" +
+            "<p>" +
+            data.buyyer.alamat_penerima +
+            "<br>" +
+            data.buyyer.district_penerima +
+            ", " +
+            data.buyyer.kota_penerima +
+            "<br>" +
+            data.buyyer.provinsi_penerima +
+            ", ID " +
+            data.buyyer.kode_pos_penerima +
+            "</p>" +
+            "</div>" +
+            "</div>" +
+            "</div>" +
+            '<div class="data-transaksi-penjual">' +
             '<div class="item-transaksi-penjual">' +
-                '<div class="row">' +
-                    '<div class="label"><b>Penjual</b></div>' +
-                    '<div class="pemisah">:</div>' +
-                    '<div class="value">' + item.nama_pt + '</div>' +
-                '</div>' +
-                '<div class="row">' +
-                    '<div class="label"><b>NPWP</b></div>' +
-                    '<div class="pemisah">:</div>' +
-                    '<div class="value">' + item.npwp + '</div>' +
-                '</div>' +
-                '<div class="row">' +
-                    '<div class="label"><b>Tanggal Dibuat</b></div>' +
-                    '<div class="pemisah">:</div>' +
-                    '<div class="value">' + data.created_date + '</div>' +
-                '</div>' +
-                '<div class="row">' +
-                    '<div class="label"><b>Pemohon</b></div>' +
-                    '<div class="pemisah">:</div>' +
-                    '<div class="value">' + data.buyyer.nama + '</div>' +
-                '</div>' +
-                '<div class="row">' +
-                    '<div class="label"><b>Departemen</b></div>' +
-                    '<div class="pemisah">:</div>' +
-                    '<div class="value">' + (data.buyyer.instansi ? data.buyyer.instansi : 'No Department') + '</div>' +
-                '</div>' +
-                '<div class="row">' +
-                    '<div class="label"><b>Tipe Pembayaran</b></div>' +
-                    '<div class="pemisah">:</div>' +
-                    '<div class="value">' + data.pembayaran + '</div>' +
-                '</div>' +
-                '<div class="row">' +
-                    '<div class="label"><b>TOP</b></div>' +
-                    '<div class="pemisah">:</div>' +
-                    '<div class="value">' + data.jml_top + '</div>' +
-                '</div>' +
-            '</div>' +
+            '<div class="row">' +
+            '<div class="label"><b>Penjual</b></div>' +
+            '<div class="pemisah">:</div>' +
+            '<div class="value">' +
+            item.nama_pt +
+            "</div>" +
+            "</div>" +
+            '<div class="row">' +
+            '<div class="label"><b>NPWP</b></div>' +
+            '<div class="pemisah">:</div>' +
+            '<div class="value">' +
+            item.npwp +
+            "</div>" +
+            "</div>" +
+            '<div class="row">' +
+            '<div class="label"><b>Tanggal Dibuat</b></div>' +
+            '<div class="pemisah">:</div>' +
+            '<div class="value">' +
+            data.created_date +
+            "</div>" +
+            "</div>" +
+            '<div class="row">' +
+            '<div class="label"><b>Pemohon</b></div>' +
+            '<div class="pemisah">:</div>' +
+            '<div class="value">' +
+            data.buyyer.nama +
+            "</div>" +
+            "</div>" +
+            '<div class="row">' +
+            '<div class="label"><b>Departemen</b></div>' +
+            '<div class="pemisah">:</div>' +
+            '<div class="value">' +
+            (data.buyyer.instansi ? data.buyyer.instansi : "No Department") +
+            "</div>" +
+            "</div>" +
+            '<div class="row">' +
+            '<div class="label"><b>Tipe Pembayaran</b></div>' +
+            '<div class="pemisah">:</div>' +
+            '<div class="value">' +
+            data.pembayaran +
+            "</div>" +
+            "</div>" +
+            '<div class="row">' +
+            '<div class="label"><b>TOP</b></div>' +
+            '<div class="pemisah">:</div>' +
+            '<div class="value">' +
+            data.jml_top +
+            "</div>" +
+            "</div>" +
+            "</div>" +
             '<div class="item-transaksi-penjual">' +
-                '<div class="row">' +
-                    '<div class="label"><b>Untuk Keperluan</b></div>' +
-                    '<div class="pemisah">:</div>' +
-                    '<div class="value">' + (item.keperluan ? item.keperluan : '') + '</div>' +
-                '</div>' +
-                '<div class="row">' +
-                    '<div class="label"><b>Alamat Pengiriman</b></div>' +
-                    '<div class="pemisah">:</div>' +
-                    '<div class="value">' + data.buyyer.alamat_penerima + '<br>' +
-                    data.buyyer.district_penerima + ', ' + data.buyyer.kota_penerima + '<br>' +
-                    data.buyyer.provinsi_penerima + ', ID ' + data.buyyer.kode_pos_penerima + '</div>' +
-                '</div>' +
-                '<div class="row">' +
-                    '<div class="label"><b>Alamat Penagihan</b></div>' +
-                    '<div class="pemisah">:</div>' +
-                    '<div class="value">' + data.buyyer.address_biller + '<br>' +
-                    data.buyyer.district_biller + ', ' + data.buyyer.kota_biller + '<br>' +
-                    data.buyyer.provinsi_biller + ', ID ' + data.buyyer.kode_pos_biller + '</div>' +
-                '</div>' +
-                '<div class="row">' +
-                    '<div class="label"><b>Penerima</b></div>' +
-                    '<div class="pemisah">:</div>' +
-                    '<div class="value">' + data.buyyer.nama_penerima + '</div>' +
-                '</div>' +
-                '<div class="row">' +
-                    '<div class="label"><b>No Telpon Penerima</b></div>' +
-                    '<div class="pemisah">:</div>' +
-                    '<div class="value">' + data.buyyer.phone_penerima + '</div>' +
-                '</div>' +
-                '<div class="row">' +
-                    '<div class="label"><b>Pesan ke Penjual</b></div>' +
-                    '<div class="pemisah">:</div>' +
-                    '<div class="value">' + (item.pesan_seller ? item.pesan_seller : '') + '</div>' +
-                '</div>' +
-            '</div>' +
-        '</div>'
-        '<br>';
-        html +=`
+            '<div class="row">' +
+            '<div class="label"><b>Untuk Keperluan</b></div>' +
+            '<div class="pemisah">:</div>' +
+            '<div class="value">' +
+            (item.keperluan ? item.keperluan : "") +
+            "</div>" +
+            "</div>" +
+            '<div class="row">' +
+            '<div class="label"><b>Alamat Pengiriman</b></div>' +
+            '<div class="pemisah">:</div>' +
+            '<div class="value">' +
+            data.buyyer.alamat_penerima +
+            "<br>" +
+            data.buyyer.district_penerima +
+            ", " +
+            data.buyyer.kota_penerima +
+            "<br>" +
+            data.buyyer.provinsi_penerima +
+            ", ID " +
+            data.buyyer.kode_pos_penerima +
+            "</div>" +
+            "</div>" +
+            '<div class="row">' +
+            '<div class="label"><b>Alamat Penagihan</b></div>' +
+            '<div class="pemisah">:</div>' +
+            '<div class="value">' +
+            data.buyyer.address_biller +
+            "<br>" +
+            data.buyyer.district_biller +
+            ", " +
+            data.buyyer.kota_biller +
+            "<br>" +
+            data.buyyer.provinsi_biller +
+            ", ID " +
+            data.buyyer.kode_pos_biller +
+            "</div>" +
+            "</div>" +
+            '<div class="row">' +
+            '<div class="label"><b>Penerima</b></div>' +
+            '<div class="pemisah">:</div>' +
+            '<div class="value">' +
+            data.buyyer.nama_penerima +
+            "</div>" +
+            "</div>" +
+            '<div class="row">' +
+            '<div class="label"><b>No Telpon Penerima</b></div>' +
+            '<div class="pemisah">:</div>' +
+            '<div class="value">' +
+            data.buyyer.phone_penerima +
+            "</div>" +
+            "</div>" +
+            '<div class="row">' +
+            '<div class="label"><b>Pesan ke Penjual</b></div>' +
+            '<div class="pemisah">:</div>' +
+            '<div class="value">' +
+            (item.pesan_seller ? item.pesan_seller : "") +
+            "</div>" +
+            "</div>" +
+            "</div>" +
+            "</div>";
+        ("<br>");
+        html += `
         <div class="detail-product-transaksi">
             <div class="toko-info">
                 <p>${item.nama_pt}</p>
@@ -588,70 +644,106 @@ function generateDataDetailorderHeader(data) {
         item.products.forEach(function (product) {
             html +=
                 '<div class="product-item">' +
-                    // '<div class="product-number">' + (index + 1) + '.</div>' +
-                    '<div class="">' +
-                        '<img src="' + product.image + '" alt="product" width="50px" height="50px">' +
-                    '</div>' +
-                    '<div class="product-name">' + product.nama + '</div>' +
-                    '<div class="product-price">' + formatRupiah(product.price) + '</div>' +
-                    '<div class="product-quantity">' + product.qty + '</div>' +
-                    '<div class="product-total">' + formatRupiah(product.total) + '</div>'+
-                '</div>';
-                });
+                // '<div class="product-number">' + (index + 1) + '.</div>' +
+                '<div class="">' +
+                '<img src="' +
+                product.image +
+                '" alt="product" width="50px" height="50px">' +
+                "</div>" +
+                '<div class="product-name">' +
+                product.nama +
+                "</div>" +
+                '<div class="product-price">' +
+                formatRupiah(product.price) +
+                "</div>" +
+                '<div class="product-quantity">' +
+                product.qty +
+                "</div>" +
+                '<div class="product-total">' +
+                formatRupiah(product.total) +
+                "</div>" +
+                "</div>";
+        });
 
-                html +=
-                '<div class="product-item">' +
-                    // '<div class="product-number">' + (index + 1) + '.</div>' +
-                    '<div class="product-image">' +
-                        '<img src="" alt="product" width="50px" height="50">' +
-                    '</div>' +
-                    '<div class="product-name"> Ongkos Kirim' + item.deskripsi +'-'+ item.service + '('+ item.etd + ' Hari)' + '</div>' +
-                    '<div class="product-price">' + formatRupiah(item.total_shipping) + '</div>' +
-                    '<div class="product-quantity">1</div>' +
-                    '<div class="product-total">' + formatRupiah(item.total_shipping) + '</div>'+
-                '</div>';
+        html +=
+            '<div class="product-item">' +
+            // '<div class="product-number">' + (index + 1) + '.</div>' +
+            '<div class="product-image">' +
+            '<img src="" alt="product" width="50px" height="50">' +
+            "</div>" +
+            '<div class="product-name"> Ongkos Kirim' +
+            item.deskripsi +
+            "-" +
+            item.service +
+            "(" +
+            item.etd +
+            " Hari)" +
+            "</div>" +
+            '<div class="product-price">' +
+            formatRupiah(item.total_shipping) +
+            "</div>" +
+            '<div class="product-quantity">1</div>' +
+            '<div class="product-total">' +
+            formatRupiah(item.total_shipping) +
+            "</div>" +
+            "</div>";
 
-            html += '</div>' +
-        '</div>'+
-        '<div class="container">' +
-                            '<div class="row">' +
-                                '<div class="col-md-5"></div>' +
-                                '<div class="col-md-7">' +
-                                    '<div class="detail-pembayaran">' +
-                                        '<p>Subtotal Product tanpa PPN</p>' +
-                                        '<p>' + formatRupiah(item.total_barang_tanpa_PPN) + '</p>' +
-                                    '</div>' +
-                                    '<div class="detail-pembayaran">' +
-                                        '<p>Subtotal produk sebelum PPN</p>' +
-                                        '<p>' + formatRupiah(item.total_barang_dengan_PPN) + '</p>' +
-                                    '</div>' +
-                                    '<div class="detail-pembayaran">' +
-                                        '<p>Subtotal Ongkos Kirim sebelum PPN</p>' +
-                                        '<p>' + formatRupiah(item.sum_shipping) + '</p>' +
-                                    '</div>' +
-                                    '<div class="detail-pembayaran">' +
-                                        '<p>Subtotal Asuransi Pengiriman sebelum PPN</p>' +
-                                        '<p>' + formatRupiah(item.insurance_nominal) + '</p>' +
-                                    '</div>' +
-                                    '<div class="detail-pembayaran">' +
-                                        '<p>Biaya Penanganan sebelum PPN</p>' +
-                                        '<p>' + formatRupiah(item.handling_cost_non_ppn) + '</p>' +
-                                    '</div>' +
-                                    '<div class="detail-pembayaran">' +
-                                        '<p>PPN</p>' +
-                                        '<p>' + formatRupiah(item.total_ppn) + '</p>' +
-                                    '</div>' +
-                                    '<div class="total-pembayaran">' +
-                                        '<p>Grand Total</p>' +
-                                        '<p>' + formatRupiah(item.total) + '</p>' +
-                                    '</div>' +
-                                    '&nbsp;' +
-                                '</div>' +
-                            '</div>' +
-                        '</div>' +
-                    '<hr>';
+        html +=
+            "</div>" +
+            "</div>" +
+            '<div class="container">' +
+            '<div class="row">' +
+            '<div class="col-md-5"></div>' +
+            '<div class="col-md-7">' +
+            '<div class="detail-pembayaran">' +
+            "<p>Subtotal Product tanpa PPN</p>" +
+            "<p>" +
+            formatRupiah(item.total_barang_tanpa_PPN) +
+            "</p>" +
+            "</div>" +
+            '<div class="detail-pembayaran">' +
+            "<p>Subtotal produk sebelum PPN</p>" +
+            "<p>" +
+            formatRupiah(item.total_barang_dengan_PPN) +
+            "</p>" +
+            "</div>" +
+            '<div class="detail-pembayaran">' +
+            "<p>Subtotal Ongkos Kirim sebelum PPN</p>" +
+            "<p>" +
+            formatRupiah(item.sum_shipping) +
+            "</p>" +
+            "</div>" +
+            '<div class="detail-pembayaran">' +
+            "<p>Subtotal Asuransi Pengiriman sebelum PPN</p>" +
+            "<p>" +
+            formatRupiah(item.insurance_nominal) +
+            "</p>" +
+            "</div>" +
+            '<div class="detail-pembayaran">' +
+            "<p>Biaya Penanganan sebelum PPN</p>" +
+            "<p>" +
+            formatRupiah(item.handling_cost_non_ppn) +
+            "</p>" +
+            "</div>" +
+            '<div class="detail-pembayaran">' +
+            "<p>PPN</p>" +
+            "<p>" +
+            formatRupiah(item.total_ppn) +
+            "</p>" +
+            "</div>" +
+            '<div class="total-pembayaran">' +
+            "<p>Grand Total</p>" +
+            "<p>" +
+            formatRupiah(item.total) +
+            "</p>" +
+            "</div>" +
+            "&nbsp;" +
+            "</div>" +
+            "</div>" +
+            "</div>" +
+            "<hr>";
     });
-    html += '</div>';
+    html += "</div>";
     return html;
 }
 
@@ -661,16 +753,22 @@ function generateDataDetailorderMain(data) {
                 <div class="container">
                     <div class="row">
                         <div class="col-md-5">
-                            <p>Metode Pembayaran : <b>${ data.pembayaran}</b> <br> <b> Bank BNI </b> <br> <br> No Rekening <b>03975-60583</b> a/n <br> <b>PT. Elite Proxy Sistem</b> </p>
+                            <p>Metode Pembayaran : <b>${
+                                data.pembayaran
+                            }</b> <br> <b> Bank BNI </b> <br> <br> No Rekening <b>03975-60583</b> a/n <br> <b>PT. Elite Proxy Sistem</b> </p>
                         </div>
                         <div class="col-md-7">
                             <div class="detail-pembayaran">
                                 <p>Subtotal Product tanpa PPN</p>
-                                <p>${formatRupiah(data.total_barang_tanpa_PPN)}</p>
+                                <p>${formatRupiah(
+                                    data.total_barang_tanpa_PPN
+                                )}</p>
                             </div>
                             <div class="detail-pembayaran">
                                 <p>Subtotal produk sebelum PPN</p>
-                                <p>${formatRupiah(data.total_barang_dengan_PPN)}</p>
+                                <p>${formatRupiah(
+                                    data.total_barang_dengan_PPN
+                                )}</p>
                             </div>
                             <div class="detail-pembayaran">
                                 <p>Subtotal Ongkos Kirim sebelum PPN</p>
@@ -682,7 +780,9 @@ function generateDataDetailorderMain(data) {
                             </div>
                             <div class="detail-pembayaran">
                                 <p>Biaya Penanganan sebelum PPN</p>
-                                <p>${formatRupiah(data.total_handling_cost_non_ppn)}</p>
+                                <p>${formatRupiah(
+                                    data.total_handling_cost_non_ppn
+                                )}</p>
                             </div>
                             <div class="detail-pembayaran">
                                 <p>PPN</p>
@@ -696,18 +796,18 @@ function generateDataDetailorderMain(data) {
                         </div>
                     </div>
                 </div>
-                <hr>` ;
-    } else{
-        var html =`
+                <hr>`;
+    } else {
+        var html = `
         // kode html biasa
         `;
     }
-    if (data.status === 'Belum Bayar' && data.id_pembayaran !== 22) {
+    if (data.status === "Belum Bayar" && data.id_pembayaran !== 22) {
         var button_pebayaran = `
             <p class="btn btn-primary">Kembali</p>
-            <p class="btn btn-success" data-id_cart="${(data.id_cart)}" data-total="${(data.total)}" id="upload-payment">Upload Pembayaran</p>
+            <p class="btn btn-success" data-id_cart="${data.id_cart}" data-total="${data.total}" id="upload-payment">Upload Pembayaran</p>
         `;
-    } else{
+    } else {
         var button_pebayaran = `
             <p class="btn btn-primary">Kembali</p>
         `;
@@ -720,7 +820,7 @@ function generateDataDetailorderMain(data) {
                 <div class="col-md-5">
                 </div>
                 <div class="col-md-7">
-                    ${(button_pebayaran)}
+                    ${button_pebayaran}
                 </div>
             </div>
         </div>
@@ -735,11 +835,12 @@ function generateviewtransaksibody(dataArray) {
 
     dataArray.forEach(function (item) {
         if (item.status_pembayaran === 1) {
-            var status_pembayaran= 'Selesai';
-        } if (item.status_pembayaran === 0 && item.file_upload !== null) {
-            var status_pembayaran= 'Menunggu Pengecekkan Pembayaran';
-        }else {
-            var status_pembayaran= 'Belum Bayar';
+            var status_pembayaran = "Selesai";
+        }
+        if (item.status_pembayaran === 0 && item.file_upload !== null) {
+            var status_pembayaran = "Menunggu Pengecekkan Pembayaran";
+        } else {
+            var status_pembayaran = "Belum Bayar";
         }
 
         html += '<div class="item-transaksi">';
@@ -784,15 +885,14 @@ function generateviewtransaksibody(dataArray) {
             html += "</div>";
 
             var tombol;
-            if (detail.status_dari_toko === 'send_by_seller') {
+            if (detail.status_dari_toko === "send_by_seller") {
                 tombol = `<p><button class="btn btn-warning" id="pesanan-diterima" data-id_cs="${detail.id}" data-id_cart="${item.id_transaksi}" data-id_shop=${detail.id_shop} style="width:100%">Terima Pesanan</button></p>`;
-            } else if (detail.status_dari_toko === 'complete') {
+            } else if (detail.status_dari_toko === "complete") {
                 tombol = `<p><button class="btn btn-success" style="width:100%">Pesanan Telah Sampai</button></p>`;
             } else {
-                tombol = '';
+                tombol = "";
             }
-        html += tombol;
-
+            html += tombol;
         });
 
         html += '<div style="display: flex; justify-content: space-between;">';
@@ -805,10 +905,9 @@ function generateviewtransaksibody(dataArray) {
             '<p style="text-align: right">Total Harga <b>' +
             formatRupiah(item.total) +
             "</b></p>";
-        html +=
-        `
+        html += `
             <p><button class="btn btn-primary" id="detail-order" data-id_cart="${item.id_transaksi}" style="width:100%">Detail</button></p>'
-        `
+        `;
         html += "</div>";
         html += "</div>";
         html += "</div>";
@@ -885,8 +984,9 @@ $(document).on("click", "#pesanan-diterima", function () {
         method: "GET",
         success: function (response) {
             var nama_seller = response.cart_shop.nama_seller;
-            var detail_product = response.cart_shop.products.map(function (item) {
-                return `
+            var detail_product = response.cart_shop.products
+                .map(function (item) {
+                    return `
                     <tr>
                         <td style="width: 40%; text-align: left; padding: 8px; border: 1px solid #ddd;">${item.nama}</td>
                         <td style="padding: 8px; border: 1px solid #ddd;">${item.qty}</td>
@@ -898,7 +998,8 @@ $(document).on("click", "#pesanan-diterima", function () {
                         </td>
                     </tr>
                 `;
-            }).join('');
+                })
+                .join("");
             var tableHtml = `
                 <div style="margin-bottom: 10px;"><b>${nama_seller}</b></div>
                 <div style="overflow-x: auto;">
@@ -919,54 +1020,75 @@ $(document).on("click", "#pesanan-diterima", function () {
             `;
 
             Swal.fire({
-                title: 'Formulir Penerimaan',
+                title: "Formulir Penerimaan",
                 html: tableHtml,
-                confirmButtonText: 'Simpan',
-                width: window.innerWidth <= 600 ? '100%' : '40%',
+                confirmButtonText: "Simpan",
+                width: window.innerWidth <= 600 ? "100%" : "40%",
                 preConfirm: () => {
                     var qty_diterima = [];
                     var qty_dikembalikan = [];
 
                     response.cart_shop.products.forEach(function (item) {
-                        var diterima = Swal.getPopup().querySelector(`#qty_diterima_${item.id}`).value;
-                        var dikembalikan = Swal.getPopup().querySelector(`#qty_dikembalikan_${item.id}`).value;
+                        var diterima = Swal.getPopup().querySelector(
+                            `#qty_diterima_${item.id}`
+                        ).value;
+                        var dikembalikan = Swal.getPopup().querySelector(
+                            `#qty_dikembalikan_${item.id}`
+                        ).value;
 
                         if (!diterima || !dikembalikan) {
-                            Swal.showValidationMessage(`Harap mengisi semua field untuk semua produk`);
+                            Swal.showValidationMessage(
+                                `Harap mengisi semua field untuk semua produk`
+                            );
                             return;
                         }
 
-                        qty_diterima.push({ id: item.id, qty_diterima: diterima });
-                        qty_dikembalikan.push({ id: item.id, qty_dikembalikan: dikembalikan });
+                        qty_diterima.push({
+                            id: item.id,
+                            qty_diterima: diterima,
+                        });
+                        qty_dikembalikan.push({
+                            id: item.id,
+                            qty_dikembalikan: dikembalikan,
+                        });
                     });
 
-                    return { qty_diterima: qty_diterima, qty_dikembalikan: qty_dikembalikan };
-                }
+                    return {
+                        qty_diterima: qty_diterima,
+                        qty_dikembalikan: qty_dikembalikan,
+                    };
+                },
             }).then((result) => {
                 if (result.isConfirmed) {
                     var formData = new FormData();
-                    formData.append('id_cart', id_cart);
-                    formData.append('id_cs', id_cs);
-                    formData.append('qty_diterima', JSON.stringify(result.value.qty_diterima));
-                    formData.append('qty_dikembalikan', JSON.stringify(result.value.qty_dikembalikan));
+                    formData.append("id_cart", id_cart);
+                    formData.append("id_cs", id_cs);
+                    formData.append(
+                        "qty_diterima",
+                        JSON.stringify(result.value.qty_diterima)
+                    );
+                    formData.append(
+                        "qty_dikembalikan",
+                        JSON.stringify(result.value.qty_dikembalikan)
+                    );
                     $.ajax({
-                        url: appUrl + '/api/sumbitBast',
-                        type: 'POST',
+                        url: appUrl + "/api/sumbitBast",
+                        type: "POST",
                         data: formData,
                         contentType: false,
                         processData: false,
-                        success: function(response) {
+                        success: function (response) {
                             Swal.fire({
-                                title: 'Berhasil',
-                                icon: 'success'
+                                title: "Berhasil",
+                                icon: "success",
                             });
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             Swal.fire({
-                                title: 'Gagal',
-                                icon: 'error'
+                                title: "Gagal",
+                                icon: "error",
                             });
-                        }
+                        },
                     });
                 }
             });
@@ -981,7 +1103,6 @@ $(document).on("click", "#pesanan-diterima", function () {
             });
         },
     });
-
 
     // Swal.fire({
     //     title: 'Formulir Penerimaan',
@@ -1008,29 +1129,28 @@ $(document).on("click", "#pesanan-diterima", function () {
     //         formData.append('qty_diterima', result.value.qty_diterima);
     //         formData.append('qty_dikembalikan', result.value.qty_dikembalikan);
 
-            // $.ajax({
-            //     url: appUrl + '/api/sumbitBast',
-            //     type: 'POST',
-            //     data: formData,
-            //     contentType: false,
-            //     processData: false,
-            //     success: function(response) {
-            //         Swal.fire({
-            //             title: 'Berhasil',
-            //             icon: 'success'
-            //         });
-            //     },
-            //     error: function(xhr, status, error) {
-            //         Swal.fire({
-            //             title: 'Gagal',
-            //             icon: 'error'
-            //         });
-            //     }
-            // });
+    // $.ajax({
+    //     url: appUrl + '/api/sumbitBast',
+    //     type: 'POST',
+    //     data: formData,
+    //     contentType: false,
+    //     processData: false,
+    //     success: function(response) {
+    //         Swal.fire({
+    //             title: 'Berhasil',
+    //             icon: 'success'
+    //         });
+    //     },
+    //     error: function(xhr, status, error) {
+    //         Swal.fire({
+    //             title: 'Gagal',
+    //             icon: 'error'
+    //         });
+    //     }
+    // });
     //     }
     // });
 });
-
 
 $(document).on("click", "#menu-profile", function () {});
 
@@ -1059,9 +1179,9 @@ $(document).on("click", "#menu-dashboard", function () {
 });
 
 $(document).on("click", "#detail-order", function () {
-    var id_cart = $(this).data("id_cart")
+    var id_cart = $(this).data("id_cart");
     console.log(id_cart);
-    getdata(appUrl + "/api/getorder/"+ id_cart);
+    getdata(appUrl + "/api/getorder/" + id_cart);
 });
 
 function getdata(url) {
@@ -1078,7 +1198,7 @@ function getdata(url) {
                 var header = generateDataDetailorderHeader(data.order);
                 var body = generateDataDetailorderMain(data.order);
                 // console.log('masuk');
-            }else if (data.transaksi.data != null) {
+            } else if (data.transaksi.data != null) {
                 var header = generateviewtransaksiheader();
                 var body = generateviewtransaksibody(data.transaksi.data);
 
@@ -1105,17 +1225,17 @@ function getdata(url) {
     });
 }
 
-function updateqtyCart( id_cst, action, quantity = null) {
+function updateqtyCart(id_cst, action, quantity = null) {
     $.ajax({
         url: appUrl + "/api/updateqtyCart",
         method: "POST",
         data: {
             id_cst: id_cst,
-            action : action,
-            quantity : quantity,
+            action: action,
+            quantity: quantity,
         },
         success: function (response) {
-            console.log('masuk');
+            console.log("masuk");
         },
         error: function (error) {
             console.error("Terjadi kesalahan:", error);
@@ -1123,22 +1243,22 @@ function updateqtyCart( id_cst, action, quantity = null) {
                 title: "Terjadi Kesalahan",
                 text: "Silakan coba lagi nanti.",
                 icon: "error",
-                confirmButtonText: "OK"
+                confirmButtonText: "OK",
             });
-        }
+        },
     });
 }
 
 $(document).on("click", "#kurang-qty", function () {
     var id_cst = $(this).data("id_cst");
 
-    updateqtyCart(id_cst, 'decrease');
+    updateqtyCart(id_cst, "decrease");
 });
 
 $(document).on("click", "#tambah-qty", function () {
     var id_cst = $(this).data("id_cst");
 
-    updateqtyCart(id_cst, 'increase');
+    updateqtyCart(id_cst, "increase");
 });
 
 $(document).on("change", "#quantity", function () {
@@ -1147,23 +1267,39 @@ $(document).on("change", "#quantity", function () {
     var stock = $(this).data("stock");
     if (newQuantity > stock) {
         Swal.fire({
-            title: 'Gagal',
-            text: 'Quantity product melebihi stok toko',
-            icon: 'error',
-            confirmButtonText: 'OK'
+            title: "Gagal",
+            text: "Quantity product melebihi stok toko",
+            icon: "error",
+            confirmButtonText: "OK",
         });
         newQuantity = stock;
         $(this).val(stock);
     }
-    updateqtyCart(id_cst, 'coustom' ,newQuantity);
+    updateqtyCart(id_cst, "coustom", newQuantity);
 });
 
 $(document).on("click", ".cart-btn", function () {
     const quantity = getQuantity();
     var id_product = $(this).data("id");
+    var id_user = $(this).data("id_user");
+    console.log(id_user);
     var qty = quantity;
-    console.log("Quantity:", qty);
 
+    if (id_user == null || id_user == "") {
+        Swal.fire({
+            title: "Perhatian",
+            text: "Harap login terlebih dahulu untuk menambahkan produk ke keranjang.",
+            icon: "warning",
+            confirmButtonText: "OK",
+            showCancelButton: true,
+            cancelButtonText: "Batal",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = appUrl + "/login";
+            }
+        });
+        return;
+    }
     $.ajax({
         url: appUrl + "/api/add-cart",
         type: "POST",
@@ -1174,19 +1310,18 @@ $(document).on("click", ".cart-btn", function () {
         },
         success: function (response) {
             Swal.fire({
-                title: 'Berhasil!',
-                text: 'Produk berhasil dimasukkan ke dalam keranjang.',
-                icon: 'success',
-                confirmButtonText: 'OK'
+                title: "Berhasil!",
+                text: "Produk telah ditambahkan ke keranjang.",
+                icon: "success",
+                confirmButtonText: "OK",
             });
         },
-        error: function (error) {
-            console.error(error);
+        error: function (xhr, status, error) {
             Swal.fire({
-                title: 'Gagal',
-                text: 'Terjadi kesalahan saat menambah produk ke dalam keranjang.',
-                icon: 'error',
-                confirmButtonText: 'OK'
+                title: "Gagal",
+                text: "Terjadi kesalahan saat menambah produk ke dalam keranjang.",
+                icon: "error",
+                confirmButtonText: "OK",
             });
         },
     });
@@ -1200,20 +1335,20 @@ $(document).on("click", "#deleteCart", function () {
         type: "delete",
         success: function (response) {
             Swal.fire({
-                title: 'Berhasil!',
-                text: 'Menghapus Produk dari keranjang.',
-                icon: 'success',
-                confirmButtonText: 'OK'
+                title: "Berhasil!",
+                text: "Menghapus Produk dari keranjang.",
+                icon: "success",
+                confirmButtonText: "OK",
             });
-            location.reload();
+            // location.reload();
         },
         error: function (error) {
             console.error(error);
             Swal.fire({
-                title: 'Gagal',
-                text: 'Terjadi kesalahan saat menghapus produk di keranjang.',
-                icon: 'error',
-                confirmButtonText: 'OK'
+                title: "Gagal",
+                text: "Terjadi kesalahan saat menghapus produk di keranjang.",
+                icon: "error",
+                confirmButtonText: "OK",
             });
         },
     });
@@ -1240,9 +1375,7 @@ $(document).on("click", "#ubah-lokasi-pengiriman", function () {
                     <label for="address_${addr.member_address_id}">
                         ${addr.address_name} - ${addr.address}, ${
                         addr.subdistrict_name
-                    }, ${addr.city}, ${addr.province_name}, ${
-                        addr.postal_code
-                    }
+                    }, ${addr.city}, ${addr.province_name}, ${addr.postal_code}
                     </label>
                 </div>
             `
@@ -1273,7 +1406,10 @@ $(document).on("click", "#ubah-lokasi-pengiriman", function () {
                     console.log("Alamat yang dipilih:", selectedAddress);
                     // Mengirim permintaan AJAX ke route untuk memperbarui alamat di keranjang
                     $.ajax({
-                        url: appUrl + '/api/updateAddressCart/'+selectedAddress,
+                        url:
+                            appUrl +
+                            "/api/updateAddressCart/" +
+                            selectedAddress,
                         type: "get",
                         success: function (response) {
                             // Lakukan sesuatu setelah alamat keranjang berhasil diperbarui
@@ -1335,7 +1471,16 @@ $(document).on("click", "#asuransi-pengiriman", function () {
     var id_cs = $(this).data("id_cs");
     var status = $(this).data("status");
     $.ajax({
-        url: appUrl + "/api/insurance/"+id_shop +"/"+id_courier +"/"+id_cs +"/"+status,
+        url:
+            appUrl +
+            "/api/insurance/" +
+            id_shop +
+            "/" +
+            id_courier +
+            "/" +
+            id_cs +
+            "/" +
+            status,
         type: "get",
         success: function (response) {
             location.reload();
@@ -1367,19 +1512,19 @@ $(document).on("click", "#paymend_method", function () {
 });
 
 $(document).on("click", "#updateTOP", function () {
-        var top = $(this).data("top");
-        console.log(top);
-        $.ajax({
-            url: appUrl + "/api/update-top/"+top,
-            type: "get",
-            success: function (response) {
-                location.reload();
-            },
-            error: function (error) {
-                console.error(error);
-                alert("Terjadi kesalahan saat Menambah TOP");
-            },
-        });
+    var top = $(this).data("top");
+    console.log(top);
+    $.ajax({
+        url: appUrl + "/api/update-top/" + top,
+        type: "get",
+        success: function (response) {
+            location.reload();
+        },
+        error: function (error) {
+            console.error(error);
+            alert("Terjadi kesalahan saat Menambah TOP");
+        },
+    });
 });
 
 $(document).on("click", "#upload-payment", function () {
@@ -1391,64 +1536,64 @@ $(document).on("click", "#upload-payment", function () {
             Nama Bank Tujuan    : PT. Elite Proxy Sistem <br>
             Bank Tujuan         : Bank BNI <br>
             No Rek Tujuan       : <b> 03975-60583 </b> <br>
-            Total Pembayaran    : <b> ${(formatRupiah(total))} </b>
+            Total Pembayaran    : <b> ${formatRupiah(total)} </b>
         </p>
         <img id="swal2-image-preview" src="#" alt="Bukti Transfer" style="max-width: 200px; max-height: 200px; display: none;"> <!-- Tempat untuk menampilkan preview gambar -->
         <input type="file" id="swal2-file" name="img" accept="image/*" style="display: block; margin-top: 10px;">
     `;
 
     Swal.fire({
-        title: 'Upload Pembayaran',
+        title: "Upload Pembayaran",
         html: html,
         showCancelButton: true,
-        confirmButtonText: 'Unggah',
-        cancelButtonText: 'Batal',
+        confirmButtonText: "Unggah",
+        cancelButtonText: "Batal",
         showLoaderOnConfirm: true,
         preConfirm: () => {
             return new Promise((resolve, reject) => {
-                var fileInput = document.getElementById('swal2-file');
+                var fileInput = document.getElementById("swal2-file");
                 var file = fileInput.files[0];
                 if (!file) {
-                    reject('Anda harus memilih file gambar.');
+                    reject("Anda harus memilih file gambar.");
                 } else {
                     resolve(file);
                 }
             });
         },
-        allowOutsideClick: () => !Swal.isLoading()
+        allowOutsideClick: () => !Swal.isLoading(),
     }).then((result) => {
         if (result.isConfirmed) {
             var file = result.value;
             var formData = new FormData();
-            formData.append('id_cart', id_cart);
-            formData.append('img', file);
+            formData.append("id_cart", id_cart);
+            formData.append("img", file);
 
             $.ajax({
-                url: appUrl + '/api/upload-payment',
-                type: 'POST',
+                url: appUrl + "/api/upload-payment",
+                type: "POST",
                 data: formData,
                 contentType: false,
                 processData: false,
-                success: function(response) {
+                success: function (response) {
                     Swal.fire({
-                        title: 'Upload Berhasil',
-                        text: 'Pembayaran telah diunggah.',
-                        icon: 'success'
+                        title: "Upload Berhasil",
+                        text: "Pembayaran telah diunggah.",
+                        icon: "success",
                     });
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     Swal.fire({
-                        title: 'Upload Gagal',
-                        text: 'Terjadi kesalahan saat mengunggah pembayaran.',
-                        icon: 'error'
+                        title: "Upload Gagal",
+                        text: "Terjadi kesalahan saat mengunggah pembayaran.",
+                        icon: "error",
                     });
-                }
+                },
             });
         }
     });
 });
 
-$(document).on('change', '#swal2-file', function() {
+$(document).on("change", "#swal2-file", function () {
     previewImage(this);
 });
 
@@ -1456,9 +1601,9 @@ function previewImage(input) {
     if (input.files && input.files[0]) {
         var reader = new FileReader();
 
-        reader.onload = function(e) {
-            $('#swal2-image-preview').attr('src', e.target.result).show();
-        }
+        reader.onload = function (e) {
+            $("#swal2-image-preview").attr("src", e.target.result).show();
+        };
 
         reader.readAsDataURL(input.files[0]);
     }
@@ -1467,7 +1612,7 @@ function previewImage(input) {
 $(document).on("click", "#request-checkout", function () {
     var id_cart = $(this).data("id_cart");
     Swal.fire({
-        title: 'Syarat dan Ketentuan',
+        title: "Syarat dan Ketentuan",
         html: `
             <p>Dengan melakukan checkout, Anda setuju dengan <a href="http://eliteproxy.co.id/info-term-and-condition" target="_blank">Syarat dan Ketentuan</a>.</p>
             <div>
@@ -1476,57 +1621,59 @@ $(document).on("click", "#request-checkout", function () {
             </div>
         `,
         showCancelButton: true,
-        confirmButtonText: 'Lanjutkan',
-        cancelButtonText: 'Batal',
+        confirmButtonText: "Lanjutkan",
+        cancelButtonText: "Batal",
         preConfirm: () => {
-            if (!document.getElementById('terms-checkbox').checked) {
-                Swal.showValidationMessage('Anda harus menyetujui Syarat dan Ketentuan untuk melanjutkan.');
+            if (!document.getElementById("terms-checkbox").checked) {
+                Swal.showValidationMessage(
+                    "Anda harus menyetujui Syarat dan Ketentuan untuk melanjutkan."
+                );
                 return false;
             }
-        }
+        },
     }).then((result) => {
         if (result.isConfirmed) {
             // Tampilkan SweetAlert2 kedua untuk konfirmasi pesanan
             Swal.fire({
-                title: 'Konfirmasi Pesanan',
-                text: 'Selesaikan Pesanan?',
-                icon: 'question',
+                title: "Konfirmasi Pesanan",
+                text: "Selesaikan Pesanan?",
+                icon: "question",
                 showCancelButton: true,
-                confirmButtonText: 'Ya, Selesaikan',
-                cancelButtonText: 'Batal'
+                confirmButtonText: "Ya, Selesaikan",
+                cancelButtonText: "Batal",
             }).then((confirmResult) => {
                 if (confirmResult.isConfirmed) {
                     var formData = new FormData();
-                    formData.append('id_cart', id_cart);
+                    formData.append("id_cart", id_cart);
 
                     $.ajax({
-                        url: appUrl + '/api/finishCheckout',
-                        type: 'POST',
+                        url: appUrl + "/api/finishCheckout",
+                        type: "POST",
                         data: formData,
                         contentType: false,
                         processData: false,
-                        success: function(response) {
+                        success: function (response) {
                             Swal.fire({
-                                title: 'Pesanan Berhasil Diproses',
-                                text: 'Silahkan lihat pesanan anda di transaksi.',
-                                icon: 'success'
+                                title: "Pesanan Berhasil Diproses",
+                                text: "Silahkan lihat pesanan anda di transaksi.",
+                                icon: "success",
                             });
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             Swal.fire({
-                                title: 'Pesanan gagal Diproses',
-                                text: 'Terjadi kesalahan saat Memproses Transaksi.',
-                                icon: 'error'
+                                title: "Pesanan gagal Diproses",
+                                text: "Terjadi kesalahan saat Memproses Transaksi.",
+                                icon: "error",
                             });
-                        }
+                        },
                     });
-                    console.log('Pesanan selesai = ' + id_cart);
+                    console.log("Pesanan selesai = " + id_cart);
                 } else {
-                    console.log('Pesanan dibatalkan');
+                    console.log("Pesanan dibatalkan");
                 }
             });
         } else {
-            console.log('User tidak setuju dengan Syarat dan Ketentuan');
+            console.log("User tidak setuju dengan Syarat dan Ketentuan");
         }
     });
 });
@@ -1538,7 +1685,7 @@ $(document).on("click", "#lacak_pesanan", function () {
     console.log(id_order_shop);
 
     $.ajax({
-        url: appUrl + "/api/lacak_pengiriman/"+ id_shop + `/` + id_order_shop,
+        url: appUrl + "/api/lacak_pengiriman/" + id_shop + `/` + id_order_shop,
         method: "GET",
         success: function (response) {
             var status = response.ccs.status;
@@ -1546,13 +1693,19 @@ $(document).on("click", "#lacak_pesanan", function () {
             var deliveryEnd = response.ccs.delivery_end;
             var fileDO = response.ccs.file_pdf_url;
 
-            var tableHtml = generateTableHtml(response.ccs.id_courier, response.ccs.file_do, deliveryStart, deliveryEnd, fileDO);
+            var tableHtml = generateTableHtml(
+                response.ccs.id_courier,
+                response.ccs.file_do,
+                deliveryStart,
+                deliveryEnd,
+                fileDO
+            );
 
             Swal.fire({
                 title: "Lacak Order",
                 html: tableHtml,
                 confirmButtonText: "OK",
-                width: window.innerWidth <= 600 ? '100%' : '40%'
+                width: window.innerWidth <= 600 ? "100%" : "40%",
             });
         },
         error: function (error) {
@@ -1567,7 +1720,13 @@ $(document).on("click", "#lacak_pesanan", function () {
     });
 });
 
-function generateTableHtml(idCourier, fileDO, deliveryStart, deliveryEnd, filePdfUrl) {
+function generateTableHtml(
+    idCourier,
+    fileDO,
+    deliveryStart,
+    deliveryEnd,
+    filePdfUrl
+) {
     var tableHtml = `
         <table class="table">
             <thead>
@@ -1626,7 +1785,7 @@ $(document).on("click", "#updateIsSelectProduct", function () {
         method: "POST",
         data: {
             id_cart: id_cart,
-            id_cst: id_cst
+            id_cst: id_cst,
         },
         success: function (response) {
             $("#sumprice").empty();
@@ -1637,7 +1796,10 @@ $(document).on("click", "#updateIsSelectProduct", function () {
             var qty = `Subtotal (${response.carts.qty} Produk)`;
             $("#totalqty").append(qty);
 
-            var icon = response.carts.is_selected === 'Y' ? 'check_box' : 'check_box_outline_blank';
+            var icon =
+                response.carts.is_selected === "Y"
+                    ? "check_box"
+                    : "check_box_outline_blank";
             $("#icon-" + id_cst).text(icon);
         },
         error: function (error) {
@@ -1646,13 +1808,189 @@ $(document).on("click", "#updateIsSelectProduct", function () {
                 title: "Terjadi Kesalahan",
                 text: "Silakan coba lagi nanti.",
                 icon: "error",
-                confirmButtonText: "OK"
+                confirmButtonText: "OK",
             });
-        }
+        },
     });
 });
 
+$(".input-qty").on("input", function () {
+    $(".btn-checkout").prop("disabled", true);
+    var $this = $(this);
+    var id_produk  = $this.data("id");
+    var id_cst = $this.data("id_cst");
+    var max = $this.data("max");
 
+    var currentValue = $this.val();
+    var cleanedValue = currentValue.replace(/[^0-9]/g, "");
+    $this.val(cleanedValue);
 
+    if (cleanedValue === "" || parseInt(cleanedValue) < 1) {
+        $("#empty-" + id_produk ).show(); // Tampilkan pesan error
+        return;
+    }
+    $("#empty-" + id_produk ).hide();
 
+    var qty = cleanedValue;
 
+    if (qty > max) {
+        Swal.fire({
+            title: "Peringatan",
+            text: "Jumlah melebihi stok. Jumlah akan disesuaikan dengan stok maksimum.",
+            icon: "warning",
+        });
+        $(`#qty-product-cart-${id_produk }`).val(max);
+        qty = max;
+        
+        $.ajax({
+            url: appUrl + "/api/cart/update-quantity",
+            method: "POST",
+            data: {
+                qty: qty,
+                id_cst: id_cst,
+            },
+            success: function (response) {
+                if (response.success) {
+                    $("#total-cart").empty();
+                    var sumprice = `${formatRupiah(response.hasil.sumprice)}`;
+                    $("#total-cart").append(sumprice);
+                    $(`#qty-product-cart-${id_produk}`).val(qty);
+                    var itemPrice = $(`#price-${id_cst}`).data("price");
+                    var newSubtotal = itemPrice * qty;
+                    $(`#subtotal-${id_cst}`).text(formatRupiah(newSubtotal));
+                } else {
+                    Swal.fire({
+                        title: "Terjadi Kesalahan",
+                        text: "Gagal memperbarui jumlah item.",
+                        icon: "error",
+                        confirmButtonText: "OK",
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                console.log("Error updating qty", error);
+                Swal.fire({
+                    title: "Terjadi Kesalahan",
+                    text: "Silakan coba lagi nanti.",
+                    icon: "error",
+                    confirmButtonText: "OK",
+                });
+            },
+            complete: function () {
+                $(".btn-checkout").prop("disabled", false);
+            },
+        });
+        return;
+    }
+
+    clearTimeout(timeout);
+    timeout = setTimeout(function () {
+        $.ajax({
+            url: appUrl + "/api/cart/update-quantity",
+            method: "POST",
+            data: {
+                qty: qty,
+                id_cst: id_cst,
+            },
+            success: function (response) {
+                if (response.success) {
+                    $("#total-cart").empty();
+                    var sumprice = `${formatRupiah(response.hasil.sumprice)}`;
+                    $("#total-cart").append(sumprice);
+                    $(`#qty-product-cart-${id_produk}`).val(qty);
+                } else {
+                    Swal.fire({
+                        title: "Terjadi Kesalahan",
+                        text: "Gagal memperbarui jumlah item.",
+                        icon: "error",
+                        confirmButtonText: "OK",
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                console.log("Error updating qty", error);
+                Swal.fire({
+                    title: "Terjadi Kesalahan",
+                    text: "Silakan coba lagi nanti.",
+                    icon: "error",
+                    confirmButtonText: "OK",
+                });
+            },
+        });
+    }, 500);
+});
+
+function updateCartQuantity(action) {
+    return function () {
+        $(".btn-checkout").prop("disabled", true);
+        var id_cst = $(this).data("id_cst");
+        var id_produk = $(this).data("id");
+        var max =$("#qty-product-cart-" + id_produk).data("max");
+
+        // Ambil nilai qty langsung dari input
+        var qty = parseInt($("#qty-product-cart-" + id_produk).val());
+        var newQty = action === "decrease" ? qty - 1 : qty + 1;
+
+        if (newQty < 1) {
+            Swal.fire({
+                title: "Terjadi Kesalahan",
+                text: "Minimal 1 Produk.",
+                icon: "error",
+                confirmButtonText: "OK",
+            });
+            return;
+        }
+
+        if (newQty > max) {
+            Swal.fire({
+                title: "Peringatan",
+                text: "Jumlah melebihi stok. Jumlah akan disesuaikan dengan stok maksimum.",
+                icon: "warning",
+            });
+            return;
+        }
+
+        $.ajax({
+            url: appUrl + "/api/cart/update-quantity",
+            method: "POST",
+            data: {
+                qty: newQty,
+                id_cst: id_cst,
+            },
+            success: function (response) {
+                if (response.success) {
+                    $("#total-cart").empty();
+                    var sumprice = `${formatRupiah(response.hasil.sumprice)}`;
+                    $("#total-cart").append(sumprice);
+                    $(`#qty-product-cart-${id_produk}`).val(newQty);
+                    var itemPrice = $(`#price-${id_cst}`).data("price");
+                    var newSubtotal = itemPrice * newQty;
+                    $(`#subtotal-${id_cst}`).text(formatRupiah(newSubtotal));
+                } else {
+                    Swal.fire({
+                        title: "Terjadi Kesalahan",
+                        text: "Gagal memperbarui jumlah item.",
+                        icon: "error",
+                        confirmButtonText: "OK",
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                console.log("Error updating qty", error);
+                Swal.fire({
+                    title: "Terjadi Kesalahan",
+                    text: "Silakan coba lagi nanti.",
+                    icon: "error",
+                    confirmButtonText: "OK",
+                });
+            },
+            complete: function () {
+                $(".btn-checkout").prop("disabled", false);
+            },
+        });
+    };
+}
+
+// Penggunaan:
+$(".btn-kurang").click(updateCartQuantity("decrease"));
+$(".btn-tambah").click(updateCartQuantity("increase"));

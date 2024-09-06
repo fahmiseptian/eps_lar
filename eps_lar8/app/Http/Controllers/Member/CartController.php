@@ -18,9 +18,11 @@ use Illuminate\Support\Facades\DB;
 class CartController extends Controller
 {
     protected $data;
+    protected $model;
     public function __construct(Request $request)
     {
-        $this->data['CartShopTemporary'] = new CartShopTemporary();
+        $this->model['CartShopTemporary'] = new CartShopTemporary();
+        $this->model['CartShop'] = new CartShop();
         // Ambil semua data sesi
         $sessionData = $request->session()->all();
         $this->data['id_user'] = $sessionData['id'] ?? null;
@@ -31,32 +33,46 @@ class CartController extends Controller
         $cart = Cart::where('id_user',$id_member)->select('id','total','qty')->first();
 
         if ($cart) {
-            $cart->detail = CartShop::getdetailcartByIdcart($cart->id);
+            $cart->detail = $this->model['CartShop']->getdetailcartByIdcart($cart->id);
 
             foreach ($cart->detail as $detail ) {
-                $products =CartShopTemporary::getDetailCartByIdShop($detail->id_shop,$cart->id);
+                $products =$this->model['CartShopTemporary']->getDetailCartByIdShop($detail->id_shop,$cart->id);
                 $detail->products= $products;
             }
 
-            $sumprice = CartShopTemporary::sumPriceSelectProductCart($cart->id);
+            $sumprice = $this->model['CartShopTemporary']->sumPriceSelectProductCart($cart->id);
             $cart->sumprice= $sumprice;
 
             // return response()->json(["cart"=>$cart]);
-            return view('member.cart.index',$this->data,["cart"=>$cart]);
+            return view('member.cart.keranjang',$this->data,["cart"=>$cart]);
         } else{
             return view('member.cart.empty-cart',$this->data);
         }
     }
 
+    function updateProductCart(Request $request){
+        $id_user = $this->data['id_user'];
+        $id_cst = $request->id_cst;
+        $qty = $request->qty;
+
+        $cst = $this->model['CartShopTemporary']->find($id_cst);
+        if (!$cst) {
+            return response()->json(['message' => 'Product Cart Tidak ditemukan'], 404);
+        }
+
+        $hasil = $this->model['CartShopTemporary']->updateTemporaryById($id_user, $cst->id_shop, $id_cst, $qty);
+        return response()->json(['success' => true, 'hasil' => $hasil]);
+    }
+
     function updateqtyCart(Request $request){
         $id_user = $this->data['id_user'];
-        $cartShop = new CartShop;
+        $cartShop = $this->model['CartShop'];
 
         $id_cst = $request->id_cst;
         $action = $request->action;
         $quantity = $request->quantity;
 
-        $cst =$this->data['CartShopTemporary']->find($id_cst);
+        $cst =$this->model['CartShopTemporary']->find($id_cst);
         if (!$cst) {
             return response()->json(['message' => 'Product Cart Tidak ditemukan'], 404);
         }
@@ -69,20 +85,20 @@ class CartController extends Controller
                     $dataArr = [
                         'qty' => $newQty,
                     ];
-                    $hasil = $this->data['CartShopTemporary']->updateTemporaryById($id_user, $cst->id_shop, $id_cst, $newQty);
+                    $hasil = $this->model['CartShopTemporary']->updateTemporaryById($id_user, $cst->id_shop, $id_cst, $newQty);
 
                 } elseif ($action == 'increase') {
                     $newQty = $cst->qty + 1;
                     $dataArr = [
                         'qty' => $newQty,
                     ];
-                    $hasil = $this->data['CartShopTemporary']->updateTemporaryById($id_user, $cst->id_shop, $id_cst, $newQty);
+                    $hasil = $this->model['CartShopTemporary']->updateTemporaryById($id_user, $cst->id_shop, $id_cst, $newQty);
 
                 } elseif ($action == 'custom') {
                     $dataArr = [
                         'qty' => $quantity,
                     ];
-                    $hasil = $this->data['CartShopTemporary']->updateTemporaryById($id_user, $cst->id_shop, $id_cst, $quantity);
+                    $hasil = $this->model['CartShopTemporary']->updateTemporaryById($id_user, $cst->id_shop, $id_cst, $quantity);
                 }
             });
 
@@ -105,14 +121,14 @@ class CartController extends Controller
         $qty = $request->qty;
         $id_shop= 0;
 
-        $addcart =$this->data['CartShopTemporary']->updateTemporary($id_member,$id_product,$id_shop,$qty) ;
+        $addcart =$this->model['CartShopTemporary']->updateTemporary($id_member,$id_product,$id_shop,$qty) ;
 
         return response()->json(["Masagge"=>$addcart]);
     }
 
     function deletecart($id_temporary,$id_shop) {
         $id_member=$this->data['id_user'];
-        $deletecart = $this->data['CartShopTemporary']->deletecart($id_member,$id_temporary,$id_shop);
+        $deletecart = $this->model['CartShopTemporary']->deletecart($id_member,$id_temporary,$id_shop);
     }
 
     function checkout(){
@@ -124,7 +140,7 @@ class CartController extends Controller
         $insert_handling_cost =$carts->insertHandlingCost($id_member);
 
         $this->data['cartAddress']  = $carts->getaddressCart($cart->id_address_user);
-        $cart->detail = CartShop::getdetailcartByIdcart($cart->id);
+        $cart->detail = $this->model['CartShop']->getdetailcartByIdcart($cart->id);
 
         $total_barang_dengan_PPN = 0;
         $total_barang_tanpa_PPN = 0;
@@ -136,7 +152,7 @@ class CartController extends Controller
 
         foreach ($cart->detail as $detail ) {
             $pengiriman = $carts->getRates($cart->id,$detail->id_shop);
-            $products = $this->data['CartShopTemporary']->getCartSelectedByIdShop($detail->id_shop,$cart->id);
+            $products = $this->model['CartShopTemporary']->getCartSelectedByIdShop($detail->id_shop,$cart->id);
 
             // Gabungkan pengiriman dan detail produk ke dalam satu objek
             $detail->pengiriman = $pengiriman;
@@ -182,7 +198,7 @@ class CartController extends Controller
 
     function getOngkir($id_shipping,$id) {
         $calculation = new Calculation();
-        $cartShop = new CartShop();
+        $cartShop = $this->model['CartShop'];
         $priceRecord = DB::table('shipping')->where('id', $id_shipping)->first('price');
 
         // Pastikan bahwa $priceRecord tidak null dan memiliki properti price
@@ -190,7 +206,7 @@ class CartController extends Controller
             $price = $priceRecord->price;
             $ongkir_akhir = $calculation->OngkirSudahPPN($price);
 
-            $updatecart = CartShop::where('id', $id)->update([
+            $updatecart = $this->model['CartShop']->where('id', $id)->update([
                 'id_shipping' => $id_shipping,
                 'sum_shipping' => $ongkir_akhir['ongkir_sudah_ppn_dan_pph'],
                 'ppn_shipping' => $ongkir_akhir['ppn_ongkir'],
@@ -214,7 +230,7 @@ class CartController extends Controller
     }
 
     function insurance($id_shop, $id_courier, $idcs, $status){
-        $cart = new CartShop();
+        $cart = $this->model['CartShop'];
         $id_user = $this->data['id_user'];
 
         if ($status == 'add') {
@@ -277,7 +293,7 @@ class CartController extends Controller
     function updateIsSelectProduct(Request $request){
         $id_cart = $request->id_cart;
         $id_cst = $request->id_cst;
-        $cst =$this->data['CartShopTemporary']->find($id_cst);
+        $cst =$this->model['CartShopTemporary']->find($id_cst);
         if (!$cst) {
             return response()->json(['message' => 'Product Cart Tidak ditemukan'], 404);
         }
@@ -289,8 +305,8 @@ class CartController extends Controller
             $cst->is_selected = 'Y';
             $cst->save();
         }
-        $sumprice = $this->data['CartShopTemporary']->sumPriceSelectProductCart($id_cart);
-        $totalqty =$this->data['CartShopTemporary']->sumqtySelected($id_cart);
+        $sumprice = $this->model['CartShopTemporary']->sumPriceSelectProductCart($id_cart);
+        $totalqty =$this->model['CartShopTemporary']->sumqtySelected($id_cart);
 
         $carts = [
             'sumprice' => $sumprice,

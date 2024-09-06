@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
 use App\Libraries\Calculation;
+use App\Libraries\Checkout;
 use App\Models\Cart;
 use App\Models\CartShop;
 use App\Models\CartShopTemporary;
@@ -30,6 +31,12 @@ class HomememberController extends Controller
         // Ambil semua data sesi
         $sessionData = $request->session()->all();
         $this->user_id = $sessionData['id'] ?? null;
+    }
+
+    function keranjang($id_member) {
+        $checkout = new Checkout();
+        $keranjang = $checkout->keranjang($id_member);
+        return response()->json(["keranjang" => $keranjang]);
     }
 
     public function index() {

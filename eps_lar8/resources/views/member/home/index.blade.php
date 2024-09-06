@@ -135,10 +135,6 @@
                     <p>Promo 1</p>
                     <img src="https://via.placeholder.com/50x50" alt="Promo 1">
                 </div>
-                <div class="promo-item">
-                    <p>Promo 1</p>
-                    <img src="https://via.placeholder.com/50x50" alt="Promo 1">
-                </div>
                 <!-- Tambahkan promo lain -->
             </div>
         </section>
@@ -185,6 +181,7 @@
             <div class="product-grid" id="productGrid">
                 @include('member.home.product-list', ['products' => $products])
             </div>
+            <button id="moreproduct" class="load-more-button">Muat Lebih Banyak Produk</button>
             <div class="loading" style="display: none;">
                 <p>Loading...</p>
             </div>
@@ -201,29 +198,36 @@
             $.ajax({
                 url: "{{ route('products.get') }}?page=" + page,
                 type: "get",
-                beforeSend: function () {
+                beforeSend: function() {
                     $('.loading').show();
                 }
             })
-            .done(function (data) {
+            .done(function(data) {
                 if (data.length === 0) {
-                    $('.loading').html("<p>No more products to load</p>");
+                    $('.loading').html("<p align='center'>Semua Produk sudah ditampilkan</p>");
+                    $('#moreproduct').hide(); // Sembunyikan tombol
                     return;
                 }
                 $('.loading').hide();
                 $('#productGrid').append(data);
             })
-            .fail(function (jqXHR, ajaxOptions, thrownError) {
-                alert('Server error occurred');
+            .fail(function(jqXHR, ajaxOptions, thrownError) {
+                alert('Terjadi kesalahan server');
             });
         }
 
-        $(window).scroll(function() {
-            if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
-                page++;
-                loadMoreProducts(page);
-            }
+        $('#moreproduct').click(function(e) {
+            e.preventDefault();
+            page++;
+            loadMoreProducts(page);
         });
+
+        // $(window).scroll(function() {
+        //     if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
+        //         page++;
+        //         loadMoreProducts(page);
+        //     }
+        // });
     </script>
 </body>
 

@@ -163,6 +163,7 @@ Route::post('/download-sp', [OrederController::class, 'downloadSp'])->name('down
 // Member
 Route::group(['middleware' => 'member'], function () {
     Route::post('/update-quantity', [CartController::class, 'updateQuantity']);
+    Route::post('/cart/update-quantity', [CartController::class, 'updateProductCart']);
     Route::post('/add-cart', [CartController::class, 'addCart']);
     Route::get('/update-top/{top}', [CartController::class, 'updateTOP']);
     Route::post('/update-payment', [CartController::class, 'updatePayment']);
@@ -191,3 +192,5 @@ Route::post('/kurir/tracking', [KurirController::class, 'Tracking']);
 Route::get('/config/getProvince', [LoginSellerController::class, 'getProvince']);
 Route::get('/config/getCity/{id}', [LoginSellerController::class, 'getCity']);
 Route::get('/config/getdistrict/{id}', [LoginSellerController::class, 'getdistrict']);
+
+Route::get('/keranjang/{id_member}', [HomememberController::class, 'keranjang']);

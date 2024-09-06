@@ -61,7 +61,7 @@
                     <p>Stok tersisa: <span class="stock-remaining">{{$stock}}</span></p>
                 </div>
                 <div class="action-buttons">
-                    <button class="cart-btn" data-id="{{$id}}"><span class="material-icons">add_shopping_cart</span>
+                    <button class="cart-btn" data-id_user="{{$id_user}}" data-id="{{$id}}"><span class="material-icons">add_shopping_cart</span>
                         Keranjang</button>
                     <button class="buy-btn">Beli Sekarang</button>
                     <button class="nego-btn">Nego</button>
