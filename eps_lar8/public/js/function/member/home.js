@@ -4,6 +4,38 @@ const productItems = document.querySelectorAll(".productdetail-item");
 let slides;
 var timeout;
 
+$(document).ready(function () {
+    function updateQuantity(amount) {
+        var $quantityInput = $("#quantity");
+        var currentQuantity = parseInt($quantityInput.val());
+        var maxStock = parseInt($quantityInput.attr("max"));
+        var newQuantity = currentQuantity + amount;
+
+        if (newQuantity >= 1 && newQuantity <= maxStock) {
+            $quantityInput.val(newQuantity);
+            updateButtonStates();
+        }
+    }
+
+    function updateButtonStates() {
+        var currentQuantity = parseInt($("#quantity").val());
+        var maxStock = parseInt($("#quantity").attr("max"));
+
+        $(".quantity-btn.minus").prop("disabled", currentQuantity <= 1);
+        $(".quantity-btn.plus").prop("disabled", currentQuantity >= maxStock);
+    }
+
+    $(".quantity-btn.minus").click(function () {
+        updateQuantity(-1);
+    });
+
+    $(".quantity-btn.plus").click(function () {
+        updateQuantity(1);
+    });
+
+    // Panggil updateButtonStates saat halaman dimuat
+    updateButtonStates();
+});
 // Pilih slides berdasarkan elemen yang ditemukan
 if (bannerItems.length > 0) {
     slides = bannerItems;
@@ -49,7 +81,7 @@ if (productMobileItems.length > 0) {
 
 // product
 $(document).ready(function () {
-    const initialDisplayCount = 12;
+    const initialDisplayCount = 35;
     let displayedCount = initialDisplayCount;
 
     $(".product-item").hide();
@@ -64,6 +96,13 @@ $(document).ready(function () {
         }
     });
 });
+
+function truncateString(str, num) {
+    if (str && str.length > num) {
+        return str.slice(0, num) + "...";
+    }
+    return str || "";
+}
 
 // qty Product
 function increaseQuantity() {
@@ -442,6 +481,15 @@ function formatRupiah(angka) {
 
     rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
     return "Rp. " + rupiah;
+}
+
+function unformatRupiah(formattedRupiah) {
+    var number_string = formattedRupiah.replace(/[^,\d]/g, "");
+    return parseInt(number_string.replace(/[.,]/g, ""));
+}
+
+function parseRupiah(rupiahString) {
+    return parseInt(rupiahString.replace(/[^0-9]/g, ""));
 }
 
 function generateDataHTML(dataArray) {
@@ -1817,7 +1865,7 @@ $(document).on("click", "#updateIsSelectProduct", function () {
 $(".input-qty").on("input", function () {
     $(".btn-checkout").prop("disabled", true);
     var $this = $(this);
-    var id_produk  = $this.data("id");
+    var id_produk = $this.data("id");
     var id_cst = $this.data("id_cst");
     var max = $this.data("max");
 
@@ -1826,10 +1874,10 @@ $(".input-qty").on("input", function () {
     $this.val(cleanedValue);
 
     if (cleanedValue === "" || parseInt(cleanedValue) < 1) {
-        $("#empty-" + id_produk ).show(); // Tampilkan pesan error
+        $("#empty-" + id_produk).show(); // Tampilkan pesan error
         return;
     }
-    $("#empty-" + id_produk ).hide();
+    $("#empty-" + id_produk).hide();
 
     var qty = cleanedValue;
 
@@ -1839,9 +1887,9 @@ $(".input-qty").on("input", function () {
             text: "Jumlah melebihi stok. Jumlah akan disesuaikan dengan stok maksimum.",
             icon: "warning",
         });
-        $(`#qty-product-cart-${id_produk }`).val(max);
+        $(`#qty-product-cart-${id_produk}`).val(max);
         qty = max;
-        
+
         $.ajax({
             url: appUrl + "/api/cart/update-quantity",
             method: "POST",
@@ -1925,7 +1973,7 @@ function updateCartQuantity(action) {
         $(".btn-checkout").prop("disabled", true);
         var id_cst = $(this).data("id_cst");
         var id_produk = $(this).data("id");
-        var max =$("#qty-product-cart-" + id_produk).data("max");
+        var max = $("#qty-product-cart-" + id_produk).data("max");
 
         // Ambil nilai qty langsung dari input
         var qty = parseInt($("#qty-product-cart-" + id_produk).val());
@@ -1994,3 +2042,311 @@ function updateCartQuantity(action) {
 // Penggunaan:
 $(".btn-kurang").click(updateCartQuantity("decrease"));
 $(".btn-tambah").click(updateCartQuantity("increase"));
+
+document.addEventListener("DOMContentLoaded", function () {
+    const categoryItems = document.querySelectorAll(
+        ".category-list .filter-item"
+    );
+
+    categoryItems.forEach((item) => {
+        item.addEventListener("click", handleCategoryClick);
+    });
+
+    function handleCategoryClick(e) {
+        e.preventDefault();
+
+        // Remove active class from all items
+        categoryItems.forEach((i) => i.classList.remove("active"));
+
+        // Add active class to clicked item
+        this.classList.add("active");
+
+        // Close all open submenus
+        document.querySelectorAll(".has-submenu.open").forEach((submenu) => {
+            submenu.classList.remove("open");
+        });
+
+        // If item is in submenu, open parent submenu
+        const parentSubmenu = this.closest(".submenu");
+        if (parentSubmenu) {
+            parentSubmenu.parentElement.classList.add("open");
+        }
+
+        // If item has submenu, toggle it
+        const parentLi = this.closest("li");
+        if (parentLi && parentLi.classList.contains("has-submenu")) {
+            parentLi.classList.toggle("open");
+        }
+
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const activeFilter = document.querySelector(
+            ".category-list .filter-item.active"
+        );
+        const activeCategory = activeFilter
+            ? activeFilter.dataset.category
+            : null;
+
+        const keyword = document.getElementById("keyword").value;
+        const max = unformatRupiah(document.getElementById("price_max").value);
+        const min = unformatRupiah(document.getElementById("price_min").value);
+
+        var dataArray = {
+            category: activeCategory,
+            keyword: keyword,
+            max: max,
+            min: min,
+            condition: null,
+        };
+
+        console.log("Filter data:", dataArray);
+
+        // Uncomment the line below when you're ready to implement the AJAX call
+        fetchProducts(dataArray);
+    }
+
+    function fetchProducts(data) {
+        // Implement your AJAX call here
+        fetch(appUrl + "/api/filter-searching", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                updateProductList(data);
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
+    }
+
+    function updateProductList(products) {
+        const productSection = document.querySelector(".products-section");
+        productSection.innerHTML = ""; // Bersihkan konten sebelumnya
+
+        if (products && products.length > 0) {
+            products.forEach((product) => {
+                const productItem = document.createElement("div");
+                productItem.className = "product-item";
+
+                const image300 = product.image.startsWith("http")
+                    ? product.image
+                    : `https://eliteproxy.co.id/${product.image}`;
+
+                productItem.innerHTML = `
+                    <a href="/product/${product.id}" class="product-link">
+                        <img src="${image300}" alt="${product.name}">
+                        <p title="${product.name}">${truncateString(
+                    product.name,
+                    30
+                )}</p>
+                        <p>${formatRupiah(product.hargaTayang)}</p>
+                        <div class="product-info">
+                            <small title="${
+                                product.shop_name || ""
+                            }">${truncateString(
+                    product.shop_name || "",
+                    14
+                )}</small>
+                            <small>${product.total_sold || 0} terjual</small>
+                            <small>${product.province_name || ""}</small>
+                        </div>
+                    </a>
+                `;
+
+                productSection.appendChild(productItem);
+            });
+        } else {
+            productSection.innerHTML =
+                "<p>Tidak ada produk yang ditemukan.</p>";
+        }
+    }
+
+    // Event listener for condition filter
+    document
+        .querySelectorAll(".filter-item[data-condition]")
+        .forEach((item) => {
+            item.addEventListener("click", handleConditionClick);
+        });
+
+    function handleConditionClick() {
+        const condition = this.dataset.condition;
+        const activeFilter = document.querySelector(
+            ".category-list .filter-item.active"
+        );
+        const activeCategory = activeFilter
+            ? activeFilter.dataset.category
+            : null;
+
+        const keyword = document.getElementById("keyword").value;
+        const max = document.getElementById("price_max").value;
+        const min = document.getElementById("price_min").value;
+
+        var dataArray = {
+            category: activeCategory,
+            keyword: keyword,
+            max: max,
+            min: min,
+            condition: condition,
+        };
+
+        filterByCondition(dataArray);
+    }
+
+    function filterByCondition(data) {
+        fetch(appUrl + "/api/filter-searching", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                updateProductList(data);
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
+    }
+
+    function debounce(func, delay) {
+        let timeoutId;
+        return function (...args) {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
+    ["price_min", "price_max"].forEach((id) => {
+        const input = document.getElementById(id);
+
+        input.addEventListener("input", function (e) {
+            let value = this.value.replace(/[^0-9]/g, "");
+            if (value !== "") {
+                const formattedValue = formatRupiah(parseInt(value));
+                this.value = formattedValue;
+            }
+            debouncedApplyFilters();
+        });
+
+        input.addEventListener("blur", function () {
+            if (this.value === "" || parseRupiah(this.value) === 0) {
+                this.value = formatRupiah(0);
+            }
+        });
+    });
+
+    // Fungsi debounce yang sudah ada
+    const debouncedApplyFilters = debounce(() => {
+        applyFilters();
+        setTimeout(() => {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+            });
+        }, 100);
+    }, 1000);
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const sortOrder = document.getElementById("sort-order");
+
+    sortOrder.addEventListener("change", function () {
+        const selectedValue = this.value;
+        console.log("Urutan yang dipilih:", selectedValue);
+
+        applySort(selectedValue);
+    });
+});
+
+function applySort(sortType) {
+    const activeFilter = document.querySelector(
+        ".category-list .filter-item.active"
+    );
+    const activeCategory = activeFilter ? activeFilter.dataset.category : null;
+    const keyword = document.getElementById("keyword").value;
+    const max = unformatRupiah(document.getElementById("price_max").value);
+    const min = unformatRupiah(document.getElementById("price_min").value);
+
+    var dataArray = {
+        category: activeCategory,
+        keyword: keyword,
+        max: max,
+        min: min,
+        condition: null,
+        sort: sortType,
+    };
+
+    console.log("Filter dan pengurutan data:", dataArray);
+    fetchProducts(dataArray);
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+    });
+}
+
+// Pastikan fungsi fetchProducts sudah ada dan dapat menerima parameter sort
+function fetchProducts(data) {
+    fetch(appUrl + "/api/filter-searching", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            updateListProduct(data);
+        })
+        .catch((error) => {
+            console.error("Error:", error);
+        });
+}
+
+function updateListProduct(products) {
+    const productSection = document.querySelector(".products-section");
+    productSection.innerHTML = ""; // Bersihkan konten sebelumnya
+
+    if (products && products.length > 0) {
+        products.forEach((product) => {
+            const productItem = document.createElement("div");
+            productItem.className = "product-item";
+
+            const image300 = product.image.startsWith("http")
+                ? product.image
+                : `https://eliteproxy.co.id/${product.image}`;
+
+            productItem.innerHTML = `
+                <a href="/product/${product.id}" class="product-link">
+                    <img src="${image300}" alt="${product.name}">
+                    <p title="${product.name}">${truncateString(
+                product.name,
+                30
+            )}</p>
+                    <p>${formatRupiah(product.hargaTayang)}</p>
+                    <div class="product-info">
+                        <small title="${
+                            product.shop_name || ""
+                        }">${truncateString(
+                product.shop_name || "",
+                14
+            )}</small>
+                        <small>${product.total_sold || 0} terjual</small>
+                        <small>${product.province_name || ""}</small>
+                    </div>
+                </a>
+            `;
+
+            productSection.appendChild(productItem);
+        });
+    } else {
+        productSection.innerHTML = "<p>Tidak ada produk yang ditemukan.</p>";
+    }
+}

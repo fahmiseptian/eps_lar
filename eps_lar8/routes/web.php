@@ -16,6 +16,7 @@ use App\Http\Controllers\Member\DashboardmemberController;
 use App\Http\Controllers\Member\HomememberController;
 use App\Http\Controllers\Member\LoginmemberController;
 use App\Http\Controllers\Member\ProfilememberController;
+use App\Http\Controllers\Member\SearchController;
 use App\Http\Controllers\Seller\LoginSellerController;
 use App\Http\Controllers\Seller\HomesellerController;
 use App\Http\Controllers\Seller\DeliveryController;
@@ -232,6 +233,9 @@ Route::group(['middleware' => 'member'], function () {
     Route::get('/inv/{id_seller}/{id_cart_shop}',[CheckoutController::class,'cetak_Invoice']);
     Route::get('/kwitansi/{id_seller}/{id_cart_shop}',[CheckoutController::class,'cetak_Kwitansi']);
 });
+
+Route::get('/find/{query}', [SearchController::class, 'fullSearch']);
+
 
 
 Route::get('test/', [HomememberController::class, 'tampil']);

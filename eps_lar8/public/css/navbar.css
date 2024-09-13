@@ -1,0 +1,109 @@
+:root {
+    --primary-color: #fc6703;
+    --secondary-color: #fff0e6;
+    --text-color: #333333;
+    --hover-color: #e55a00;
+    --putih: #ffffff;
+    --navbar-height: 100px; /* Sesuaikan dengan tinggi navbar Anda */
+}
+
+body {
+    padding-top: var(--navbar-height); /* Menambahkan padding atas pada body */
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: var(--putih);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: fixed; /* Mengubah posisi menjadi fixed */
+    top: 0; /* Menempatkan navbar di bagian atas */
+    left: 0; /* Menempatkan navbar di sisi kiri */
+    right: 0; /* Menempatkan navbar di sisi kanan */
+    z-index: 1000; /* Memastikan navbar selalu di atas konten lain */
+    height: var(--navbar-height);
+}
+
+.navbar-left,
+.navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    margin-right: 20px;
+}
+
+.category-dropdown {
+    position: relative;
+}
+
+.category-btn {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.search-bar {
+    flex-grow: 1;
+    margin: 0 20px;
+    display: flex;
+}
+
+.search-bar input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px 0 0 4px;
+}
+
+.search-bar button {
+    padding: 10px;
+    background-color: #42b549;
+    color: white;
+    border: none;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+}
+
+.icon-btn {
+    color: #757575;
+    margin-right: 15px;
+    text-decoration: none;
+}
+
+.user-menu {
+    position: relative;
+}
+
+.user-btn {
+    display: flex;
+    align-items: center;
+    color: #757575;
+    text-decoration: none;
+}
+
+.user-btn span:last-child {
+    margin-left: 5px;
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        flex-wrap: wrap;
+    }
+
+    .search-bar {
+        order: 3;
+        width: 100%;
+        margin: 10px 0 0 0;
+    }
+
+    .navbar-right {
+        margin-left: auto;
+    }
+}

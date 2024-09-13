@@ -11,6 +11,8 @@ use PhpParser\Node\Stmt\Foreach_;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
+use function PHPUnit\Framework\returnSelf;
+
 class Products extends Model implements HasMedia
 {
     use HasFactory, Notifiable, InteractsWithMedia;
@@ -47,7 +49,7 @@ class Products extends Model implements HasMedia
     {
         $this
             ->addMediaCollection('artwork')
-            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/svg']);
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/svg', 'image/jpg', 'application/octet-stream']);
 
         $this->addMediaConversion('sm')
             ->width(50)
@@ -157,14 +159,15 @@ class Products extends Model implements HasMedia
     }
 
 
-    public function getorderproduct($perPage = 10)
+    public function getShowproduct($perPage = 10)
     {
         return self::select(
             'products.*',
             'lp.price_lpse as hargaTayang',
             's.name as namaToko',
             's.id as idToko',
-            'p.province_name'
+            'p.province_name',
+            DB::raw('(SELECT image300 FROM product_image WHERE id_product = products.id AND is_default = "yes" LIMIT 1) AS image')
         )
             ->leftJoin('lpse_price as lp', 'products.id', '=', 'lp.id_product')
             ->leftJoin('shop as s', 'products.id_shop', '=', 's.id')
@@ -229,7 +232,7 @@ class Products extends Model implements HasMedia
             'lp.price_lpse as hargaTayang',
             's.name as namaToko',
             's.id as idToko',
-            'p.province_name'
+            'p.province_name',
         )
             ->join('lpse_price as lp', 'products.id', '=', 'lp.id_product')
             ->join('shop as s', 'products.id_shop', '=', 's.id')
@@ -251,7 +254,7 @@ class Products extends Model implements HasMedia
             's.id as idToko',
             's.avatar',
             'p.province_name',
-            'b.name as merek'
+            'b.name as merek',
         )
             ->join('lpse_price as lp', 'products.id', '=', 'lp.id_product')
             ->join('shop as s', 'products.id_shop', '=', 's.id')
@@ -262,13 +265,25 @@ class Products extends Model implements HasMedia
             ->first();
     }
 
+    function getGambarProduct($id)
+    {
+        $query = DB::table('product_image')
+            ->where('id_product', $id)
+            ->get();
+
+        return $query;
+    }
+
     public function get5ProductByIdShop($id_shop)
     {
         return self::select(
             'products.*',
+            'pi.image300'
         )
             ->join('shop as s', 'products.id_shop', '=', 's.id')
+            ->leftjoin('product_image as pi', 'products.id', '=', 'pi.id_product')
             ->where('s.id', $id_shop)
+            ->where('pi.is_default', 'yes')
             ->inRandomOrder() // Urutkan hasil secara acak
             ->take(5) // Ambil 5 data
             ->get();
@@ -554,5 +569,29 @@ class Products extends Model implements HasMedia
         return $averageRatings;
     }
 
-}
+    function getPencarianProdukwithlimit($limit)
+    {
+        return DB::table('log_search')
+            ->select([
+                'log_search.*',
+                'product_image.image50 as image'
+            ])
+            ->join('product_image', 'product_image.id_product', '=', 'log_search.first_product')
+            ->orderBy('search_count', 'desc')
+            ->limit($limit)
+            ->get();
+    }
 
+    function getRandomSerach()
+    {
+        return DB::table('log_search')
+            ->select([
+                'log_search.*',
+                'product_image.image50 as image'
+            ])
+            ->join('product_image', 'product_image.id_product', '=', 'log_search.first_product')
+            ->inRandomOrder()
+            ->limit(8)
+            ->get();
+    }
+}

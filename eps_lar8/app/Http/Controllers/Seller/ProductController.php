@@ -538,7 +538,7 @@ class ProductController extends Controller
 
         // Mengambil URL gambar untuk setiap produk
         $images = DB::table('product as p')
-            ->select('p.id', DB::raw("CONCAT('http://127.0.0.1:8001/',pi.image800) as image800"))
+            ->select('p.id', DB::raw("CONCAT('https://eliteproxy.co.id/',pi.image800) as image800"))
             ->join('product_image as pi', 'pi.id_product', '=', 'p.id')
             ->where('p.status_delete', 'N')
             ->whereIn('p.id', range($id, $idAkhir))

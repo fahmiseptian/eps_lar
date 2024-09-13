@@ -6,6 +6,7 @@ use App\Http\Controllers\Member\HomememberController;
 use App\Http\Controllers\Member\LoginmemberController;
 use App\Http\Controllers\Partner\BniController;
 use App\Http\Controllers\Partner\KurirController;
+use App\Http\Controllers\Member\SearchController;
 use App\Http\Controllers\Seller\DeliveryController;
 use App\Http\Controllers\Seller\FinanceController;
 use App\Http\Controllers\Seller\LoginSellerController;
@@ -51,7 +52,10 @@ Route::post('/login/getsatker', [LoginmemberController::class, 'get_satker']);
 Route::post('/login/getbidang', [LoginmemberController::class, 'get_bidang']);
 
 Route::get('/dashboard', [HomememberController::class, 'dashboard']);
+Route::get('/quick-search', [SearchController::class, 'quickSearch'])->name('quick.search');
+Route::get('/refresh-hits', [HomememberController::class, 'refreshHits']);
 Route::get('/transaksi/{kondisi}', [HomememberController::class, 'transaksi']);
+Route::post('/filter-searching', [SearchController::class, 'filterSearching']);
 
 // For Login Seller
 Route::get('/getShop/kategori', [LoginSellerController::class, 'getKategori']);
@@ -146,7 +150,7 @@ Route::group(['middleware' => 'seller'], function () {
     Route::post('/seller/toko/updatePassword', [ShopSettingController::class, 'updatePassword']);
     Route::post('/seller/toko/UploadFile', [ShopSettingController::class, 'UploadFile']);
     Route::post('/seller/toko/UplaodBanner', [ShopSettingController::class, 'UplaodBanner']);
-    Route::delete('/seller/toko/deleteBanner', [ShopSettingController::class,'deleteBanner']);
+    Route::delete('/seller/toko/deleteBanner', [ShopSettingController::class, 'deleteBanner']);
     Route::post('/seller/toko/updateProfileSeller', [ShopSettingController::class, 'updateProfileSeller']);
     Route::delete('/seller/toko/delete-etalase', [ShopSettingController::class, 'deleteEtalase']);
     Route::post('/seller/toko/tambahEtalase', [ShopSettingController::class, 'addEtalase']);

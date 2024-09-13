@@ -11,6 +11,7 @@ use App\Models\CompleteCartAddress;
 use App\Models\CompleteCartShop;
 use App\Models\CompleteCartShopDetail;
 use App\Models\Invoice;
+use App\Models\Member;
 use App\Models\Shop;
 use App\Models\UploadPayment;
 use Illuminate\Support\Carbon;
@@ -21,12 +22,21 @@ use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
 class CheckoutController extends Controller
 {
     protected $data;
+    protected $model;
     public function __construct(Request $request)
     {
         $this->data['complate_cart'] = new Invoice();
+        $this->model['member'] = new Member();
         // Ambil semua data sesi
         $sessionData = $request->session()->all();
         $this->data['id_user'] = $sessionData['id'] ?? null;
+
+        $this->data['nama_user'] = '';
+
+        if ($this->data['id_user'] != null) {
+            $this->data['member'] = $this->model['member']->find($this->data['id_user']);
+            $this->data['nama_user'] = $this->data['member']->nama;
+        }
     }
 
     function getOrder($id_cart) {

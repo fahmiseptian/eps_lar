@@ -18,6 +18,7 @@ use App\Models\Nego;
 use App\Models\Products;
 use App\Models\Shop;
 use App\Models\Shop_courier;
+use App\Models\ShopBanner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -25,45 +26,73 @@ class HomememberController extends Controller
 {
     protected $data;
     protected $user_id;
+    protected $model;
 
     public function __construct(Request $request)
     {
         // Ambil semua data sesi
         $sessionData = $request->session()->all();
         $this->user_id = $sessionData['id'] ?? null;
+
+        $this->model['products'] = new Products();
+        $this->model['shop_banner'] = new ShopBanner();
+        $this->model['member'] = new Member();
+        $this->data['nama_user'] = '';
+
+        if ($this->user_id != null) {
+            $this->data['member'] = $this->model['member']->find($this->user_id);
+            $this->data['nama_user'] = $this->data['member']->nama;
+        }
     }
 
-    function keranjang($id_member) {
+    function keranjang($id_member)
+    {
         $checkout = new Checkout();
         $keranjang = $checkout->keranjang($id_member);
         return response()->json(["keranjang" => $keranjang]);
     }
 
-    public function index() {
-        $products= Products::getorderproduct(12);
-        $this->data['id_user']=$this->user_id;
+    public function index()
+    {
+        $products =  $this->model['products']->getShowproduct(35);
+        $banners = $this->model['shop_banner']->getBannerbyTipe(1);
+        $chill_banner =  $this->model['shop_banner']->getBannerbyTipe(2, 3);
+        $this->data['id_user'] = $this->user_id;
 
-        // return response()->json(["products"=>$products]);
-        return view('member.home.index',$this->data,["products"=>$products]);
+        $banner_product_category = DB::table('product_category')->where('active', 'Y')->where('icon', '!=', '')->get();
+        $promos = DB::table('promo_category')->where('active', 'Y')->where('display_status', 'show')->get();
+        $product_search = $this->model['products']->getPencarianProdukwithlimit(4);
+        $random_search = $this->model['products']->getRandomSerach();
+        $categories = collect();
+        $productsearch = collect();
+        $stores = collect();
+
+        return view('member.home.index', $this->data, [
+            "products" => $products,
+            "banners" => $banners,
+            "random_search" => $random_search,
+            "chill_banner" => $chill_banner,
+            "banner_product_category" => $banner_product_category,
+            "promos" => $promos,
+            "product_search" => $product_search,
+            "categories" => $categories,
+            "stores" => $stores,
+            "productsearch" => $productsearch
+        ]);
     }
 
-    public function getPaginatedProducts(Request $request) {
-        $perPage = 12;
-        $products = Products::select(
-            'products.*',
-            'lp.price_lpse as hargaTayang',
-            's.name as namaToko',
-            's.id as idToko',
-            'p.province_name'
-        )
-        ->join('lpse_price as lp', 'products.id', '=', 'lp.id_product')
-        ->join('shop as s', 'products.id_shop', '=', 's.id')
-        ->join('member_address as ma', 's.id_address', '=', 'ma.member_address_id')
-        ->join('province as p', 'ma.province_id', '=', 'p.province_id')
-        ->where('products.status_display', 'Y')
-        ->where('products.status_delete', 'N')
-        ->where('s.status', 'active')
-        ->paginate($perPage);
+    function refreshHits()
+    {
+        $random_search = $this->model['products']->getRandomSerach();
+        return response()->json([
+            "status" => "success",
+            "data" => $random_search,
+        ]);
+    }
+
+    public function getPaginatedProducts(Request $request)
+    {
+        $products =  $this->model['products']->getShowproduct(35);
 
         if ($request->ajax()) {
             return view('member.home.product-list', compact('products'))->render();
@@ -72,34 +101,30 @@ class HomememberController extends Controller
         return view('home.index', compact('products'));
     }
 
-    public function getDetailproduct($id) {
-        $this->data = Products::getproductById($id);
-        $this->data['id_user']=$this->user_id;
-        $produkToko = Products::get5ProductByIdShop($this->data->idToko);
-        $gambarProductlain = [];
-        $productlain = [];
+    public function getDetailproduct($id)
+    {
+        $this->data = $this->model['products']->getproductById($id);
+        $this->data['id_user'] = $this->user_id;
+        $produkToko = $this->model['products']->get5ProductByIdShop($this->data->idToko);
+        $gambarProduct = $this->model['products']->getGambarProduct($id);
 
 
-        foreach ($produkToko as $produk) {
-            // Check if $produk is an object, artwork_url_sm exists, is an array, and is not empty
-            if (is_object($produk) && isset($produk->artwork_url_sm) && is_array($produk->artwork_url_sm) && !empty($produk->artwork_url_sm)) {
-                // Add the first image from artwork_url_sm array and the product name to $gambarProductlain array
-                $gambarProductlain[] =  $produk->artwork_url_sm[0];
-                $productlain[] =  $produk->id;
-            }
+        if ($this->data['id_user'] != null) {
+            $this->data['member'] = $this->model['member']->find($this->data['id_user']);
+            $this->data['nama_user'] = $this->data['member']->nama;
         }
 
         // Store the array in the data property
-        $this->data->productlain = $gambarProductlain;
-        $this->data->productidlain = $productlain;
+        $this->data->produkToko = $produkToko;
+        $this->data->gambarProduct = $gambarProduct;
 
         // return response()->json($this->data);
-        return view('member.home.detail',$this->data);
+        return view('member.home.detail', $this->data);
     }
 
-    public function ShowSeller($id_shop) {
-        $where = [
-        ];
+    public function ShowSeller($id_shop)
+    {
+        $where = [];
         $this->data = Shop::getShopById($id_shop);
         if (is_object($this->data)) {
             $this->data = (array) $this->data;
@@ -115,40 +140,50 @@ class HomememberController extends Controller
         ];
         $this->data = array_merge($this->data, $dataToko);
 
-        $products= Products::getProductByIdShop($id_shop);
+        $products = Products::getProductByIdShop($id_shop);
         $productTerbaru = Products::getProductTerbaruByIdshop($id_shop);
 
         $products->level1 = Products::GetKategoryProductByIdshoplavel1($id_shop);
         $products->level2 = Products::GetKategoryProductByIdshoplavel2($id_shop);
         $products->level3 = Products::GetKategoryProductByIdshoplavel3($id_shop);
 
+        if ($this->data['id_user'] != null) {
+            $this->data['member'] = $this->model['member']->find($this->data['id_user']);
+            $this->data['nama_user'] = $this->data['member']->nama;
+        }
+
         // return response()->json($this->data);
-        return view('member.home.seller', $this->data,["products"=>$products, "NewProduct"=>$productTerbaru]);
+        return view('member.home.seller', $this->data, ["products" => $products, "NewProduct" => $productTerbaru]);
     }
 
-    public function getProductsByEtalase($id_etalse) {
-        $products= Products::getProductbyEtalase($id_etalse);
-        return response()->json(["products"=>$products]);
+    public function getProductsByEtalase($id_etalse)
+    {
+        $products = Products::getProductbyEtalase($id_etalse);
+        return response()->json(["products" => $products]);
     }
 
-    public function getProductsByIdshop($id_shop) {
-        $products= Products::getProductByIdShop($id_shop);
-        return response()->json(["products"=>$products]);
+    public function getProductsByIdshop($id_shop)
+    {
+        $products = Products::getProductByIdShop($id_shop);
+        return response()->json(["products" => $products]);
     }
 
-    public function GetKategoryProductByIdshop($id_shop) {
+    public function GetKategoryProductByIdshop($id_shop)
+    {
         $products = new \stdClass();
         $products->level1 = Products::GetKategoryProductByIdshoplavel1($id_shop);
         $products->level2 = Products::GetKategoryProductByIdshoplavel2($id_shop);
         $products->level3 = Products::GetKategoryProductByIdshoplavel3($id_shop);
         return response()->json(["products" => $products]);
     }
-    public function GetProductByKategoriandIdShop($id_kategori,$id_shop) {
-        $products = Products::GetProductByKategoriandIdShop($id_kategori,$id_shop);
+    public function GetProductByKategoriandIdShop($id_kategori, $id_shop)
+    {
+        $products = Products::GetProductByKategoriandIdShop($id_kategori, $id_shop);
         return response()->json(["products" => $products]);
     }
 
-    public function dashboard(){
+    public function dashboard()
+    {
         $semuakondisi = ['belum', 'sudah', 'ulang', 'batal'];
         $statuses = ['baru', 'belumbayar', 'pengiriman', 'selesai', 'batal'];
         $results = [];
@@ -170,29 +205,30 @@ class HomememberController extends Controller
         ]);
     }
 
-    function transaksi($kondisi){
+    function transaksi($kondisi)
+    {
         if ($kondisi == 'semua') {
             $status = null;
-        }elseif ($kondisi == 'butuhpersetujuan') {
+        } elseif ($kondisi == 'butuhpersetujuan') {
             $status = 'waiting_approve_by_ppk';
-        }elseif ($kondisi == 'disetujui') {
-            $status ='pending';
-        }elseif ($kondisi == 'ditolak') {
-            $status ='cancel';
-        }elseif ($kondisi == 'kirim') {
-            $status ='on_delivery';
+        } elseif ($kondisi == 'disetujui') {
+            $status = 'pending';
+        } elseif ($kondisi == 'ditolak') {
+            $status = 'cancel';
+        } elseif ($kondisi == 'kirim') {
+            $status = 'on_delivery';
         }
 
         // $detail = CompleteCartShop::getorderbyIdCart(630);
 
 
-        $transaksi = Invoice::getOrderByIdmember($this->user_id,$status);
+        $transaksi = Invoice::getOrderByIdmember($this->user_id, $status);
 
         foreach ($transaksi as $trans) {
             $detail = CompleteCartShop::getorderbyIdCart($trans->id_transaksi);
 
             foreach ($detail as $product) {
-                $products = CompleteCartShop::getDetailProduct($product->id_shop,$product->id);
+                $products = CompleteCartShop::getDetailProduct($product->id_shop, $product->id);
                 $product->products = $products;
             }
 
@@ -210,20 +246,21 @@ class HomememberController extends Controller
     public function tampil()
     {
         $carts = new Cart();
-        $cart =$carts->getProductDetail(284);
-        return response()->json(["test" =>$cart ]);
+        $cart = $carts->getProductDetail(284);
+        return response()->json(["test" => $cart]);
     }
 
 
     public function fetchProducts()
     {
         $carts = new Cart();
-        $cart =$carts->insertHandlingCost(702);
-        return response()->json(["test" =>$cart ]);
+        $cart = $carts->insertHandlingCost(702);
+        return response()->json(["test" => $cart]);
     }
 
 
-    public function fetchCompleteCartShop(){
+    public function fetchCompleteCartShop()
+    {
         $carts = new Calculation();
         $dataArr = [
             'fee_nominal' => 3500,
@@ -237,7 +274,6 @@ class HomememberController extends Controller
             // 'total_non_ppn' => $dcart->total_non_ppn,
         ];
         $cart = $carts->calc_handling_cost($dataArr);
-        return response()->json(["test" =>$cart ]);
-
+        return response()->json(["test" => $cart]);
     }
 }

@@ -15,4 +15,15 @@ class ShopBanner extends Model implements HasMedia
 
     protected $table = 'shop_banner';
     public $timestamps = false;
+
+    function getBannerbyTipe($tipe, $limit = null)
+    {
+        $query = DB::table('banner')
+            ->where('category_banner_id', $tipe)
+            ->where('active', 'Y');
+        if ($limit) {
+            $query->limit($limit);
+        }
+        return $query->get();
+    }
 }

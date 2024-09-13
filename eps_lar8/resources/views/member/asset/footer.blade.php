@@ -72,7 +72,7 @@
 
 
 
- {{-- <!-- Footer -->
+{{-- <!-- Footer -->
 <footer>
     <div class="footer-content">
         <!-- Kolom Layanan Pelanggan -->
@@ -145,3 +145,62 @@
 <script src="{{ secure_asset('plugins/sweetalert2/sweetalert2.min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script> --}}
+
+<script>
+    $(document).ready(function() {
+        var searchTimer;
+
+        $('#search-input').on('input', function() {
+            clearTimeout(searchTimer);
+            var query = $(this).val();
+
+            if (query.length >= 2) {
+                $('#search-results').show();
+                $('#search-loading').show();
+                $('#quick-search-results').html('');
+                $('#full-search-results').html('');
+            } else {
+                $('#search-results').hide();
+                return;
+            }
+
+            searchTimer = setTimeout(function() {
+                if (query.length >= 2) {
+                    $.ajax({
+                        url: '{{ route("quick.search") }}',
+                        method: 'GET',
+                        data: {
+                            query: query
+                        },
+                        success: function(response) {
+                            $('#search-loading').hide();
+                            $('#quick-search-results').html(response);
+                        },
+                        error: function(xhr, status, error) {
+                            $('#search-loading').hide();
+                            console.error("AJAX error: " + status + ": " + error);
+                        }
+                    });
+                } else {
+                    $('#search-loading').hide();
+                    $('#quick-search-results').html('');
+                    $('#search-results').hide();
+                }
+            }, 500);
+        });
+
+        $('#search-button').on('click', function() {
+            var query = $('#search-input').val();
+            if (query.length >= 2) {
+                window.location.href = appUrl + '/find/' + query;
+            }
+        });
+
+        // Sembunyikan hasil pencarian ketika klik di luar area pencarian
+        $(document).on('click', function(event) {
+            if (!$(event.target).closest('.search-container').length) {
+                $('#search-results').hide();
+            }
+        });
+    });
+</script>

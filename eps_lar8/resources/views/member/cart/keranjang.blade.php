@@ -49,9 +49,9 @@
                         </div>
                         <div class="qty-produk-cart">
                             <div class="qty-cart-produk">
-                                <button class="btn-qty btn-kurang" data-id_cst="{{ $product->id_cst }}" data-id="{{ $product->id }}" >-</button>
+                                <button class="btn-qty btn-kurang" data-id_cst="{{ $product->id_cst }}" data-id="{{ $product->id }}">-</button>
                                 <input type="text" data-max="{{ $product->stock }}" id="qty-product-cart-{{ $product->id }}" data-id_cst="{{ $product->id_cst }}" data-id_cs="{{ $detail->id_cs }}" data-id="{{ $product->id }}" value="{{ $product->qty }}" class="input-qty">
-                                <button class="btn-qty btn-tambah" data-id_cst="{{ $product->id_cst }}" data-id="{{ $product->id }}" >+</button>
+                                <button class="btn-qty btn-tambah" data-id_cst="{{ $product->id_cst }}" data-id="{{ $product->id }}">+</button>
                             </div>
                             <p id="empty-{{ $product->id }}" style="display: none; color: red;">Minimal 1 Produk</p>
                         </div>
@@ -59,8 +59,9 @@
                     <hr style="margin-left: 20px;">
                     @endforeach
                 </div>
+                @endforeach
+
             </div>
-            @endforeach
             </div>
             <div class="sub-total-cart">
                 <b style="font-size: 18px; margin-bottom: 10px;" align="left">Ringkasan Belanja</b>

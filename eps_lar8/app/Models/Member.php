@@ -228,7 +228,7 @@ class Member extends Model
                 'ma.member_address_id',
                 'ma.phone',
                 'ma.address_name',
-                'ma.address',
+            'ma.address',
                 'ma.postal_code',
                 'p.province_name',
                 's.subdistrict_name',

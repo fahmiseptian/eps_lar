@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Member;
-
+    
 use App\Http\Controllers\Controller;
 use App\Libraries\Calculation;
 use App\Models\Cart;
@@ -23,9 +23,18 @@ class CartController extends Controller
     {
         $this->model['CartShopTemporary'] = new CartShopTemporary();
         $this->model['CartShop'] = new CartShop();
+        $this->model['member'] = new Member();
+            
         // Ambil semua data sesi
         $sessionData = $request->session()->all();
         $this->data['id_user'] = $sessionData['id'] ?? null;
+
+        $this->data['nama_user'] = '';
+
+        if ($this->data['id_user'] != null) {
+            $this->data['member'] = $this->model['member']->find($this->data['id_user']);
+            $this->data['nama_user'] = $this->data['member']->nama;
+        }
     }
     // Metode lain dalam controller
     public function index() {

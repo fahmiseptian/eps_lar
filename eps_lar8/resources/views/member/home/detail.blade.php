@@ -20,23 +20,31 @@
                     @endforeach
                 </div>
                 <div class="product-carousel">
-                    @foreach ($artwork_url_lg as $gambar)
-                        <div class="productdetail-item">
-                            <img src="{{ $gambar }}" class="product-image-large">
-                        </div>
+                    @foreach ($gambarProduct as $gambar)
+                    @php
+                    $requiresBaseUrl = strpos($gambar->image300, 'http') === false;
+                    $image300 = $requiresBaseUrl ? "https://eliteproxy.co.id/" . $gambar->image300 : $gambar->image300;
+                    @endphp
+                    <div class="productdetail-item">
+                        <img src="{{ $image300 }}" class="product-image-large">
+                    </div>
                     @endforeach
                 </div>
 
                 <!-- Gambar kecil -->
                 <div class="product-small">
-                    @foreach ($artwork_url_sm as $gambar)
-                        <img src="{{ $gambar }}" alt="Gambar kecil" class="product-image-small">
+                    @foreach ($gambarProduct as $gambar)
+                    @php
+                    $requiresBaseUrl = strpos($gambar->image50, 'http') === false;
+                    $image50 = $requiresBaseUrl ? "https://eliteproxy.co.id/" . $gambar->image50 : $gambar->image50;
+                    @endphp
+                    <img src="{{ $image50 }}" alt="Gambar kecil" class="product-image-small">
                     @endforeach
                 </div>
             </div>
             <div class="product-detail">
                 <div class="product-info-detail">
-                    <h4>{{ $name }}</h4>
+                    <h4><b>{{ $name }} </b></h4>
                     <div class="rate-product">
                         <ul>
                             <li>{{$count_rating}} Penilaian</li>
@@ -51,14 +59,16 @@
                 </div>
 
                 <div class="quantity-selector">
-                    <label for="quantity">Jumlah:</label>
-                    <div class="quantity-input">
-                        <button type="button" class="quantity-btn" onclick="decreaseQuantity()">-</button>
-                        <input type="number" id="quantity" name="quantity" min="1" max="{{$stock}}"
-                            value="1" step="1">
-                        <button type="button" class="quantity-btn" onclick="increaseQuantity()">+</button>
+                    <label for="quantity">Kuantitas :</label>
+                    <div class="total-stock">
+
+                        <div class="quantity-input">
+                            <button type="button" class="quantity-btn minus">-</button>
+                            <input type="number" id="quantity" name="quantity" min="1" max="{{$stock}}" value="1" step="1">
+                            <button type="button" class="quantity-btn plus">+</button>
+                        </div>
+                        <p>Stok tersisa: <span id="stock-remaining">{{$stock}}</span></p>
                     </div>
-                    <p>Stok tersisa: <span class="stock-remaining">{{$stock}}</span></p>
                 </div>
                 <div class="action-buttons">
                     <button class="cart-btn" data-id_user="{{$id_user}}" data-id="{{$id}}"><span class="material-icons">add_shopping_cart</span>
@@ -83,7 +93,7 @@
                     <p>
                         Merek : {{$merek}} <br>
                         {{ strip_tags($spesifikasi) }}
-                    </p>                    
+                    </p>
                 </div>
                 <div id="informasi-toko" class="section-content" style="display: none;">
                     <!-- Konten Informasi Toko -->
@@ -91,12 +101,29 @@
                 </div>
             </div>
             <div class="seller-detail">
-                <img src="https://eliteproxy.co.id/seller_center/{{ $avatar }}" alt="Avatar">
-                <p>
-                    <a href="{{ route('seller.detail', ['id' => $idToko]) }}" style="text-decoration: none;">
-                        <b>{{ $namaToko }}</b>
-                    </a>
-                </p>
+                @php
+                $requiresBaseUrl = strpos($avatar, 'http') === false;
+                $icon_toko = $requiresBaseUrl ? "https://eliteproxy.co.id/" .$avatar :$avatar;
+                @endphp
+                <div class="toko_detail_produk">
+                    <div class="toko-header">
+                        <img src="{{ $icon_toko }}" alt="Avatar" class="toko-avatar">
+                        <a href="{{ route('seller.detail', ['id' => $idToko]) }}" class="toko-nama">
+                            <b>{{ $namaToko }}</b>
+                        </a>
+                    </div>
+                    <div class="toko-actions">
+                        <button class="btn-chat">
+                            <i class="material-icons">chat</i>
+                            Chat
+                        </button>
+                        <a href="{{ route('seller.detail', ['id' => $idToko]) }}" class="btn-kunjungi">
+                            <i class="material-icons">store</i>
+                            Kunjungi Toko
+                        </a>
+                    </div>
+                </div>
+
                 <table style="width: 100%">
                     <tr>
                         <td style="font-size:10px">Produk lainnya</td>
@@ -104,17 +131,16 @@
                     </tr>
                 </table>
                 <div class="product-seller">
+                    @foreach ($produkToko as $product)
                     @php
-                        $combined = array_map(null, $productlain, $productidlain);
+                    $requiresBaseUrl = strpos($product->image300, 'http') === false;
+                    $image300 = $requiresBaseUrl ? "https://eliteproxy.co.id/" .$product->image300 : $product->image300;
                     @endphp
 
-                    @foreach ($combined as [$product, $idProduct])
-                        <a href="{{ route('product.show', ['id' => $idProduct]) }}">
-                            <img src="{{ $product }}" alt="Gambar produk">
-                        </a>
+                    <a href="{{ route('product.show', ['id' => $product->id]) }}">
+                        <img src="{{ $image300 }}" alt="Gambar produk">
+                    </a>
                     @endforeach
-
-
                 </div>
             </div>
         </section class="ulasan-product">

@@ -1,19 +1,107 @@
 /* Orange = #FC6703 */
+/* #039be5 = Biru */
+
+:root {
+    --primary-color: #fc6703;
+    --secondary-color: #fff0e6;
+    --text-color: #333333;
+    --hover-color: #e55a00;
+    --putih: #fff;
+    --background-color: #efefef;
+    --samar-background-color: #f9f9f9;
+}
 
 /* Gaya umum */
 body {
     font-family: Arial, sans-serif, Georgia, "Times New Roman", Times, serif;
     margin: 0;
     padding: 0;
+    min-height: 100%;
+    overflow-y: scroll;
+    background-color: var(--background-color) !important;
 }
 
 main {
+    padding-top: var(--navbar-height);
     max-width: 1200px;
     /* Batas lebar maksimal konten utama */
     margin: 0 auto;
-    /* Pusatkan konten utama secara horizontal */
     padding: 20px;
     /* Beri jarak di dalam konten utama */
+}
+
+.search-container {
+    position: relative;
+    width: 100%;
+    max-width: 600px; /* Sesuaikan lebar maksimum sesuai kebutuhan */
+    margin: 0 auto; /* Ini akan membuat container berada di tengah */
+}
+
+.search-bar {
+    display: flex;
+    width: 100%;
+}
+
+#search-input {
+    flex-grow: 1;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px 0 0 4px;
+}
+
+#search-button {
+    padding: 5px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+}
+
+#search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--secondary-color);
+    border: 1px solid #ddd;
+    color: gray;
+    border-top: none;
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 0 0 4px 4px;
+}
+
+#quick-search-results {
+    padding: 10px;
+    font-style: italic;
+}
+
+#quick-search-results h3 {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    font-size: 20px;
+    color: #000;
+    font-weight: bold;
+}
+
+#quick-search-results ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+#quick-search-results li {
+    padding: 5px 0;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+}
+
+#quick-search-results li:last-child {
+    border-bottom: none;
 }
 
 .google-icon {
@@ -25,7 +113,7 @@ main {
 
 .load-more-button {
     width: 100%;
-    background-color: orange;
+    background-color: var(--primary-color);
     color: white;
     padding: 10px 0;
     border: none;
@@ -44,10 +132,12 @@ main {
     padding: 10px 20px;
     background-color: grey;
     color: white;
+    height: 100px;
 }
 
 .navbar .logo img {
-    height: 40px;
+    height: 60px;
+    margin-left: 40px;
 }
 
 .navbar .logo-mobile img {
@@ -95,28 +185,38 @@ main {
 /* Banner kecil */
 .banner-small {
     display: flex;
-    justify-content: space-between;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: 100px;
 }
 
 .banner-small img {
-    width: 49%;
-    height: 200px;
+    width: calc(33.33% - 10px);
+    height: 100px;
     object-fit: cover;
     border-radius: 8px;
+    flex-shrink: 0;
+    margin-right: 10px;
 }
 
 /* Gaya untuk search bar */
 .search-bar {
     display: flex;
-    /* Menggunakan flexbox untuk tata letak */
-    width: 75%;
-    /* Lebar search bar */
-    height: 40px;
-    /* Tinggi search bar */
+    width: 100%;
+    height: 60px;
     padding: 5px;
-    /* Beri jarak di dalam search bar */
+    justify-content: center;
+    align-items: center;
     border-radius: 4px;
-    /* Membulatkan sudut search bar */
+    margin-right: -30px;
+}
+
+#search-loading {
+    padding: 10px;
+    text-align: center;
+    color: #666;
+    font-style: italic;
 }
 
 .search-bar input {
@@ -130,26 +230,20 @@ main {
 }
 
 .search-bar button {
-    width: 100px;
-    /* Lebar button */
+    width: 60px;
     height: 100%;
     background-color: #00cec9;
-    /* Warna latar belakang button */
     color: white;
-    /* Warna teks button */
     border: none;
-    /* Hapus garis batas */
     border-radius: 0 4px 4px 0;
-    /* Membulatkan sudut kanan */
     cursor: pointer;
-    /* Ubah cursor saat hover */
     font-size: 16px;
-    /* Ukuran font button */
 }
 
 .account a {
-    margin: 0 10px;
+    margin: 0 20px;
     color: white;
+    font-size: larger;
     text-decoration: none;
 }
 
@@ -159,27 +253,278 @@ main {
 
 /* Kategori */
 .categories {
+    background-color: var(--samar-background-color);
+    box-shadow: 0 2px 4px 0 gray;
+    border-radius: 15px;
     padding: 20px;
+}
+
+.category-container {
+    position: relative;
+    overflow: hidden;
+    padding: 0 40px;
 }
 
 .category-carousel {
     display: flex;
-    overflow-x: auto;
-    /* Mengaktifkan scroll horizontal */
+    transition: transform 0.3s ease;
     padding: 10px 0;
 }
 
 .category-item {
     display: flex;
     flex-direction: column;
-    /* Mengatur elemen sebagai kolom */
     align-items: center;
-    /* Menyelaraskan item secara horizontal */
     padding: 10px;
-    width: 100px;
     margin-right: 10px;
-    background-color: #dfe6e9;
+    min-width: 100px;
+    background-color: var(--putih);
+    box-shadow: 0 2px 4px 0 gray;
     border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #333;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1;
+    opacity: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.nav-btn:hover {
+    background-color: rgba(255, 255, 255, 1);
+    color: #000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.prev-btn {
+    left: 10px;
+}
+
+.next-btn {
+    right: 10px;
+}
+
+.category-container:hover .nav-btn {
+    opacity: 1;
+}
+
+/* Tambahkan ini jika Anda ingin menggunakan ikon dari font awesome atau material icons */
+.nav-btn i {
+    font-size: 24px;
+}
+
+.products-section {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.search-results {
+    background-color: var(--putih);
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    padding-left: 30px;
+}
+
+.stores-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.search-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.search-result-text {
+    font-size: 14px;
+    color: #666;
+}
+
+.sort-dropdown {
+    position: relative;
+}
+
+#sort-order {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: var(--putih);
+    border: 1px solid var(--primary-color);
+    border-radius: 10px;
+    padding: 8px 30px 8px 10px;
+    font-size: 14px;
+    width: 200px;
+    color: #333;
+    cursor: pointer;
+}
+
+#sort-order::-ms-expand {
+    display: none;
+}
+
+.sort-dropdown::after {
+    content: "\25BC";
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 12px;
+    color: #666;
+}
+
+#sort-order:hover {
+    background-color: var(--secondary-color);
+}
+
+#sort-order:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.search-filters {
+    background-color: #f8f8f8;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-filters h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.filter-section {
+    margin-bottom: 20px;
+}
+
+.filter-section h4 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.filter-section ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.filter-section li {
+    margin-bottom: 8px;
+}
+
+.category-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.category-list li {
+    margin-bottom: 8px;
+}
+
+.filter-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background-color: #fff;
+    border-radius: 4px;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.filter-item:hover {
+    background-color: #e9e9e9;
+}
+
+.filter-item.active {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+}
+
+.arrow {
+    font-size: 14px;
+    color: var(--text-color);
+}
+
+.has-submenu > .submenu {
+    display: none;
+    list-style-type: none;
+    padding-left: 20px;
+    margin-top: 8px;
+}
+
+.has-submenu.open > .submenu {
+    display: block;
+}
+
+.submenu .filter-item {
+    background-color: var(--putih);
+}
+
+.filter-item.active {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+}
+
+.filter-item.active .arrow {
+    color: var(--primary-color);
+}
+
+.price-inputs {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.price-inputs input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+#apply-price {
+    width: 100%;
+    padding: 8px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#apply-price:hover {
+    background-color: #0056b3;
 }
 
 .category-item img {
@@ -222,6 +567,63 @@ main {
     text-align: center;
     background-color: #f0f0f0;
     border-radius: 4px;
+    max-width: 200px;
+}
+
+.stores-section {
+    margin-bottom: 30px;
+}
+
+.stores-section h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.store-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.store-card {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    width: calc(50% - 10px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.store-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.store-card img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 15px;
+}
+
+.store-info {
+    flex-grow: 1;
+}
+
+.store-info h4 {
+    margin: 0 0 5px 0;
+    font-size: 16px;
+    color: #333;
+}
+
+.store-info p {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
 }
 
 .product-link {
@@ -265,7 +667,12 @@ main {
     display: grid;
     justify-content: space-between;
     font-size: 12px;
-    color: gray;
+    color: var(--text-color);
+}
+
+.product-info-detail h3 {
+    color: var(--primary-color);
+    font-weight: bold;
 }
 
 /* Efek hover pada item produk */
@@ -278,14 +685,14 @@ main {
     margin-top: 20px;
     padding: 10px;
     border: none;
-    background-color: #007bff;
+    background-color: var(--primary-color);
     color: white;
     border-radius: 5px;
     cursor: pointer;
 }
 
 .load-more-button:hover {
-    background-color: #0056b3;
+    background-color: var(--hover-color);
 }
 
 .button-container {
@@ -301,37 +708,127 @@ main {
 
 /* Promos */
 .promos {
+    background-color: var(--samar-background-color);
+    border-radius: 10px;
     padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .promo-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 10px;
-    overflow-x: auto;
-    max-height: 160px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .promo-item {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    padding: 10px;
-    background-color: #f0f0f0;
-    border-radius: 4px;
+    background-color: white;
+    border-radius: 8px;
+    padding: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.promo-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.promo-item p {
+    margin: 0 0 10px 0;
+    font-weight: bold;
+    text-align: center;
+    color: #333;
 }
 
 .promo-item img {
     width: 50px;
     height: 50px;
+    object-fit: contain;
+}
+
+.promo-container h2,
+.categories h2 {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+    margin-bottom: 10px;
+}
+
+.toko_detail_produk {
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.toko-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.toko-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
     object-fit: cover;
+    margin-right: 15px;
+}
+
+.toko-nama {
+    text-decoration: none;
+    color: #333;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.toko-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-chat,
+.btn-kunjungi {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    flex: 1;
+}
+
+.btn-chat {
+    background-color: #4caf50;
+    color: white;
+}
+
+.btn-kunjungi {
+    background-color: #2196f3;
+    color: white;
+}
+
+.btn-chat:hover,
+.btn-kunjungi:hover {
+    opacity: 0.9;
+}
+
+.btn-chat i,
+.btn-kunjungi i {
+    font-size: 16px;
     margin-right: 5px;
-    margin-left: 10px;
 }
-
-.promo-item p {
-    margin: 5px;
-}
-
 /* Flash Sale */
 .flash-sale {
     display: flex;
@@ -363,6 +860,80 @@ main {
     /* Jarak sekitar bagian */
 }
 
+.popular-searches-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.popular-searches-header h2 {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.reload-search {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: var(--primary-color);
+}
+
+.reload-search .material-icons {
+    font-size: 18px;
+    margin-right: 5px;
+}
+
+.reload-search span:last-child {
+    font-size: 14px;
+}
+
+.popular-searches h2 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.popular-searches-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 15px;
+}
+
+.popular-search-item {
+    display: flex;
+    align-items: center;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.popular-search-item img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.search-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.search-info .keyword {
+    font-weight: bold;
+    margin: 0 0 5px 0;
+}
+
+.search-info .product-count {
+    color: #666;
+    font-size: 0.9em;
+    margin: 0;
+}
+
 .searches-grid {
     gap: 10px;
     /* Jarak antara item */
@@ -375,24 +946,34 @@ main {
 
 .search-item {
     display: flex;
-    /* Menggunakan flexbox untuk tata letak dalam item */
     align-items: center;
-    /* Menyelaraskan teks ke tengah */
     padding: 10px;
-    /* Memberi jarak dalam item */
-    background-color: #dfe6e9;
-    /* Latar belakang abu-abu terang */
+    background-color: var(--putih);
+    box-shadow: 0 2px 4px 0 gray;
     border-radius: 4px;
-    /* Membulatkan sudut item */
 }
 
 .search-item p {
     margin: 10px;
 }
 
+.search-page {
+    display: flex;
+    margin-top: 20px;
+}
+
+.search-filters {
+    width: 250px;
+    padding-right: 20px;
+}
+
+.search-results {
+    flex: 1;
+}
+
 /* CSS untuk footer */
 .footer-content {
-    background-color: #f0f0f0;
+    background-color: var(--putih);
     padding: 20px 40px;
     display: flex;
     justify-content: space-between;
@@ -479,12 +1060,19 @@ main {
     display: flex;
     gap: 10px;
     overflow-x: auto;
+    max-width: 300px;
     justify-content: center;
+    scrollbar-width: none; /* Untuk Firefox */
+    -ms-overflow-style: none; /* Untuk Internet Explorer dan Edge */
+}
+
+.product-small::-webkit-scrollbar {
+    display: none; /* Untuk Chrome, Safari, dan Opera */
 }
 
 .product-image-small {
     width: 100%;
-    height: 100px;
+    height: 50px;
     max-width: 100px;
     /* Batasi lebar maksimal gambar kecil */
     border-radius: 8px;
@@ -495,6 +1083,102 @@ main {
     margin-bottom: 4px;
 }
 
+.total-stock {
+    display: flex;
+    align-items: center;
+    /* justify-content: center; */
+}
+
+.total-stock p {
+    margin-left: 10px;
+}
+
+.quantity-input-container {
+    margin-bottom: 20px;
+    font-family: "Arial", sans-serif;
+}
+
+.quantity-input-container label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.quantity-input {
+    display: flex;
+    align-items: center;
+    border: 2px solid #e0e0e0;
+    border-radius: 50px;
+    overflow: hidden;
+    height: 40px;
+    width: fit-content;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+
+    vertical-align: middle; /* Mengatur posisi vertikal ikon */
+    line-height: 18px; /* Mengatur ketinggian baris agar ikon berada di tengah */
+    margin-right: 5px;
+}
+
+.quantity-input:focus-within {
+    border-color: #fc6703;
+    box-shadow: 0 0 0 3px rgba(252, 103, 3, 0.2);
+}
+
+.quantity-btn {
+    background-color: var(--putih);
+    border: none;
+    color: #fc6703;
+    font-size: 24px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quantity-btn:hover {
+    background-color: rgba(252, 103, 3, 0.1);
+}
+
+.quantity-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.quantity-btn .material-icons {
+    font-size: 20px;
+}
+
+#quantity {
+    width: 50px;
+    text-align: center;
+    border: none;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    padding: 10px 0;
+    -moz-appearance: textfield;
+    background-color: transparent;
+}
+
+#quantity::-webkit-outer-spin-button,
+#quantity::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.stock-info {
+    font-size: 14px;
+    color: #666;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+}
+
 /* Style untuk komponen */
 .product-detail {
     display: grid;
@@ -503,7 +1187,7 @@ main {
     padding: 16px;
     border: 1px solid #ccc;
     border-radius: 8px;
-    background-color: #f9f9f9;
+    background-color: var(--putih);
     width: 45%;
 }
 
@@ -699,7 +1383,7 @@ main {
 .product-item {
     display: flex;
     align-items: center;
-    background-color: #fff;
+    background-color: var(--putih);
     padding: 10px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -774,7 +1458,7 @@ main {
     border: 1px solid #ccc;
     border-radius: 8px;
     margin-left: 10px;
-    background-color: #f9f9f9;
+    background-color: var(--putih);
     width: auto;
     height: 10%;
 }
@@ -1402,9 +2086,9 @@ main {
 }
 
 .google-icon {
-    font-size: 24px;
-    color: #757575;
-    cursor: pointer;
+    /* font-size: 24px; */
+    /* color: #757575; */
+    /* cursor: pointer; */
 }
 
 .product-name {
@@ -1470,20 +2154,22 @@ main {
     box-shadow: 0 4px 8px rgba(244, 67, 54, 0.3);
 }
 
-.btn-nego:active, .btn-hapus:active {
+.btn-nego:active,
+.btn-hapus:active {
     transform: translateY(2px);
     box-shadow: none;
 }
 
 /* Efek ripple untuk tombol */
-.btn-nego::after, .btn-hapus::after {
-    content: '';
+.btn-nego::after,
+.btn-hapus::after {
+    content: "";
     position: absolute;
     top: 50%;
     left: 50%;
     width: 5px;
     height: 5px;
-    background: rgba(255, 255, 255, .5);
+    background: rgba(255, 255, 255, 0.5);
     opacity: 0;
     border-radius: 100%;
     transform: scale(1, 1) translate(-50%);
@@ -1579,7 +2265,8 @@ main {
         transform: scale(40, 40);
     }
 }
-.btn-nego:focus:not(:active)::after, .btn-hapus:focus:not(:active)::after {
+.btn-nego:focus:not(:active)::after,
+.btn-hapus:focus:not(:active)::after {
     animation: ripple 1s ease-out;
 }
 .btn-qty:focus {
