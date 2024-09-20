@@ -1122,8 +1122,12 @@ function activateEventListeners() {
             },
         });
     }
+    let isSubmitting = false;
 
     function handleSave(status) {
+
+        if (isSubmitting) return;
+        isSubmitting = true;
         // Collect all required data
         var name = $("#nama").val();
         var kategorilevel1 = $("#kategori").attr("data-idlv1");
@@ -1250,6 +1254,7 @@ function activateEventListeners() {
             },
             complete: function () {
                 $("#overlay").hide(); // Hide the overlay
+                isSubmitting = false;
             },
         });
     }

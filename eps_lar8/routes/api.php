@@ -4,6 +4,7 @@ use App\Http\Controllers\Member\CartController;
 use App\Http\Controllers\Member\CheckoutController;
 use App\Http\Controllers\Member\HomememberController;
 use App\Http\Controllers\Member\LoginmemberController;
+use App\Http\Controllers\Member\ProfilememberController;
 use App\Http\Controllers\Partner\BniController;
 use App\Http\Controllers\Partner\KurirController;
 use App\Http\Controllers\Member\SearchController;
@@ -56,6 +57,8 @@ Route::get('/quick-search', [SearchController::class, 'quickSearch'])->name('qui
 Route::get('/refresh-hits', [HomememberController::class, 'refreshHits']);
 Route::get('/transaksi/{kondisi}', [HomememberController::class, 'transaksi']);
 Route::post('/filter-searching', [SearchController::class, 'filterSearching']);
+Route::get('/more-product', [SearchController::class, 'more_product']);
+Route::get('/shop/search-product', [SearchController::class, 'filterProductwithIdshop']);
 
 // For Login Seller
 Route::get('/getShop/kategori', [LoginSellerController::class, 'getKategori']);
@@ -178,6 +181,8 @@ Route::group(['middleware' => 'member'], function () {
     Route::get('/insurance/{id_shop}/{id_courier}/{idcs}/{status}', [CartController::class, 'insurance']);
     Route::get('/getorder/{id_cart}', [CheckoutController::class, 'getOrder']);
     Route::post('/upload-payment', [CheckoutController::class, 'uploadPayment']);
+    Route::post('/storeKontrak', [ProfilememberController::class, 'storeKontrak']);
+    Route::post('/storeSuratPesanan', [ProfilememberController::class, 'storeSuratPesanan']);
     Route::post('/finishCheckout', [CartController::class, 'finish_checkout']);
     Route::post('/sumbitBast', [CheckoutController::class, 'sumbit_bast']);
     Route::get('/lacak_pengiriman/{id_seller}/{id_cart_shop}', [CheckoutController::class, 'lacak_pengiriman']);

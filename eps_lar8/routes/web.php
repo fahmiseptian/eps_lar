@@ -232,9 +232,20 @@ Route::group(['middleware' => 'member'], function () {
     Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
     Route::get('/inv/{id_seller}/{id_cart_shop}',[CheckoutController::class,'cetak_Invoice']);
     Route::get('/kwitansi/{id_seller}/{id_cart_shop}',[CheckoutController::class,'cetak_Kwitansi']);
+    Route::get('/profile/transaksi', [ProfilememberController::class, 'transaksi'])->name('profile.transaksi');
+    Route::get('/profile/detail-transaksi', [ProfilememberController::class, 'GetDetailTransaction'])->name('profile.transaksi.detail');
+    Route::get('/cetak-invoice', [ProfilememberController::class, 'cetakInvoice'])->name('cetak.invoice');
+    Route::get('/cetak-kwitansi', [ProfilememberController::class, 'cetakKwitansi'])->name('cetak.kwitansi');
+    Route::get('/profile/kontrak', [ProfilememberController::class, 'getKontrak'])->name('profile.kontrak');
+    Route::get('/profile/suratpesanan', [ProfilememberController::class, 'getSuratPesanan'])->name('profile.suratpesanan');
+    Route::get('/profile/create-kontrak', [ProfilememberController::class, 'createKontrak'])->name('profile.create-kontrak');
+    Route::get('/profile/create-suratpesanan', [ProfilememberController::class, 'createSuratPesanan'])->name('profile.create-suratpesanan');
+    Route::get('/profile/edit-kontrak', [ProfilememberController::class, 'editKontrak'])->name('profile.edit-kontrak');
+    Route::get('/profile/edit-suratpesanan', [ProfilememberController::class, 'editSuratPesanan'])->name('profile.edit-suratpesanan');
 });
 
 Route::get('/find/{query}', [SearchController::class, 'fullSearch']);
+Route::get('/find/category/{category}', [SearchController::class, 'SerachwithCategory']);
 
 
 

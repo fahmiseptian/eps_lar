@@ -13,9 +13,13 @@
             <div class="gambarProduct">
                 <!-- Gambar besar -->
                 <div class="product-mobile">
-                    @foreach ($artwork_url_lg as $gambar)
+                    @foreach ($gambarProduct as $gambar)
+                    @php
+                    $requiresBaseUrl = strpos($gambar->image300, 'http') === false;
+                    $image300 = $requiresBaseUrl ? "https://eliteproxy.co.id/" . $gambar->image300 : $gambar->image300;
+                    @endphp
                     <div class="product-mobile-item">
-                        <img src="{{ $gambar }}" alt="Gambar besar">
+                        <img src="{{ $image300 }}" alt="Gambar besar">
                     </div>
                     @endforeach
                 </div>
@@ -103,17 +107,20 @@
             <div class="seller-detail">
                 @php
                 $requiresBaseUrl = strpos($avatar, 'http') === false;
-                $icon_toko = $requiresBaseUrl ? "https://eliteproxy.co.id/" .$avatar :$avatar;
+                $icon_toko = $requiresBaseUrl ? "https://eliteproxy.co.id/seller_center/" .$avatar :$avatar;
+                $requrl = strpos($image_banner, 'http') === false;
+                $image_banner = $requrl ? "https://eliteproxy.co.id/" . $image_banner : $image_banner;
                 @endphp
                 <div class="toko_detail_produk">
-                    <div class="toko-header">
-                        <img src="{{ $icon_toko }}" alt="Avatar" class="toko-avatar">
-                        <a href="{{ route('seller.detail', ['id' => $idToko]) }}" class="toko-nama">
+                    <div class="toko-header" style="background-image: url('{{ $image_banner }}'); background-size: cover; background-position: center; width: 100%; height: 100px; position: relative;">
+                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.3); border-radius: 10px;"></div>
+                        <img src="{{ $icon_toko }}" alt="Avatar" class="toko-avatar" style="position: relative; z-index: 2; border-radius: 10px; margin-left: 20px; ">
+                        <a href="{{ route('seller.detail', ['id' => $idToko]) }}" class="toko-nama" style="position: relative; z-index: 2; color: #fff; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
                             <b>{{ $namaToko }}</b>
                         </a>
                     </div>
-                    <div class="toko-actions">
-                        <button class="btn-chat">
+                    <div class="toko-actions-detail-product">
+                        <button class="btn-chat-detail-product">
                             <i class="material-icons">chat</i>
                             Chat
                         </button>

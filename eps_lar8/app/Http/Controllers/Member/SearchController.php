@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\ProductCategory;
 use App\Models\Shop;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class SearchController extends Controller
 {
@@ -40,18 +41,26 @@ class SearchController extends Controller
 
     public function fullSearch($query)
     {
-        $result = $this->libraries['Searchengine']->fullSearch($query);
+        $result = $this->libraries['Searchengine']->fullSearch($query, null, null, 20, 1);
 
-        if ($result && isset($result['productsearch']) && $result['productsearch']->count() > 0) {
-            $this->libraries['Searchengine']->SaveLogSearch(
-                $query,
-                $result['productsearch']->get()[0]->id,
-                $this->data['id_user'],
-                $result['productsearch']->count()
-            );
+        if ($result && isset($result['productsearch']) && $result['productsearch']->total() > 0) {
+            $firstProduct = $result['productsearch']->first();
+            if ($firstProduct) {
+                $this->libraries['Searchengine']->SaveLogSearch(
+                    $query,
+                    $firstProduct->id,
+                    $this->data['id_user'],
+                    $result['productsearch']->total()
+                );
+            }
         }
+        Log::info('Search called with query: ' . $query);
+
+        // Jangan panggil get() di sini
+        // $result['productsearch'] = $result['productsearch']->get(); // Hapus atau komentari baris seperti ini jika ada
 
         return view('member.home.search', $this->data, $result);
+        // return response()->json($result);
     }
 
 
@@ -64,6 +73,51 @@ class SearchController extends Controller
             'min' => $request->input('min'),
             'condition' => $request->input('condition'),
             'sort' => $request->input('sort'),
+            'perPage' => $request->input('perPage'),
+            'page' => $request->input('page'),
+        ];
+        $result = $this->libraries['Searchengine']->filterSearching($data);
+        return response()->json($result);
+    }
+
+    function more_product(Request $request)
+    {
+        $query = $request->input('query');
+        $page = $request->input('page');
+
+        // return response()->json(["query" => $query, "page" => $page]);
+
+        $result = $this->libraries['Searchengine']->fullSearch($query, null, null, 20, $page);
+
+        if ($request->ajax()) {
+            return view('member.home.product_searching', $result)->render();
+        }
+
+        return view('member.home.search', $this->data, $result);
+    }
+
+    function SerachwithCategory($category)
+    {
+        $result = $this->libraries['Searchengine']->fullSearch(null, null, $category, 20, 1);
+        // return response()->json($result);
+        return view('member.home.search', $this->data, $result);
+    }
+
+    function filterProductwithIdshop(Request $request)
+    {
+        $idshop = $request->input('idshop');
+        $keyword = $request->input('keyword');
+        $category = $request->input('category');
+        $sort = $request->input('condition');
+        if ($category == 0) {
+            $category = null;
+        }
+
+        $data = [
+            'idshop' => $idshop,
+            'keyword' => $keyword,
+            'category' => $category,
+            'sort' => $sort
         ];
         $result = $this->libraries['Searchengine']->filterSearching($data);
         return response()->json($result);

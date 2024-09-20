@@ -233,6 +233,7 @@ class Products extends Model implements HasMedia
             's.name as namaToko',
             's.id as idToko',
             'p.province_name',
+            DB::raw('(SELECT image300 FROM product_image WHERE id_product = products.id AND is_default = "yes" LIMIT 1) AS image')
         )
             ->join('lpse_price as lp', 'products.id', '=', 'lp.id_product')
             ->join('shop as s', 'products.id_shop', '=', 's.id')
@@ -255,6 +256,7 @@ class Products extends Model implements HasMedia
             's.avatar',
             'p.province_name',
             'b.name as merek',
+            DB::raw('(select image from shop_banner where id_shop = s.id order by urutan desc limit 1) as image_banner')
         )
             ->join('lpse_price as lp', 'products.id', '=', 'lp.id_product')
             ->join('shop as s', 'products.id_shop', '=', 's.id')
@@ -326,7 +328,8 @@ class Products extends Model implements HasMedia
             'lp.price_lpse as hargaTayang',
             's.name as namaToko',
             's.id as idToko',
-            'p.province_name'
+            'p.province_name',
+            DB::raw('(SELECT image300 FROM product_image WHERE id_product = products.id AND is_default = "yes" LIMIT 1) AS image')
         )
             ->join('lpse_price as lp', 'products.id', '=', 'lp.id_product')
             ->join('shop as s', 'products.id_shop', '=', 's.id')
@@ -388,7 +391,8 @@ class Products extends Model implements HasMedia
             'lp.price_lpse as hargaTayang',
             's.name as namaToko',
             's.id as idToko',
-            'p.province_name'
+            'p.province_name',
+            DB::raw('(SELECT image300 FROM product_image WHERE id_product = products.id AND is_default = "yes" LIMIT 1) AS image')
         )
             ->join('lpse_price as lp', 'products.id', '=', 'lp.id_product')
             ->join('shop as s', 'products.id_shop', '=', 's.id')

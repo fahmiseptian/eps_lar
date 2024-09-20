@@ -102,7 +102,8 @@ class Shop extends Model implements HasMedia
             ->where('shop.id', $id_shop)
             ->select(
                 'shop.*',
-                'c.city_name'
+                'c.city_name',
+                DB::raw('(select image from shop_banner where id_shop = shop.id order by urutan desc limit 1) as image_banner')
             )
             ->first();
 

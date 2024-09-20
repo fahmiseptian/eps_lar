@@ -88,7 +88,7 @@
                     Satker : {{$dataPembeli->satker}} <br>
                     NPWP : {{$dataPembeli->npwp}} <br>
                     Alamat : {{$dataPembeli->address}}, {{$dataPembeli->subdistrict_name}},
-                    {{$dataPembeli->city_name}}, {{$dataPembeli->province_name}}, ID {{$dataPembeli->postal_code}}
+                    {{$dataPembeli->city}}, {{$dataPembeli->province_name}}, ID {{$dataPembeli->postal_code}}
                 </td>
                 <td style="vertical-align:top">
                     Nama : {{$dataSeller->nama_pt}} <br>

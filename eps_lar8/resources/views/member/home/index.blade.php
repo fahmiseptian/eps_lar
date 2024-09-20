@@ -48,7 +48,7 @@
                     $requiresBaseUrl = strpos($pc->icon, 'http') === false;
                     $icon = $requiresBaseUrl ? "https://eliteproxy.co.id/" .$pc->icon :$pc->icon;
                     @endphp
-                    <div class="category-item">
+                    <div class="category-item" data-category="{{$pc->code}}">
                         <img src="{{ $icon}}" alt="{{ $pc->code }}">
                         <p>{{ $pc->name }}</p>
                     </div>
@@ -73,7 +73,7 @@
                 $requiresBaseUrl = strpos($rs->image, 'http') === false;
                 $image = $requiresBaseUrl ? "https://eliteproxy.co.id/" .$rs->image :$rs->image;
                 @endphp
-                <div class="popular-search-item">
+                <div class="popular-search-item" data-keyword="{{$rs->keyword}}">
                     <img src="{{$image}}" alt="{{$rs->keyword}}">
                     <div class="search-info">
                         <p class="keyword">{{$rs->keyword}}</p>
@@ -124,7 +124,7 @@
                 $requiresBaseUrl = strpos($ps->image, 'http') === false;
                 $pc_image = $requiresBaseUrl ? "https://eliteproxy.co.id/" .$ps->image : $ps->image;
                 @endphp
-                <div class="popular-search-item">
+                <div class="popular-search-item" data-keyword="{{$ps->keyword}}">
                     <img src="{{$pc_image}}" alt="{{$ps->keyword}}">
                     <div class="search-info">
                         <p class="keyword">{{$ps->keyword}}</p>

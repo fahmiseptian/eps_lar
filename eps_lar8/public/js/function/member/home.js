@@ -320,63 +320,22 @@ $(document).on("click", "#list-etalase", function () {
     }
 });
 
-$(document).on("click", "#list-category", function () {
-    var idCategory = $(this).data("id"); // Mengambil nilai option yang dipilih
-    var idshop = $(this).data("idshop");
+$(document).ready(function () {
+    // Tambahkan kelas 'active' ke 'Semua' saat halaman dimuat
+    $("#list-etalase").addClass("active");
 
-    // Permintaan AJAX untuk mendapatkan data produk baru berdasarkan ID kategori
-    $.ajax({
-        url: appUrl + "/api/kategoriProduct/" + idCategory + "/" + idshop,
-        type: "GET",
-        dataType: "json",
-        success: function (data) {
-            // Bersihkan konten produk yang ada
-            $("#productGrid-kategori").empty();
+    $(document).on("click", "#list-category, #list-etalase", function () {
+        var idCategory = $(this).data("id");
+        var idshop = $(this).data("idshop");
 
-            // Iterasi data produk dan tampilkan ke dalam grid produk
-            data.products.forEach(function (product) {
-                var productItem = $("<div>")
-                    .addClass("product-item")
-                    .css("margin-top", "10px");
-                var productLink = $("<a>")
-                    .attr("href", "/product/" + product.id)
-                    .addClass("product-link");
-                productLink.append(
-                    $("<img>")
-                        .attr("src", product.artwork_url_md[0])
-                        .attr("alt", "Produk")
-                );
-                productLink.append(
-                    $("<p>")
-                        .attr("title", product.name)
-                        .text(product.name.substring(0, 20) + "...")
-                );
-                productLink.append(
-                    $("<p>").text(
-                        "Rp " + product.hargaTayang.toLocaleString("id-ID")
-                    )
-                );
-                var productInfo = $("<div>").addClass("product-info");
-                productInfo.append(
-                    $("<small>")
-                        .attr("title", product.namaToko)
-                        .text(product.namaToko.substring(0, 6) + "...")
-                );
-                productInfo.append(
-                    $("<small>").text(product.count_sold + " terjual")
-                );
-                productInfo.append($("<small>").text(product.province_name));
-                // Tambahkan elemen informasi produk ke tautan
-                productLink.append(productInfo);
-                // Tambahkan tautan produk ke dalam elemen produk
-                productItem.append(productLink);
-                // Tambahkan elemen produk ke dalam productGrid
-                $("#productGrid-kategori").append(productItem);
-            });
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-            console.error("Error fetching products:", textStatus, errorThrown);
-        },
+        // Hapus kelas 'active' dari semua item dan tambahkan ke item yang diklik
+        $("#list-etalase, #list-category").removeClass("active");
+        $(this).addClass("active");
+
+        const keyword = $("#searchProduct").val().trim();
+        const condition = $("#sortOrder").val();
+
+        applySort(keyword, idshop, idCategory, condition);
     });
 });
 
@@ -1365,9 +1324,14 @@ $(document).on("click", ".cart-btn", function () {
             });
         },
         error: function (xhr, status, error) {
+            var errorMessage =
+                "Terjadi kesalahan saat menambah produk ke dalam keranjang.";
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMessage = xhr.responseJSON.message;
+            }
             Swal.fire({
                 title: "Gagal",
-                text: "Terjadi kesalahan saat menambah produk ke dalam keranjang.",
+                text: errorMessage,
                 icon: "error",
                 confirmButtonText: "OK",
             });
@@ -1388,7 +1352,7 @@ $(document).on("click", "#deleteCart", function () {
                 icon: "success",
                 confirmButtonText: "OK",
             });
-            // location.reload();
+            location.reload();
         },
         error: function (error) {
             console.error(error);
@@ -2108,6 +2072,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function fetchProducts(data) {
+        $("#moreproduct").hide();
         // Implement your AJAX call here
         fetch(appUrl + "/api/filter-searching", {
             method: "POST",
@@ -2350,3 +2315,89 @@ function updateListProduct(products) {
         productSection.innerHTML = "<p>Tidak ada produk yang ditemukan.</p>";
     }
 }
+
+$(".popular-search-item").on("click", function () {
+    const keyword = $(this).data("keyword");
+    window.location.href = appUrl + "/find/" + keyword;
+});
+
+$(".category-item").on("click", function () {
+    const category = $(this).data("category");
+    window.location.href = appUrl + "/find/category/" + category;
+});
+
+let searchTimer;
+
+$("#searchProduct").on("input", function () {
+    clearTimeout(searchTimer);
+
+    searchTimer = setTimeout(() => {
+        const idshop = $(this).data("idshop");
+        const keyword = $(this).val().trim();
+        const category = $(".category-item-shop.active").data("id");
+        const condition = $("#sortOrder").val();
+
+        applySort(keyword, idshop, category, condition);
+    }, 500); // Tunggu 500ms setelah pengguna berhenti mengetik
+});
+
+function applySort(
+    keyword = null,
+    idshop = null,
+    category = null,
+    condition = null
+) {
+    $.ajax({
+        url: appUrl + "/api/shop/search-product",
+        method: "GET",
+        data: {
+            keyword: keyword,
+            idshop: idshop,
+            category: category,
+            condition: condition,
+        },
+        success: function (response) {
+            console.log(response);
+            updateProductList(response);
+        },
+        error: function (xhr, status, error) {
+            console.error("Error:", error);
+        },
+    });
+}
+
+function updateProductList(products) {
+    const productGrid = $("#productGrid-kategori");
+    productGrid.empty();
+
+    if (products && products.length > 0) {
+        products.forEach((product) => {
+            const image300 = product.image.startsWith("http")
+                ? product.image
+                : `https://eliteproxy.co.id/${product.image}`;
+            const productItem = `
+                <div class="product-item-category">
+                    <a href="/product/${product.id}" class="product-link">
+                        <img src="${image300}" alt="${product.name}">
+                        <div class="product-info">
+                            <p class="product-name" title="${
+                                product.name
+                            }">${truncateString(product.name, 30)}</p>
+                            <p class="product-price">${formatRupiah(
+                                product.hargaTayang
+                            )}</p>
+                        </div>
+                    </a>
+                </div>
+            `;
+            productGrid.append(productItem);
+        });
+    } else {
+        productGrid.append("<p>Tidak ada produk yang ditemukan.</p>");
+    }
+}
+
+$("#sortOrder").on("change", function () {
+    const selectedValue = $(this).val();
+    applySort(null, null, null, selectedValue);
+});

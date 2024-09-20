@@ -36,8 +36,10 @@ class HomememberController extends Controller
 
         $this->model['products'] = new Products();
         $this->model['shop_banner'] = new ShopBanner();
+        $this->model['shop'] = new Shop();
         $this->model['member'] = new Member();
         $this->data['nama_user'] = '';
+        $this->data['id_user'] =  $sessionData['id'] ?? null;
 
         if ($this->user_id != null) {
             $this->data['member'] = $this->model['member']->find($this->user_id);
@@ -125,35 +127,31 @@ class HomememberController extends Controller
     public function ShowSeller($id_shop)
     {
         $where = [];
-        $this->data = Shop::getShopById($id_shop);
-        if (is_object($this->data)) {
-            $this->data = (array) $this->data;
-        }
-        $jmlhproduct = Products::countProductByIdShop($id_shop, $where);
-        $jmlhTerjualproduct = Products::countproductTerjualbyId($id_shop);
+        $shopData = $this->model['shop']->getShopById($id_shop);
+        $jmlhproduct = $this->model['products']->countProductByIdShop($id_shop, $where);
+        $jmlhTerjualproduct = $this->model['products']->countproductTerjualbyId($id_shop);
         $etalsetoko = Etalase::getEtalasetoko($id_shop);
-        // Buat array data toko
-        $dataToko = [
+
+        $products = $this->model['products']->getProductByIdShop($id_shop);
+        $productTerbaru = $this->model['products']->getProductTerbaruByIdshop($id_shop);
+
+        $products->level1 = $this->model['products']->GetKategoryProductByIdshoplavel1($id_shop);
+        $products->level2 = $this->model['products']->GetKategoryProductByIdshoplavel2($id_shop);
+        $products->level3 = $this->model['products']->GetKategoryProductByIdshoplavel3($id_shop);
+
+        if (isset($shopData->id_user)) {
+            $member = $this->model['member']->find($shopData->id_user);
+            $shopData->nama_user = $member->nama ?? '';
+        }
+
+        return view('member.home.seller', $this->data, [
+            'shopData' => $shopData,
             'jmlhproduct' => $jmlhproduct,
             'jmlhTerjualproduct' => $jmlhTerjualproduct,
             'etalsetoko' => $etalsetoko,
-        ];
-        $this->data = array_merge($this->data, $dataToko);
-
-        $products = Products::getProductByIdShop($id_shop);
-        $productTerbaru = Products::getProductTerbaruByIdshop($id_shop);
-
-        $products->level1 = Products::GetKategoryProductByIdshoplavel1($id_shop);
-        $products->level2 = Products::GetKategoryProductByIdshoplavel2($id_shop);
-        $products->level3 = Products::GetKategoryProductByIdshoplavel3($id_shop);
-
-        if ($this->data['id_user'] != null) {
-            $this->data['member'] = $this->model['member']->find($this->data['id_user']);
-            $this->data['nama_user'] = $this->data['member']->nama;
-        }
-
-        // return response()->json($this->data);
-        return view('member.home.seller', $this->data, ["products" => $products, "NewProduct" => $productTerbaru]);
+            'products' => $products,
+            'NewProduct' => $productTerbaru
+        ]);
     }
 
     public function getProductsByEtalase($id_etalse)

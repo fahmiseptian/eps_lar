@@ -429,7 +429,7 @@ $(document).on("click", ".cancel-order", async function () {
         console.log(noteSeller);
         $("#overlay").show();
         $.ajax({
-            url: appUrl + "/seller/order/cencel",
+            url: appUrl + "/seller/order/cancel",
             type: "POST",
             data: {
                 id_cart_shop: id_cart_shop,
@@ -813,7 +813,7 @@ function downloadKontrak(id_cart_shop) {
             _token: csrfToken,
         },
         xhrFields: {
-            responseType: "blob", // Ubah ini menjadi 'blob'
+            responseType: "blob", 
             withCredentials: true,
         },
         success: function (response, status, xhr) {

@@ -128,6 +128,7 @@ class ProductController extends Controller
 
         // Tentukan ID kategori yang akan disimpan
         $id_category = $request->kategorilevel2 ? $request->kategorilevel2 : $request->kategorilevel1;
+        $Category = $this->Model['ProductCategory']->find($id_category);
 
         // Data produk yang akan disimpan
         $data = [
@@ -136,6 +137,7 @@ class ProductController extends Controller
             'id_brand' => $request->id_brand,
             'id_category' => $id_category,
             'name' => $request->name,
+            'barang_kena_ppn' => $Category->barang_kena_ppn,
             'price_exclude' => $request->price_exclude,
             'price' => $request->price,
             'weight' => $request->weight,
@@ -242,11 +244,14 @@ class ProductController extends Controller
 
         $product = Products::find($id_product);
         $id_category = $request->kategorilevel2 ? $request->kategorilevel2 : $request->kategorilevel1;
+        $Category = $this->Model['ProductCategory']->find($id_category);
+
         $data = [
             'sku' => $request->sku,
             'id_shop' => $this->seller,
             'id_brand' => $request->id_brand,
             'id_category' => $id_category,
+            'barang_kena_ppn' => $Category->barang_kena_ppn,
             'name' => $request->name,
             'price_exclude' => $request->price_exclude,
             'price' => $request->price,

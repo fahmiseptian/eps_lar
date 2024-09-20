@@ -135,7 +135,9 @@ class OrederController extends Controller
         $estimation_packing = Shop::where('id', $this->seller)
             ->pluck('packing_estimation')
             ->first();
-        $order = CompleteCartShop::find($id_cart_shop);
+        $order = CompleteCartShop::where('id', $id_cart_shop)
+            ->where('id_shop', $this->seller)
+            ->first();
         $current_date = date('Y-m-d H:i:s');
         $due_date_packing = date('Y-m-d H:i:s', strtotime($current_date . ' +' . $estimation_packing . ' day'));
 
@@ -155,15 +157,36 @@ class OrederController extends Controller
         $id_cart_shop = $request->input('id_cart_shop');
         $note = $request->input('note');
 
-        $order = CompleteCartShop::find($id_cart_shop)->where('id_shop', $this->seller);
-        $current_date = date('Y-m-d H:i:s');
+        $order = CompleteCartShop::where('id', $id_cart_shop)
+            ->where('id_shop', $this->seller)
+            ->first();
 
         if ($order) {
-            $order->status = 'cancel_by_seller';
-            $order->note_seller =  $note;
-            $order->receive_date = $current_date;
-            $order->save();
-            return "Pesanan berhasil diterima dan sedang diproses packing.";
+            DB::beginTransaction();
+            try {
+                // Ubah status CompleteCartShop
+                $order->status = 'cancel_by_seller';
+                $order->note_seller = $note;
+                $order->save();
+
+                // Cek apakah ini satu-satunya CompleteCartShop untuk CompleteCart ini
+                $completeCart = Invoice::find($order->id_cart);
+                $otherShops = CompleteCartShop::where('id_cart', $order->id_cart)
+                    ->where('id', '!=', $id_cart_shop)
+                    ->count();
+
+                if ($otherShops == 0) {
+                    // Jika tidak ada CompleteCartShop lain, ubah status CompleteCart
+                    $completeCart->status = 'cancel';
+                    $completeCart->save();
+                }
+
+                DB::commit();
+                return "Pesanan berhasil dibatalkan.";
+            } catch (\Exception $e) {
+                DB::rollback();
+                return "Terjadi kesalahan saat membatalkan pesanan: " . $e->getMessage();
+            }
         } else {
             return "Pesanan tidak ditemukan.";
         }
@@ -257,7 +280,7 @@ class OrederController extends Controller
         $detail_order  = $this->Model['CompleteCartShop']->getDetailOrderbyId($this->seller, $id_cart_shop);
         $detail_order->detail = $this->Model['CompleteCartShop']->getDetailProduct($this->seller, $id_cart_shop);
 
-        $dataPembeli    = $this->Model['CompleteCartShop']->getUserById_cart_shop($id_cart_shop);
+        $dataPembeli    = $this->Model['CompleteCartShop']->getaddressUser($id_cart_shop);
         $dataSeller     = $this->Model['CompleteCartShop']->getSellerById_cart_shop($id_cart_shop);
 
         $pdf = FacadePdf::loadView('pdf.newInvoice', ['data' => $detail_order, 'dataPembeli' => $dataPembeli, 'dataSeller' => $dataSeller]);

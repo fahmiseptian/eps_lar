@@ -4,6 +4,7 @@ namespace App\Libraries;
 
 use App\Models\Cart;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class Searchengine
 {
@@ -19,108 +20,203 @@ class Searchengine
                 'products.*',
                 DB::raw('(SELECT image50 FROM product_image WHERE id_product = products.id AND is_default = "yes" LIMIT 1) AS image50')
             )
-            ->where('name', 'like', "%$query%")
+            ->join('shop', 'products.id_shop', '=', 'shop.id')
+            ->where('products.name', 'like', "%$query%")
+            ->where('products.status_display', 'Y')
+            ->where('products.status_delete', 'N')
+            ->where('shop.status', 'active')
             ->take(5)
             ->get();
 
         $stores = DB::table('shop')
             ->where('name', 'like', "%$query%")
+            ->where('status', 'active')
             ->take(5)
             ->get();
 
         return compact('categories', 'productsearch', 'stores');
     }
 
-    function fullSearch($query, $where = null, $category = null)
+    function fullSearch($query = null, $where = null, $category = null, $perPage = 20, $page = 1)
     {
         $keyword = $query;
+        $stores = null;
 
-        if ($category != null) {
-            // Ambil kategori yang dipilih
-            $selectedCategory = DB::table('product_category')
-                ->where('id', $category)
-                ->first();
-
-            if ($selectedCategory) {
-                $menuCategories = [
-                    [
-                        'id' => $selectedCategory->id,
-                        'name' => $selectedCategory->name,
-                        'submenus' => []
-                    ]
-                ];
-
-                // Ambil submenu dari kategori yang dipilih
-                $subMenus = DB::table('product_category')
-                    ->where('parent_id', $category)
-                    ->where('active', 'Y')
-                    ->get();
-
-                foreach ($subMenus as $subMenu) {
-                    $menuCategories[0]['submenus'][] = [
-                        'id' => $subMenu->id,
-                        'name' => $subMenu->name
-                    ];
-                }
-            } else {
-                $menuCategories = [];
-            }
-        } else {
-            // Kode yang sudah ada untuk menampilkan semua kategori
-            $categories = DB::table('product_category')
-                ->where('parent_id', 0)
-                ->orWhere('level', 1)
-                ->where('active', 'Y')
+        if ($query != null) {
+            $categories = DB::table('product_category as pc1')
+                ->select('pc1.id', 'pc1.name')
+                ->join('product_category as pc2', 'pc2.parent_id', '=', 'pc1.id')
+                ->join('products', 'products.id_category', '=', 'pc2.id')
+                ->where('products.name', 'like', "%$query%")
+                ->where('pc1.level', 1)
+                ->where('pc1.active', 'Y')
+                ->where('pc1.display_status', 'show')
+                ->where('pc1.parent_id', 0)
+                ->distinct()
                 ->get();
 
             $menuCategories = [];
-            $subMenuCategories = [];
 
             foreach ($categories as $cat) {
                 $subMenus = DB::table('product_category')
+                    ->select('id', 'name')
                     ->where('parent_id', $cat->id)
                     ->where('active', 'Y')
                     ->get();
 
-                $menuCategories[$cat->id] = [
+                $menuCategories[] = [
                     'id' => $cat->id,
                     'name' => $cat->name,
-                    'submenus' => [$subMenus]
+                    'submenus' => $subMenus
                 ];
             }
 
-            $menuCategories = array_values($menuCategories);
-        }
+            $menuCategories = [];
 
-        $productsearch = DB::table('products')
-            ->select(
-                'products.*',
-                'lp.price_lpse as hargaTayang',
-                's.name as namaToko',
-                's.id as idToko',
-                'p.province_name',
-                DB::raw('(SELECT image300 FROM product_image WHERE id_product = products.id AND is_default = "yes" LIMIT 1) AS image300')
-            )
-            ->leftJoin('lpse_price as lp', 'products.id', '=', 'lp.id_product')
-            ->leftJoin('shop as s', 'products.id_shop', '=', 's.id')
-            ->leftJoin('member_address as ma', 's.id_address', '=', 'ma.member_address_id')
-            ->leftJoin('province as p', 'ma.province_id', '=', 'p.province_id')
-            ->where('products.name', 'like', "%$query%")
-            ->where('products.status_display', 'Y')
-            ->where('products.status_delete', 'N')
-            ->where('s.status', 'active');
+            foreach ($categories as $cat) {
+                $subMenus = DB::table('product_category')
+                    ->select('id', 'name')
+                    ->where('parent_id', $cat->id)
+                    ->where('active', 'Y')
+                    ->get();
 
-        if ($where) {
-            foreach ($where as $key => $value) {
-                $productsearch->where($key, $value);
+                $menuCategories[] = [
+                    'id' => $cat->id,
+                    'name' => $cat->name,
+                    'submenus' => $subMenus
+                ];
+            }
+
+            $productsearch = DB::table('products')
+                ->select(
+                    'products.*',
+                    'lp.price_lpse as hargaTayang',
+                    's.name as namaToko',
+                    's.id as idToko',
+                    'p.province_name',
+                    DB::raw('(SELECT image300 FROM product_image WHERE id_product = products.id AND is_default = "yes" LIMIT 1) AS image300')
+                )
+                ->leftJoin('lpse_price as lp', 'products.id', '=', 'lp.id_product')
+                ->join('shop as s', 'products.id_shop', '=', 's.id')
+                ->leftJoin('member_address as ma', 's.id_address', '=', 'ma.member_address_id')
+                ->leftJoin('province as p', 'ma.province_id', '=', 'p.province_id')
+                ->where('products.name', 'like', "%$query%")
+                ->where('products.status_display', 'Y')
+                ->where('products.status_delete', 'N')
+                ->where('s.status', 'active');
+
+            if ($where) {
+                foreach ($where as $key => $value) {
+                    $productsearch->where($key, $value);
+                }
+            }
+
+            $productsearch = $productsearch->paginate($perPage, ['*'], 'page', $page);
+
+            // Debugging
+            Log::info('Type of $productsearch: ' . get_class($productsearch));
+            Log::info('$productsearch contents: ' . json_encode($productsearch));
+
+
+            $stores = DB::table('shop')
+                ->where('name', 'like', "%$query%")
+                ->where('status', 'active')
+                ->limit(3)
+                ->get();
+        } else {
+            if ($category != null) {
+                // Ambil kategori yang dipilih
+                $selectedCategory = DB::table('product_category')
+                    ->where('code', $category)
+                    ->where('icon', '!=', null)
+                    ->where('lpse_report_id', '!=', null)
+                    ->where('active', 'Y')
+                    ->where('display_status', 'show')
+                    ->first();
+
+                if ($selectedCategory) {
+                    // Ambil submenu dari kategori yang dipilih
+                    $subMenus = DB::table('product_category')
+                        ->where('parent_id', $selectedCategory->id)
+                        ->where('active', 'Y')
+                        ->get();
+
+                    $menuCategories[] =
+                        [
+                            'id' => $selectedCategory->id,
+                            'name' => $selectedCategory->name,
+                            'submenus' => $subMenus
+                        ];
+
+
+                    // foreach ($subMenus as $subMenu) {
+                    //     $menuCategories[0]['submenus'][] = [
+                    //         'id' => $subMenu->id,
+                    //         'name' => $subMenu->name
+                    //     ];
+                    // }
+                } else {
+                    $menuCategories = [];
+                }
+
+                $productsearch = DB::table('products')
+                    ->select(
+                        'products.*',
+                        'lp.price_lpse as hargaTayang',
+                        's.name as namaToko',
+                        's.id as idToko',
+                        'p.province_name',
+                        DB::raw('(SELECT image300 FROM product_image WHERE id_product = products.id AND is_default = "yes" LIMIT 1) AS image300')
+                    )
+                    ->leftJoin('product_category as pc', 'products.id_category', '=', 'pc.id')
+                    ->leftJoin('lpse_price as lp', 'products.id', '=', 'lp.id_product')
+                    ->join('shop as s', 'products.id_shop', '=', 's.id')
+                    ->leftJoin('member_address as ma', 's.id_address', '=', 'ma.member_address_id')
+                    ->leftJoin('province as p', 'ma.province_id', '=', 'p.province_id')
+                    ->where('products.status_display', 'Y')
+                    ->where('products.status_delete', 'N')
+                    ->where('s.status', 'active');
+
+                $productsearch->where('products.id_category', $selectedCategory->id);
+                $productsearch->orWhere('pc.parent_id', $selectedCategory->id);
+
+                if ($where) {
+                    foreach ($where as $key => $value) {
+                        $productsearch->where($key, $value);
+                    }
+                }
+
+                $productsearch = $productsearch->paginate($perPage, ['*'], 'page', $page);
+            } else {
+                // Kode yang sudah ada untuk menampilkan semua kategori
+                $categories = DB::table('product_category')
+                    ->where('active', 'Y')
+                    ->where('display_status', 'show')
+                    ->where('parent_id', 0)
+                    ->Where('level', 1)
+                    ->get();
+
+                $menuCategories = [];
+                $subMenuCategories = [];
+
+                foreach ($categories as $cat) {
+                    $subMenus = DB::table('product_category')
+                        ->where('parent_id', $cat->id)
+                        ->where('active', 'Y')
+                        ->get();
+
+                    $menuCategories[$cat->id] = [
+                        'id' => $cat->id,
+                        'name' => $cat->name,
+                        'submenus' => [$subMenus]
+                    ];
+                }
+
+                $menuCategories = array_values($menuCategories);
             }
         }
-        $productsearch->get();
 
-        $stores = DB::table('shop')
-            ->where('name', 'like', "%$query%")
-            ->limit(3)
-            ->get();
+
 
         return compact('menuCategories', 'productsearch', 'stores', 'keyword');
     }
@@ -129,16 +225,20 @@ class Searchengine
     {
         $query = DB::table('products')
             ->select(
+                'products.id',
                 'products.name',
                 'shop.name as shop_name',
                 'p.province_name',
                 'lp.price_lpse as hargaTayang',
                 DB::raw('(SELECT image300 FROM product_image WHERE id_product = products.id AND is_default = "yes" LIMIT 1) AS image')
             )
-            ->leftJoin('shop', 'products.id_shop', '=', 'shop.id')
+            ->join('shop', 'products.id_shop', '=', 'shop.id')
             ->leftJoin('lpse_price as lp', 'products.id', '=', 'lp.id_product')
             ->leftJoin('member_address as ma', 'shop.id_address', '=', 'ma.member_address_id')
-            ->leftJoin('province as p', 'ma.province_id', '=', 'p.province_id');
+            ->leftJoin('province as p', 'ma.province_id', '=', 'p.province_id')
+            ->where('products.status_display', 'Y')
+            ->where('products.status_delete', 'N')
+            ->where('shop.status', 'active');
 
         if (!empty($data['keyword'])) {
             $query->where('products.name', 'like', '%' . $data['keyword'] . '%');
@@ -162,15 +262,24 @@ class Searchengine
             $query->where('products.status_new_product', $data['condition']);
         }
 
+        if (!empty($data['idshop'])) {
+            $query->where('products.id_shop', $data['idshop']);
+        }
+
         if (!empty($data['sort'])) {
-            if ($data['sort'] == 'terbaru') {
-                $query->orderBy('products.created_at', 'desc');
-            } elseif ($data['sort'] == 'h_tertinggi') {
-                $query->orderBy('lp.price_lpse', 'desc');
-            } elseif ($data['sort'] == 'terjual') {
-                $query->orderBy('products.count_sold', 'desc');
-            } elseif ($data['sort'] == 'h_terendah') {
-                $query->orderBy('lp.price_lpse', 'asc');
+            switch ($data['sort']) {
+                case 'terbaru':
+                    $query->orderBy('products.created_at', 'desc');
+                    break;
+                case 'h_tertinggi':
+                    $query->orderBy('lp.price_lpse', 'desc');
+                    break;
+                case 'terjual':
+                    $query->orderBy('products.count_sold', 'desc');
+                    break;
+                case 'h_terendah':
+                    $query->orderBy('lp.price_lpse', 'asc');
+                    break;
             }
         }
 
@@ -179,7 +288,8 @@ class Searchengine
         return $productsearch;
     }
 
-    function SaveLogSearch($keyword, $id_product = null, $id_user = null, $count_result = null) {
+    function SaveLogSearch($keyword, $id_product = null, $id_user = null, $count_result = null)
+    {
         $check = DB::table('log_search')
             ->where('keyword', $keyword)
             ->first();

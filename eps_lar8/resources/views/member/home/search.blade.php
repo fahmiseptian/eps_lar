@@ -23,7 +23,7 @@
                                 {{ $category['name'] }} <span class="arrow">></span>
                             </a>
                             <ul class="submenu">
-                                @foreach($category['submenus'][0] as $submenu)
+                                @foreach($category['submenus'] as $submenu)
                                 <li>
                                     <a href="#" class="filter-item" data-category="{{ $submenu->id }}">
                                         {{ $submenu->name }} <span class="arrow">></span>
@@ -107,16 +107,15 @@
                 @endif
 
                 <div class="products-section">
-                    @if($productsearch->count() > 0)
-                    @foreach($productsearch->get() as $product)
+                    @if($productsearch->total() > 0)
+                    @foreach($productsearch as $product)
                     <div class="product-item">
-
                         @php
                         $requiresBaseUrl = strpos($product->image300, 'http') === false;
-                        $image300 = $requiresBaseUrl ? "https://eliteproxy.co.id/" .$product->image300 : $product->image300;
+                        $image300 = $requiresBaseUrl ? "https://eliteproxy.co.id/" . $product->image300 : $product->image300;
                         @endphp
                         <a href="{{ route('product.show', ['id' => $product->id]) }}" class="product-link">
-                            <img src="{{ $image300}}" alt="{{ $product->name }}">
+                            <img src="{{ $image300 }}" alt="{{ $product->name }}">
                             <p title="{{ $product->name }}">{{ Str::limit($product->name, 30) }}</p>
                             <p>Rp {{ number_format($product->hargaTayang, 0, ',', '.') }}</p>
                             <div class="product-info">
@@ -127,16 +126,60 @@
                         </a>
                     </div>
                     @endforeach
-                    @else
-                    <p>Tidak ada produk yang ditemukan.</p>
-                    @endif
                 </div>
+                <button id="moreproduct" class="load-more-button">Muat Lebih Banyak Produk</button>
+                @else
+                <p>Tidak ada produk yang ditemukan.</p>
+                @endif
             </div>
         </div>
     </main>
 
     @include('member.asset.footer')
     <script src="{{ asset('/js/function/member/home.js') }}" type="text/javascript"></script>
+    <script>
+        let page = 1;
+        let query = "{{ $keyword }}";
+
+        function loadMoreProducts(page) {
+            $.ajax({
+                    url: appUrl + "/api/more-product",
+                    type: "get",
+                    beforeSend: function() {
+                        $('.load-more-button').text('Memuat...');
+                        $('.loading').show().html('<p align="center">Sedang memuat produk...</p>');
+                    },
+                    data: {
+                        query: query,
+                        page: page
+                    }
+                })
+                .done(function(data) {
+                    if (data.length === 0) {
+                        $('.loading').html("<p align='center'>Semua Produk sudah ditampilkan</p>");
+                        $('#moreproduct').hide(); // Sembunyikan tombol
+                    } else {
+                        $('.load-more-button').text('Muat Lebih Banyak Produk');
+                        $('.loading').hide();
+                        $('.products-section').append(data);
+                    }
+                })
+                .fail(function(jqXHR, ajaxOptions, thrownError) {
+                    $('.loading').html("<p align='center' style='color: red;'>Terjadi kesalahan server</p>");
+                    $('.load-more-button').text('Coba Lagi').prop('disabled', false);
+
+                    // Log error untuk debugging
+                    console.error('AJAX Error:', thrownError);
+                });
+        }
+
+        $('#moreproduct').click(function(e) {
+            e.preventDefault();
+            page++;
+            loadMoreProducts(page);
+        });
+    </script>
+
 </body>
 
 </html>

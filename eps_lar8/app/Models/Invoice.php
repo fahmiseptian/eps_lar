@@ -213,4 +213,17 @@ class Invoice extends Model
         return $invoice;
     }
 
+    function getTransaction($id_user) {
+        $transactions = DB::table('complete_cart as a')
+            ->select('a.id', 'a.invoice', 'b.status', 'a.total', 'a.created_date', 'b.id as id_cart_shop', 'b.qty' ,  'a.status_pembayaran_top as payment' , 's.name as nama_pt', 's.id as id_shop', 'a.status as status_invoice')
+            ->join('complete_cart_shop as b', 'b.id_cart', '=', 'a.id')
+            ->leftJoin('shop as s','s.id','=','b.id_shop')
+            ->leftJoin('member as m', 'm.id', '=', 'a.id_user')
+            ->where('a.id_user', $id_user)
+            ->orderBy('a.created_date', 'desc')
+            ->get();
+
+        return $transactions;
+    }
+
 }

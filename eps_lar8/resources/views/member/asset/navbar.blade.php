@@ -40,4 +40,5 @@
 <script>
     const appUrl = "{{ env('APP_URL') }}";
     window.appUrl = appUrl;
+    var csrfToken = $('meta[name="csrf-token"]').attr("content");
 </script>

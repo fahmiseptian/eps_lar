@@ -107,7 +107,8 @@ class CompleteCartShop extends Model implements HasMedia
             'sp.etd',
             'sp.price as price_ship',
             'sh.is_top',
-            'sh.name as nama_seller'
+            'sh.name as nama_seller',
+            'sh.npwp as npwp_seller'
         )
             ->join('complete_cart as cc', 'cc.id', '=', 'complete_cart_shop.id_cart')
             ->join('complete_cart_address as cca', 'cca.id_cart', 'complete_cart_shop.id_cart')
@@ -139,14 +140,26 @@ class CompleteCartShop extends Model implements HasMedia
             'ccsd.price as base_price',
             'ccsd.*',
         )
-            ->join('complete_cart_shop_detail as ccsd', 'ccsd.id_cart', '=', 'complete_cart_shop.id_cart')
-            ->join('product_image as pi', 'pi.id_product', '=', 'ccsd.id_product')
-            ->join('products as p', 'p.id', '=', 'ccsd.id_product')
-            ->join('brand as b', 'b.id', 'p.id_brand')
+            ->leftjoin('complete_cart_shop_detail as ccsd', 'ccsd.id_cart', '=', 'complete_cart_shop.id_cart')
+            ->leftjoin('product_image as pi', 'pi.id_product', '=', 'ccsd.id_product')
+            ->leftjoin('products as p', 'p.id', '=', 'ccsd.id_product')
+            ->leftjoin('brand as b', 'b.id', 'p.id_brand')
             ->where('pi.is_default', '=', 'yes')
             ->where('complete_cart_shop.id', '=', $id_cart_shop)
-            ->where('complete_cart_shop.id_shop', $shopId)
+            ->where('ccsd.id_shop', $shopId)
             ->get();
+    }
+
+    function getProductbytrax($id_ccs, $id_shop)
+    {
+        $query = DB::table('complete_cart_shop as ccs')
+            ->join('complete_cart_shop_detail as ccsd', 'ccsd.id_cart', '=', 'ccs.id_cart') // Pastikan join ini benar
+            ->where('ccs.id', '=', $id_ccs)
+            ->where('ccsd.id_shop', '=', $id_shop)
+            ->select('ccsd.*') // Memilih semua kolom dari complete_cart_shop_detail
+            ->get();
+
+        return $query;
     }
 
     public function getorderbyidcartshop($shopId, $id_cart_shop)
@@ -155,10 +168,10 @@ class CompleteCartShop extends Model implements HasMedia
             'complete_cart_shop.*',
             'sp.id_courier',
         )
-        ->join('shipping as sp', 'sp.id', '=', 'complete_cart_shop.id_shipping')
-        ->where('complete_cart_shop.id', '=', $id_cart_shop)
-        ->where('complete_cart_shop.id_shop', $shopId)
-        ->first();
+            ->join('shipping as sp', 'sp.id', '=', 'complete_cart_shop.id_shipping')
+            ->where('complete_cart_shop.id', '=', $id_cart_shop)
+            ->where('complete_cart_shop.id_shop', $shopId)
+            ->first();
     }
 
 
@@ -358,7 +371,7 @@ class CompleteCartShop extends Model implements HasMedia
                 'm.npwp',
                 'ma.*',
                 'p.province_name',
-                'c.city_name',
+                'c.city_name as city',
                 'sub.subdistrict_name',
             )
             ->join('complete_cart as cc', 'cc.id', 'ccs.id_cart')
@@ -369,6 +382,30 @@ class CompleteCartShop extends Model implements HasMedia
             ->join('subdistrict as sub', 'sub.subdistrict_id', '=', 'ma.subdistrict_id')
             ->where('ccs.id', $id_cart_shop)
             ->where('ma.is_default_billing', 'yes')
+            ->first();
+
+        return $query;
+    }
+
+    function getaddressUser($id_cart_shop)
+    {
+        $query  = DB::table('complete_cart_shop as ccs')
+            ->select(
+                'm.instansi',
+                'm.satker',
+                'm.npwp',
+                'ma.*',
+                'p.province_name',
+                'c.city_name as city',
+                'sub.subdistrict_name',
+            )
+            ->join('complete_cart as cc', 'cc.id', 'ccs.id_cart')
+            ->join('member as m', 'm.id', 'cc.id_user')
+            ->join('member_address as ma', 'ma.member_address_id', 'cc.id_address_user')
+            ->join('province as p', 'p.province_id', '=', 'ma.province_id')
+            ->join('city as c', 'c.city_id', '=', 'ma.city_id')
+            ->join('subdistrict as sub', 'sub.subdistrict_id', '=', 'ma.subdistrict_id')
+            ->where('ccs.id', $id_cart_shop)
             ->first();
 
         return $query;
