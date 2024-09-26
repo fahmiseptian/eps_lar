@@ -108,7 +108,8 @@ class CompleteCartShop extends Model implements HasMedia
             'sp.price as price_ship',
             'sh.is_top',
             'sh.name as nama_seller',
-            'sh.npwp as npwp_seller'
+            'sh.npwp as npwp_seller',
+            'up.file_upload as bukti_transfer'
         )
             ->join('complete_cart as cc', 'cc.id', '=', 'complete_cart_shop.id_cart')
             ->join('complete_cart_address as cca', 'cca.id_cart', 'complete_cart_shop.id_cart')
@@ -120,6 +121,7 @@ class CompleteCartShop extends Model implements HasMedia
             ->join('province as p', 'p.province_id', '=', 'ma.province_id')
             ->join('city as c', 'ma.city_id', '=', 'c.city_id')
             ->join('subdistrict as s', 's.subdistrict_id', '=', 'ma.subdistrict_id')
+            ->leftjoin('upload_payment as up', 'up.invoice', 'cc.invoice')
             ->where('complete_cart_shop.id', '=', $id_cart_shop)
             ->where('complete_cart_shop.id_shop', $shopId)
             ->where('cca.id_billing_address', '!=', null)
@@ -172,6 +174,24 @@ class CompleteCartShop extends Model implements HasMedia
             ->where('complete_cart_shop.id', '=', $id_cart_shop)
             ->where('complete_cart_shop.id_shop', $shopId)
             ->first();
+    }
+
+    function getTrackforfreeshipping($id_cart_shop)
+    {
+        $query = DB::table('complete_cart_shop as ccs')
+            ->select(
+                'ccs.file_do',
+                'ccs.delivery_start',
+                'ccs.delivery_end',
+                'ccs.status',
+                'sp.id_courier',
+                'ccs.no_resi'
+            )
+            ->join('shipping as sp', 'sp.id', '=', 'ccs.id_shipping')
+            ->where('ccs.id', '=', $id_cart_shop)
+            ->first();
+
+        return $query;
     }
 
 

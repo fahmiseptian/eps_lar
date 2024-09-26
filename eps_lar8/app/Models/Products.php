@@ -35,6 +35,7 @@ class Products extends Model implements HasMedia
         'stock',
         'status_display',
         'status_delete',
+        'barang_kena_ppn',
         'status_lpse',
         'is_pdn',
         'id_satuan',
@@ -286,6 +287,8 @@ class Products extends Model implements HasMedia
             ->leftjoin('product_image as pi', 'products.id', '=', 'pi.id_product')
             ->where('s.id', $id_shop)
             ->where('pi.is_default', 'yes')
+            ->where('products.status_display', 'Y')
+            ->where('products.status_delete', 'N')
             ->inRandomOrder() // Urutkan hasil secara acak
             ->take(5) // Ambil 5 data
             ->get();
@@ -597,5 +600,35 @@ class Products extends Model implements HasMedia
             ->inRandomOrder()
             ->limit(8)
             ->get();
+    }
+
+    function GetDetialProduct($id_product)
+    {
+        $query = DB::table('products as p')
+            ->select(
+                'p.*',
+                'pc.barang_kena_ppn',
+                'lp.price_lpse',
+                'pv.id as id_video',
+                'pv.link',
+                'b.name as brand_name',
+                DB::raw('(SELECT image300 FROM product_image WHERE id_product = p.id AND is_default = "yes" LIMIT 1) AS image'),
+                DB::raw('(select name from product_category where id = p.id_category) as name_lvl3'),
+                DB::raw('(select parent_id from product_category where id = p.id_category) as id_lvl2'),
+                DB::raw('(select code from product_category where id = id_lvl2) as code_lvl2'),
+                DB::raw('(select name from product_category where id = id_lvl2) as name_lvl2'),
+                DB::raw('(select parent_id from product_category where id = id_lvl2) as id_lvl1'),
+                DB::raw('(select code from product_category where id = id_lvl1) as code_lvl1'),
+                DB::raw('(select name from product_category where id = id_lvl1) as name_lvl1')
+            )
+            ->leftJoin('brand as b', 'b.id', 'p.id_brand')
+            ->leftJoin('product_video as pv', 'pv.id_product', '=', 'p.id')
+            ->leftJoin('product_category as pc', 'pc.id', '=', 'p.id_category')
+            ->leftJoin('lpse_price as lp', 'lp.id_product', '=', 'p.id')
+            ->where('p.status_delete', 'N')
+            ->where('p.id', $id_product);
+
+        $results = $query->first();
+        return $results;
     }
 }

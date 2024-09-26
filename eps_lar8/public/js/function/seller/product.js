@@ -1122,12 +1122,13 @@ function activateEventListeners() {
             },
         });
     }
-    let isSubmitting = false;
+    // let isSubmitting = false;
 
     function handleSave(status) {
+        $("#save-archive").prop("disabled", true);
 
-        if (isSubmitting) return;
-        isSubmitting = true;
+        // if (isSubmitting) return;
+        // isSubmitting = true;
         // Collect all required data
         var name = $("#nama").val();
         var kategorilevel1 = $("#kategori").attr("data-idlv1");
@@ -1254,7 +1255,8 @@ function activateEventListeners() {
             },
             complete: function () {
                 $("#overlay").hide(); // Hide the overlay
-                isSubmitting = false;
+                // isSubmitting = false;
+                $("#save-archive").prop("disabled", true);
             },
         });
     }

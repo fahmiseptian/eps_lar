@@ -1268,23 +1268,6 @@ $(document).on("click", "#tambah-qty", function () {
     updateqtyCart(id_cst, "increase");
 });
 
-$(document).on("change", "#quantity", function () {
-    var id_cst = $(this).data("id_cst");
-    var newQuantity = parseInt($(this).val());
-    var stock = $(this).data("stock");
-    if (newQuantity > stock) {
-        Swal.fire({
-            title: "Gagal",
-            text: "Quantity product melebihi stok toko",
-            icon: "error",
-            confirmButtonText: "OK",
-        });
-        newQuantity = stock;
-        $(this).val(stock);
-    }
-    updateqtyCart(id_cst, "coustom", newQuantity);
-});
-
 $(document).on("click", ".cart-btn", function () {
     const quantity = getQuantity();
     var id_product = $(this).data("id");
@@ -1321,6 +1304,64 @@ $(document).on("click", ".cart-btn", function () {
                 text: "Produk telah ditambahkan ke keranjang.",
                 icon: "success",
                 confirmButtonText: "OK",
+            });
+        },
+        error: function (xhr, status, error) {
+            var errorMessage =
+                "Terjadi kesalahan saat menambah produk ke dalam keranjang.";
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                errorMessage = xhr.responseJSON.message;
+            }
+            Swal.fire({
+                title: "Gagal",
+                text: errorMessage,
+                icon: "error",
+                confirmButtonText: "OK",
+            });
+        },
+    });
+});
+
+$(document).on("click", ".buy-btn", function () {
+    const quantity = getQuantity();
+    var id_product = $(this).data("id");
+    var id_user = $(this).data("id_user");
+    console.log(id_user);
+    var qty = quantity;
+
+    if (id_user == null || id_user == "") {
+        Swal.fire({
+            title: "Perhatian",
+            text: "Harap login terlebih dahulu untuk menambahkan produk ke keranjang.",
+            icon: "warning",
+            confirmButtonText: "OK",
+            showCancelButton: true,
+            cancelButtonText: "Batal",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = appUrl + "/login";
+            }
+        });
+        return;
+    }
+    $.ajax({
+        url: appUrl + "/api/add-cart",
+        type: "POST",
+        data: {
+            _token: $('meta[name="csrf-token"]').attr("content"),
+            id_product: id_product,
+            qty: qty,
+        },
+        success: function (response) {
+            Swal.fire({
+                title: "Berhasil!",
+                text: "Produk berhasil ditambahkan ke keranjang.",
+                icon: "success",
+                confirmButtonText: "OK",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = appUrl + "/cart";
+                }
             });
         },
         error: function (xhr, status, error) {
@@ -1788,7 +1829,7 @@ function generateTableHtml(
     return tableHtml;
 }
 
-$(document).on("click", "#updateIsSelectProduct", function () {
+$(document).on("click", ".updateIsSelectProduct", function () {
     var id_cart = $(this).data("id_cart");
     var id_cst = $(this).data("id_cst");
 
@@ -1800,12 +1841,12 @@ $(document).on("click", "#updateIsSelectProduct", function () {
             id_cst: id_cst,
         },
         success: function (response) {
-            $("#sumprice").empty();
+            $("#total-cart").empty();
             var sumprice = `${formatRupiah(response.carts.sumprice)} &nbsp;`;
-            $("#sumprice").append(sumprice);
+            $("#total-cart").append(sumprice);
 
             $("#totalqty").empty();
-            var qty = `Subtotal (${response.carts.qty} Produk)`;
+            var qty = `${response.carts.qty} Produk`;
             $("#totalqty").append(qty);
 
             var icon =
@@ -1813,6 +1854,78 @@ $(document).on("click", "#updateIsSelectProduct", function () {
                     ? "check_box"
                     : "check_box_outline_blank";
             $("#icon-" + id_cst).text(icon);
+
+            // Cek jika ada produk yang tidak terpilih
+            var allSelected = true;
+            $(".updateIsSelectProduct").each(function () {
+                if (
+                    $(this).find(".material-icons").text() ===
+                    "check_box_outline_blank"
+                ) {
+                    allSelected = false;
+                }
+            });
+
+            // Ubah ikon toko berdasarkan status produk
+            var sellerIcon = allSelected
+                ? "check_box"
+                : "check_box_outline_blank";
+            $("#icon-seller-" + response.carts.id_shop).text(sellerIcon); // Ganti dengan ID seller yang sesuai
+        },
+        error: function (error) {
+            console.error("Terjadi kesalahan:", error);
+            Swal.fire({
+                title: "Terjadi Kesalahan",
+                text: "Silakan coba lagi nanti.",
+                icon: "error",
+                confirmButtonText: "OK",
+            });
+        },
+    });
+});
+
+$(".select-all-seller").click(function (e) {
+    e.preventDefault();
+    var sellerId = $(this).data("id_seller");
+    var cartId = $(this).data("id_cart");
+    var isSelected =
+        $("#icon-seller-" + sellerId).text() === "check_box" ? "N" : "Y"; // Toggle status
+
+    // Update status semua produk di toko
+    $(this)
+        .find(".material-icons")
+        .text(isSelected === "Y" ? "check_box" : "check_box_outline_blank");
+
+    // Update ikon produk di dalam toko
+    $(".detail-product-cart[data-shop-id='" + sellerId + "']").each(
+        function () {
+            // Tambahkan filter berdasarkan sellerId
+            var productIcon = $(this).find(
+                ".updateIsSelectProduct .material-icons"
+            );
+            productIcon.text(
+                isSelected === "Y" ? "check_box" : "check_box_outline_blank"
+            );
+        }
+    );
+
+    $.ajax({
+        url: appUrl + "/api/update-product-selection/shop", // Ganti dengan URL yang sesuai
+        method: "POST",
+        data: {
+            id_cart: cartId,
+            id_shop: sellerId,
+            is_selected: isSelected,
+            _token: "{{ csrf_token() }}", // Tambahkan token CSRF
+        },
+        success: function (response) {
+            $("#total-cart").empty();
+            var sumprice = `${formatRupiah(response.carts.sumprice)} &nbsp;`;
+            $("#total-cart").append(sumprice);
+
+            $("#totalqty").empty();
+            var qty = `${response.carts.qty} Produk`;
+            $("#totalqty").append(qty);
         },
         error: function (error) {
             console.error("Terjadi kesalahan:", error);
@@ -1978,6 +2091,8 @@ function updateCartQuantity(action) {
                     var itemPrice = $(`#price-${id_cst}`).data("price");
                     var newSubtotal = itemPrice * newQty;
                     $(`#subtotal-${id_cst}`).text(formatRupiah(newSubtotal));
+                    $("#price-" + id_cst).empty();
+                    $("#price-" + id_cst).append(formatRupiah(response.total));
                 } else {
                     Swal.fire({
                         title: "Terjadi Kesalahan",

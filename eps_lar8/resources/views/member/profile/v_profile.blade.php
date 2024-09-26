@@ -30,7 +30,7 @@
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="settingDropdown">
                                     <li><a class="dropdown-item" href="#profile"><span class="material-icons">person</span> Profile</a></li>
-                                    <li><a class="dropdown-item" href="#alamat"><span class="material-icons">location_on</span> Alamat</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('profile.address') }}"><span class="material-icons">location_on</span> Alamat</a></li>
                                     <li><a class="dropdown-item" href="#gantiPassword"><span class="material-icons">vpn_key</span> Ganti Password</a></li>
                                 </ul>
                             </li>
@@ -163,6 +163,97 @@
                 },
                 error: function() {
                     targetElement.html('<h5>Terjadi kesalahan saat memuat konten. Silakan coba lagi.</h5>');
+                }
+            });
+        }
+
+        $(document).on('click', '#tambah-alamat', function(e) {
+            var url = "{{ route('profile.edit-address') }}";
+            loadContent(url, $('#contentArea'));
+        });
+
+        function editAlamat(id) {
+            var url = "{{ route('profile.edit-address') }}?id_address=" + id;
+            loadContent(url, $('#contentArea'));
+        }
+
+        function hapusAlamat(id) {
+            $.ajax({
+                url: appUrl + "/api/member/update-Address",
+                method: 'POST',
+                data: {
+                    id_address: id,
+                    action: 'delete'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire('Berhasil!', 'Alamat berhasil dihapus.', 'success').then((result) => {
+                            if (result.isConfirmed) {
+                                var url = "{{ route('profile.address') }}";
+                                loadContent(url, $('#contentArea'));
+                            }
+                        });
+                    } else {
+                        Swal.fire('Error', 'Gagal menghapus alamat.', 'error');
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error:', xhr);
+                    Swal.fire('Error', 'Terjadi kesalahan saat menghapus alamat.', 'error');
+                }
+            });
+        }
+
+        function aturSebagaiPenagihan(id) {
+            $.ajax({
+                url: appUrl + "/api/member/update-Address",
+                method: 'POST',
+                data: {
+                    id_address: id,
+                    action: 'set_billing'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire('Berhasil!', 'Alamat berhasil diset sebagai pengaihan.', 'success').then((result) => {
+                            if (result.isConfirmed) {
+                                var url = "{{ route('profile.address') }}";
+                                loadContent(url, $('#contentArea'));
+                            }
+                        });
+                    } else {
+                        Swal.fire('Error', 'Gagal saat diset alamat penagihan', 'error');
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error:', xhr);
+                    Swal.fire('Error', 'Terjadi kesalahan saat diset alamat utama', 'error');
+                }
+            });
+        }
+
+        function aturAlamatUtama(id) {
+            $.ajax({
+                url: appUrl + "/api/member/update-Address",
+                method: 'POST',
+                data: {
+                    id_address: id,
+                    action: 'set_shipping'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire('Berhasil!', 'Alamat berhasil diset sebagai alamat utama.', 'success').then((result) => {
+                            if (result.isConfirmed) {
+                                var url = "{{ route('profile.address') }}";
+                                loadContent(url, $('#contentArea'));
+                            }
+                        });
+                    } else {
+                        Swal.fire('Error', 'Gagal set alamat utama', 'error');
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error:', xhr);
+                    Swal.fire('Error', 'Terjadi kesalahan saat diset alamat utama', 'error');
                 }
             });
         }

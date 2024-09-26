@@ -153,6 +153,16 @@ class ProfilememberController extends Controller
             }
 
             $detailProductorder = $this->model['CompleteCartShop']->getProductbytrax($id_cart_shop, $shopId);
+            $total_barang_dengan_PPN = 0;
+            $total_barang_tanpa_PPN = 0;
+
+            foreach ($detailProductorder as $product) {
+                if ($product->val_ppn != 0) {
+                    $total_barang_dengan_PPN += $product->total_non_ppn;
+                } else {
+                    $total_barang_tanpa_PPN += $product->total_non_ppn;
+                }
+            }
 
             if (!$detailProductorder) {
                 continue; // Skip this iteration if detailProductorder is not found
@@ -160,7 +170,9 @@ class ProfilememberController extends Controller
             $transactions[] = [
                 'detailOrder' => $detailOrder,
                 'produk' => $detailProductorder,
-                'billing' => $billing
+                'billing' => $billing,
+                'total_barang_dengan_PPN' => $total_barang_dengan_PPN,
+                'total_barang_tanpa_PPN' => $total_barang_tanpa_PPN,
             ];
         }
 
@@ -172,9 +184,88 @@ class ProfilememberController extends Controller
 
         $this->data['transactions'] = $transactions;
 
-        // return response()->json($transactions);
+        // return response()->json($this->data);
 
         return view('member.profile.detail_transaksi', $this->data);
+    }
+
+    public function address()
+    {
+        $this->data['addresses'] =  $this->model['member']->getaddressbyIdMember($this->data['id_user']);
+        // return response()->json($this->data);
+        return view('member.profile.v_alamat', $this->data);
+    }
+
+    function editAddress(Request $request)
+    {
+        $id_address = $request->input('id_address') ?? null;
+        $province = DB::table('province')->select('*')->get();
+        $this->data['address'] = 'empty';
+        $this->data['provinces'] = $province;
+        if ($id_address != null) {
+            $this->data['address'] = $this->model['member']->getaddressbyId($id_address);
+        }
+        // return response()->json($this->data);
+        return view('member.profile.v_tambah_alamat', $this->data);
+    }
+
+    function storeAddress(Request $request)
+    {
+        $member_address_id = $request->id;
+        $address_name = $request->nama_penerima;
+        $phone = $request->no_telepon;
+        $province_id = $request->provinsi;
+        $city_id = $request->kota;
+        $subdistrict_id = $request->kecamatan;
+        $address = $request->alamat;
+        $postal_code = $request->kode_pos;
+
+        DB::table('member_address')->where('member_id', $this->data['id_user'])->update(['is_default_shipping' => 'no', 'is_default_billing' => 'no']);
+
+        $data = [
+            'address_name' => $address_name,
+            'subdistrict_id' => $subdistrict_id,
+            'phone' => $phone,
+            'province_id' => $province_id,
+            'city_id' => $city_id,
+            'address' => $address,
+            'postal_code' => $postal_code,
+            'member_id' => $this->data['id_user'],
+            'last_updated_dt' => Carbon::now(),
+            'is_default_shipping' => 'yes',
+            'is_default_billing' => 'yes'
+        ];
+
+        if ($member_address_id != null) {
+            DB::table('member_address')->where('member_address_id', $member_address_id)->update($data);
+        } else {
+            DB::table('member_address')->insert($data);
+        }
+        return redirect()->route('profile.address')->with('success', 'Alamat berhasil disimpan.');
+    }
+
+    function UpdateAddress(Request $request)
+    {
+        $id_address = $request->input('id_address');
+        $action = $request->input('action');
+
+        $data = [];
+        // Atur status default berdasarkan aksi
+        if ($action == 'set_billing') {
+            DB::table('member_address')->where('member_id', $this->data['id_user'])->update(['is_default_billing' => 'no']);
+            $data['is_default_billing'] = 'yes';
+        } elseif ($action == 'set_shipping') {
+            DB::table('member_address')->where('member_id', $this->data['id_user'])->update(['is_default_shipping' => 'no']);
+            $data['is_default_shipping'] = 'yes';
+        } elseif ($action == 'delete') {
+            $data['active_status'] = 'inactive';
+        } else {
+            return response()->json(['error' => 'Invalid'], 404);
+        }
+
+        // Update alamat
+        DB::table('member_address')->where('member_address_id', $id_address)->update($data);
+        return response()->json(['success' => 'Berhasil Memperbaharui Alamat'], 200);
     }
 
     public function cetakInvoice(Request $request)
@@ -404,7 +495,7 @@ class ProfilememberController extends Controller
         }
         return response()->json([
             'success' => false,
-            'message' => 'Kontrak gagal disimpan'
+            'message' => 'Kontrak gagal disimpan',
         ]);
     }
 

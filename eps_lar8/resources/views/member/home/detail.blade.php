@@ -77,7 +77,7 @@
                 <div class="action-buttons">
                     <button class="cart-btn" data-id_user="{{$id_user}}" data-id="{{$id}}"><span class="material-icons">add_shopping_cart</span>
                         Keranjang</button>
-                    <button class="buy-btn">Beli Sekarang</button>
+                    <button class="buy-btn"  data-id_user="{{$id_user}}" data-id="{{$id}}">Beli Sekarang</button>
                     <button class="nego-btn">Nego</button>
                 </div>
                 <div class="deskripsi-product">
@@ -130,13 +130,12 @@
                         </a>
                     </div>
                 </div>
-
-                <table style="width: 100%">
-                    <tr>
-                        <td style="font-size:10px">Produk lainnya</td>
-                        <td style="font-size:10px; "><a style="color:grey" href="#">lihat lainnya...</a></td>
-                    </tr>
-                </table>
+                <div class="produk-lainnya">
+                    <p>Produk lainnya</p>
+                    <a href="{{ route('seller.detail', ['id' => $idToko]) }}">
+                        <p>lihat lainnya...</p>
+                    </a>
+                </div>
                 <div class="product-seller">
                     @foreach ($produkToko as $product)
                     @php

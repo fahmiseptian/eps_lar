@@ -24,22 +24,29 @@
                 @foreach ($cart->detail as $detail)
                 <div class="cart-detail-seller">
                     <span class="material-icons google-icon">
-                        check_box_outline_blank
+                        <a class="select-all-seller" data-id_cart="{{ $cart->id }}" data-id_seller="{{ $detail->id_shop }}">
+                            <span id="icon-seller-{{ $detail->id_shop }}" class="material-icons {{ $detail->products->every(fn($product) => $product->is_selected == 'Y') ? 'check-box' : 'check-box-outline-blank' }}">
+                                {{ $detail->products->every(fn($product) => $product->is_selected == 'Y') ? 'check_box' : 'check_box_outline_blank' }}
+                            </span>
+                        </a>
                     </span>
-                    <b>{{ $detail->nama_seller }}</b>
+                    <b class="nama-seller-cart">{{ $detail->nama_seller }}</b>
                     <hr>
                     @foreach ($detail->products as $product)
-                    <div class="detail-product-cart">
+                    <div class="detail-product-cart" data-shop-id="{{ $detail->id_shop }}">
                         <div class="product-info">
-                            <a id="updateIsSelectProduct" data-id_cart="{{ $cart->id }}" data-id_cst="{{ $product->id_cst }}">
-                                <span id="icon-{{ $product->id_cst }}" class="material-icons">
+                            <a class="updateIsSelectProduct" data-id_cart="{{ $cart->id }}" data-id_cst="{{ $product->id_cst }}">
+                                <span id="icon-{{ $product->id_cst }}" class="material-icons {{ $product->is_selected == 'Y' ? 'check-box' : 'check-box-outline-blank' }}">
                                     {{ $product->is_selected == 'Y' ? 'check_box' : 'check_box_outline_blank' }}
                                 </span>
                             </a>
                             <img src="{{$product->gambar_product}}" alt="product" class="product-image-cart">
-                            <p style="margin-left: 10px; font-size: 14px;">{{ $product->nama_product }}</p>
+                            <div class="produk">
+                                <p style="margin-left: 10px; font-size: 14px; margin-bottom:-1px">{{ $product->nama_product }}</p>
+                                <p style="margin-left: 10px; font-size: 12px; color: gray;">Rp {{ number_format($product->price, 0, ',', '.') }}</p> <!-- Harga satuan -->
+                            </div>
                         </div>
-                        <b class="product-price-cart">Rp {{ number_format($product->price, 0, ',', '.') }}</b>
+                        <b class="product-price-cart" id="price-{{ $product->id_cst }}">Rp {{ number_format($product->price * $product->qty, 0, ',', '.') }}</b> <!-- Harga total -->
                     </div>
                     <hr style="margin-left: 20px;">
                     <div class="button-aksi-cart">
@@ -60,15 +67,13 @@
                     @endforeach
                 </div>
                 @endforeach
-
-            </div>
             </div>
             <div class="sub-total-cart">
                 <b style="font-size: 18px; margin-bottom: 10px;" align="left">Ringkasan Belanja</b>
                 <hr>
                 <div class="sub-total-cart-content">
                     <p>Total Pesanan</p>
-                    <p>{{ $cart->qty }} Product</p>
+                    <p id="totalqty">{{ $cart->qty }} Product</p>
                 </div>
                 <div class="sub-total-cart-content">
                     <p>Total</p>

@@ -247,11 +247,7 @@ class Member extends Model
     {
         $data = DB::table('member as m')
             ->select(
-                'ma.member_address_id',
-                'ma.phone',
-                'ma.address_name',
-                'ma.address',
-                'ma.postal_code',
+                'ma.*',
                 'p.province_name',
                 's.subdistrict_name',
                 'c.city_name as city',
@@ -261,9 +257,10 @@ class Member extends Model
             ->join('city as c', 'ma.city_id', 'c.city_id')
             ->join('subdistrict as s', 's.subdistrict_id', 'ma.subdistrict_id')
             ->where('m.id', $id_member)
+            ->where('ma.active_status','active')
             ->get();
         return $data;
-    }
+    }   
 
     public function getDataMember($id)
     {
@@ -289,5 +286,23 @@ class Member extends Model
             return true;
         }
         return false;
+    }
+
+    function getaddressbyId($address)
+    {
+        $address = DB::table('member as m')
+            ->select(
+                'ma.*',
+                'p.province_name',
+                's.subdistrict_name',
+                'c.city_name as city',
+            )
+            ->join('member_address as ma', 'm.id', 'ma.member_id')
+            ->join('province as p', 'p.province_id', 'ma.province_id')
+            ->join('city as c', 'ma.city_id', 'c.city_id')
+            ->join('subdistrict as s', 's.subdistrict_id', 'ma.subdistrict_id')
+            ->where('ma.member_address_id', $address)
+            ->first();
+        return $address;
     }
 }

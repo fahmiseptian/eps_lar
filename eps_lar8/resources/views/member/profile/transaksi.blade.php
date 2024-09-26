@@ -22,12 +22,19 @@
     <div class="tab-content" id="transactionTabsContent">
         @php
         $statuses = [
-        'all' => ['Menunggu Konfirmasi PPK', 'Menunggu Konfirmasi Penjual', 'Dalam Pengiriman', 'Pesanan Dibatalkan', 'Pesanan Selesai', 'Belum Di Bayar', 'Sudah Di Bayar', 'Menunggu Konfirmasi Pembayaran'],
-        'pending' => ['Menunggu Konfirmasi PPK'],
-        'approved' => ['Menunggu Konfirmasi Penjual'],
-        'on_delivery' => ['Dalam Pengiriman'],
-        'rejected' => ['Pesanan Dibatalkan']
+        'all' => ['Menunggu_Konfirmasi_PPK', 'Menunggu_Konfirmasi_Penjual', 'Dalam_Pengiriman', 'Pesanan_Dibatalkan', 'Packing', 'Selesai', 'Pesanan_Dikembalikan'],
+        'pending' => ['Menunggu_Konfirmasi_PPK'],
+        'approved' => ['Menunggu_Konfirmasi_Penjual'],
+        'on_delivery' => ['Dalam_Pengiriman'],
+        'rejected' => ['Pesanan_Dibatalkan']
         ];
+        //$statuses = [
+        //'all' => ['Menunggu Konfirmasi PPK', 'Menunggu Konfirmasi Penjual', 'Dalam Pengiriman', 'Pesanan Dibatalkan', 'Pesanan Selesai', 'Belum Di Bayar', 'Sudah Di Bayar', 'Menunggu Konfirmasi Pembayaran'],
+        //'pending' => ['Menunggu Konfirmasi PPK'],
+        //'approved' => ['Menunggu Konfirmasi Penjual'],
+        //'on_delivery' => ['Dalam Pengiriman'],
+        //'rejected' => ['Pesanan Dibatalkan']
+        //];
         @endphp
 
         @foreach($statuses as $tabId => $statusList)
@@ -36,7 +43,7 @@
                 @php
                 $filteredTransactions = $transactions->filter(function($group) use ($statusList) {
                 return collect($group)->contains(function($transaction) use ($statusList) {
-                return in_array($transaction->status_invoice, $statusList);
+                return in_array($transaction->status, $statusList);
                 });
                 });
                 @endphp

@@ -18,16 +18,14 @@ class JNE
 
 
         if ($this->Config['ENVIRONMENT'] == 'production') {
-            $this->Config['username'] = 'TESTAPI';
-            $this->Config['api_key'] = '25c898a9faea1a100859ecd9ef674548';
+            $this->Config['username'] = 'ELITEPROXY';
+            $this->Config['api_key'] = 'a2166df97bc330831f0c4e2cf4fb60b4';
             $this->Config['OLSHOP_CUST'] = '11953800';
-
         } else {
             $this->Config['username'] = 'TESTAPI';
             $this->Config['api_key'] = '25c898a9faea1a100859ecd9ef674548';
             $this->Config['OLSHOP_CUST'] = 'TESTAKUN';
         }
-
     }
 
     public function generateCnote($data)
@@ -49,7 +47,7 @@ class JNE
 
         Log::info('Send to JNE', ['payload' => $postData]);
         Log::info('Response from JNE API', ['response' => $response->body()]);
-        Log::info('Parsed response from JNE API',$response->json());
+        Log::info('Parsed response from JNE API', ['response' => $response->json()]);
 
         if ($response->successful()) {
             // Handle successful response
@@ -59,12 +57,17 @@ class JNE
                 'action' => 'Create_RESI'
             ]);
             $cnote_no = $response->json()['detail'][0]['cnote_no'];
+
+            if ( $this->Config['ENVIRONMENT'] == 'development') {
+                $cnote_no = 5403212200022724 ;
+            }
+            
             return $cnote_no;
         } else {
             // Handle error response
             JneLog::create([
                 'payload' => json_encode($postData),
-                'response' => json_encode($response->json()),
+                'response' => $response->json(),
                 'action' => 'Create_RESI'
             ]);
             // Log the error or display it for debugging
@@ -73,18 +76,19 @@ class JNE
         }
     }
 
-    function tracking($awb){
+    function tracking($awb)
+    {
         $url        = 'http://apiv2.jne.co.id:10102/tracing/api/list/v1/cnote';
 
         if ($this->Config['ENVIRONMENT'] == 'production') {
-            $resi   = $awb ;
+            $resi   = $awb;
         } else {
             // AWB Pengetesan
-            $resi   = '5403212200022724' ;
+            $resi   = '5403212200022724';
         }
 
 
-        $url    = $url.'/'.$resi;
+        $url    = $url . '/' . $resi;
         $data   = [
             'username' => $this->Config['username'],
             'api_key' => $this->Config['api_key'],
@@ -96,7 +100,7 @@ class JNE
             ])
             ->post($url, $data);
 
-        Log::info('Send to JNE', ['Url' => $url ]);
+        Log::info('Send to JNE', ['Url' => $url]);
         Log::info('Response from JNE API', ['response' => $response->body()]);
 
         JneLog::create([
@@ -108,7 +112,5 @@ class JNE
         $result = $response->json();
 
         return $result;
-
     }
-
 }

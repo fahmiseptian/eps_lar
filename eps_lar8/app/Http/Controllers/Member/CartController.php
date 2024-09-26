@@ -24,6 +24,7 @@ class CartController extends Controller
         $this->model['CartShopTemporary'] = new CartShopTemporary();
         $this->model['CartShop'] = new CartShop();
         $this->model['member'] = new Member();
+        $this->model['Cart'] = new Cart();
 
         // Ambil semua data sesi
         $sessionData = $request->session()->all();
@@ -40,9 +41,11 @@ class CartController extends Controller
     public function index()
     {
         $id_member = $this->data['id_user'];
+        // $id_cart = $this->data['Cart']->getIdCartbyidmember($id_member);
         $cart = Cart::where('id_user', $id_member)->select('id', 'total', 'qty')->first();
 
         if ($cart) {
+            $cart->qty = $this->model['CartShopTemporary']->sumqtySelected($cart->id);
             $cart->detail = $this->model['CartShop']->getdetailcartByIdcart($cart->id);
 
             foreach ($cart->detail as $detail) {
@@ -70,9 +73,10 @@ class CartController extends Controller
         if (!$cst) {
             return response()->json(['message' => 'Product Cart Tidak ditemukan'], 404);
         }
-
         $hasil = $this->model['CartShopTemporary']->updateTemporaryById($id_user, $cst->id_shop, $id_cst, $qty);
-        return response()->json(['success' => true, 'hasil' => $hasil]);
+        $total_product = DB::table('cart_shop_temporary')->where('id', $id_cst)->value('total');
+
+        return response()->json(['success' => true, 'total' =>  $total_product, 'hasil' => $hasil]);
     }
 
     function updateqtyCart(Request $request)
@@ -130,7 +134,6 @@ class CartController extends Controller
         $id_member = $this->data['id_user'];
         $id_product = $request->id_product;
         $qty = $request->qty;
-        $id_shop = 0;
 
         $id_address = DB::table('member_address')
             ->where('member_id', $id_member)
@@ -140,10 +143,11 @@ class CartController extends Controller
         if (empty($id_address)) {
             return response()->json(['message' => 'Alamat tidak ditemukan'], 404);
         }
+        $id_cart = $this->model['Cart']->getIdCartbyidmember($id_member);
 
-        $addcart = $this->model['CartShopTemporary']->updateTemporary($id_member, $id_product, $id_shop, $qty);
+        $addcart = $this->model['CartShopTemporary']->CheckCart($id_cart, $id_product, $id_member, $qty);
 
-        return response()->json(["Masagge" => $addcart]);
+        return response()->json(["Masagge" => 'Berhasil Memasukan Product Ke Keranjang']);
     }
 
     function deletecart($id_temporary, $id_shop)
@@ -324,16 +328,25 @@ class CartController extends Controller
         $id_cart = $request->id_cart;
         $id_cst = $request->id_cst;
         $cst = $this->model['CartShopTemporary']->find($id_cst);
+        $cs = DB::table('cart_shop')->where('id_cart', $id_cart)->where('id_shop', $cst->id_shop)->first();
         if (!$cst) {
             return response()->json(['message' => 'Product Cart Tidak ditemukan'], 404);
         }
+        $update_cart_shop = $this->model['CartShopTemporary']->UpdateShopCart($id_cart, $cst->id_shop);
+        $update_cart = $this->model['CartShopTemporary']->updateCart($id_cart);
 
         if ($cst->is_selected == 'Y') {
             $cst->is_selected = 'N';
             $cst->save();
+            $qty_total = $cs->qty - 1;
+            $cs->qty = $qty_total;
+            DB::table('cart_shop')->where('id_cart', $id_cart)->where('id_shop', $cst->id_shop)->update(['qty' => $qty_total]);
         } else {
             $cst->is_selected = 'Y';
             $cst->save();
+            $qty_total = $cs->qty + 1;
+            $cs->qty = $qty_total;
+            DB::table('cart_shop')->where('id_cart', $id_cart)->where('id_shop', $cst->id_shop)->update(['qty' => $qty_total]);
         }
         $sumprice = $this->model['CartShopTemporary']->sumPriceSelectProductCart($id_cart);
         $totalqty = $this->model['CartShopTemporary']->sumqtySelected($id_cart);
@@ -341,7 +354,29 @@ class CartController extends Controller
         $carts = [
             'sumprice' => $sumprice,
             'is_selected' => $cst->is_selected,
-            'qty' => $totalqty
+            'qty' => $totalqty,
+            'id_shop' => $cst->id_shop,
+        ];
+
+        return response()->json(['carts' => $carts], 200);
+    }
+
+    function updateIsSelectShop(Request $request)
+    {
+        $id_cart = $request->id_cart;
+        $id_shop = $request->id_shop;
+        $isSelected = $request->is_selected;
+
+        DB::table('cart_shop_temporary')->where('id_cart', $id_cart)->where('id_shop', $id_shop)->update(['is_selected' => $isSelected]);
+        $update_cart_shop = $this->model['CartShopTemporary']->UpdateShopCart($id_cart, $id_shop);
+        $update_cart = $this->model['CartShopTemporary']->updateCart($id_cart);
+
+        $sumprice = $this->model['CartShopTemporary']->sumPriceSelectProductCart($id_cart);
+        $totalqty = $this->model['CartShopTemporary']->sumqtySelected($id_cart);
+
+        $carts = [
+            'sumprice' => $sumprice,
+            'qty' => $totalqty,
         ];
 
         return response()->json(['carts' => $carts], 200);

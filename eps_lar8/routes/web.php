@@ -242,6 +242,8 @@ Route::group(['middleware' => 'member'], function () {
     Route::get('/profile/create-suratpesanan', [ProfilememberController::class, 'createSuratPesanan'])->name('profile.create-suratpesanan');
     Route::get('/profile/edit-kontrak', [ProfilememberController::class, 'editKontrak'])->name('profile.edit-kontrak');
     Route::get('/profile/edit-suratpesanan', [ProfilememberController::class, 'editSuratPesanan'])->name('profile.edit-suratpesanan');
+    Route::get('/profile/address', [ProfilememberController::class, 'address'])->name('profile.address');
+    Route::get('/profile/edit-address', [ProfilememberController::class, 'editAddress'])->name('profile.edit-address');
 });
 
 Route::get('/find/{query}', [SearchController::class, 'fullSearch']);

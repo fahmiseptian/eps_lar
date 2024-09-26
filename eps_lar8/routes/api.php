@@ -188,7 +188,10 @@ Route::group(['middleware' => 'member'], function () {
     Route::get('/lacak_pengiriman/{id_seller}/{id_cart_shop}', [CheckoutController::class, 'lacak_pengiriman']);
     Route::get('/get_detail_transaksi/{id_shop}/{id_cart_shop}', [CheckoutController::class, 'get_detail_product']);
     Route::post('/updateIsSelectProduct', [CartController::class, 'updateIsSelectProduct']);
+    Route::post('/update-product-selection/shop', [CartController::class, 'updateIsSelectShop']);
     Route::post('/updateqtyCart', [CartController::class, 'updateqtyCart']);
+    Route::post('/member/storeAddress', [ProfilememberController::class, 'storeAddress']);
+    Route::post('/member/update-Address', [ProfilememberController::class, 'UpdateAddress']);
     // Route::get('/bni/create-billing', [BniController::class, 'createBilling']);
 
 });
@@ -197,6 +200,7 @@ Route::group(['middleware' => 'member'], function () {
 Route::post('/kurir/anter', [KurirController::class, 'anter']);
 Route::post('/kurir/pickup', [KurirController::class, 'pickup']);
 Route::post('/kurir/tracking', [KurirController::class, 'Tracking']);
+Route::post('/kurir/view-tracking', [KurirController::class, 'trackingReturnView']);
 
 Route::get('/config/getProvince', [LoginSellerController::class, 'getProvince']);
 Route::get('/config/getCity/{id}', [LoginSellerController::class, 'getCity']);

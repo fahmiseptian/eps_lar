@@ -81,7 +81,7 @@ class SettingController extends Controller
 
     function deleteAddress(Request $request) {
         $id_address = $request->id_address;
-        $delete = DB::table('member_address')->where('member_address_id', $id_address)->delete();
+        $delete = DB::table('member_address')->where('member_address_id', $id_address)->update(['active_status'=>'inactive']);
 
         if ($delete) {
             return response()->json(['message' => 'Address deleted successfully'], 200);

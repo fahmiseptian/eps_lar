@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class SAP{
+class SAP
+{
     protected $Config;
 
     public function __construct()
@@ -22,39 +23,39 @@ class SAP{
             // $this->Config['user'] = 'eliteproxy';
             $this->Config['api_key'] = '';
             $this->Config['customer_code'] = '';
-
         } else {
             $this->Config['url']        = 'http://apisanbox.coresyssap.com/';
             // $this->Config['user'] = 'demo';
             $this->Config['api_key'] = 'DEV_m4rK3tPlac3#_2019';
             $this->Config['customer_code'] = 'DEV000';
         }
-
     }
 
 
     // Create for reference_no for SAP
-    public function numHash($str, $len = null) {
-		// Reff : https://stackoverflow.com/q/3379471/10351006
+    public function numHash($str, $len = null)
+    {
+        // Reff : https://stackoverflow.com/q/3379471/10351006
 
-		$binhash = md5($str, true);
-		$numhash = unpack('N2', $binhash);
-		$hash = $numhash[1] . $numhash[2];
+        $binhash = md5($str, true);
+        $numhash = unpack('N2', $binhash);
+        $hash = $numhash[1] . $numhash[2];
 
-		if (!empty($len)) {
-			$len = intval($len);
-		}
+        if (!empty($len)) {
+            $len = intval($len);
+        }
 
-		if ($len && is_int($len)) {
-			$lenght = $len;
-			$lenght--;
-			$hash = substr($hash, 0, $lenght);
-		}
-		return $hash;
-	}
+        if ($len && is_int($len)) {
+            $lenght = $len;
+            $lenght--;
+            $hash = substr($hash, 0, $lenght);
+        }
+        return $hash;
+    }
 
-    function pickup_order($post_array) {
-        $url    = $this->Config['url'].'shipment/pickup/single_push';
+    function pickup_order($post_array)
+    {
+        $url    = $this->Config['url'] . 'shipment/pickup/single_push';
         $header = [
             'api_key' => $this->Config['api_key'],
             'Content-Type' => 'application/json',
@@ -98,8 +99,8 @@ class SAP{
         DB::table('api_courier_sap_log')->insert($data_log);
         DB::table('sap_pickup_log')->insert([
             'invoice'   => $post_array['reference_no'],
-            'payload'   => $post_array,
-            'response'     => $result,
+            'payload'   => json_encode($post_array), // Mengubah payload menjadi JSON
+            'response'  =>  $result,     // Mengubah response menjadi JSON
         ]);
 
         if ($result['status'] == 'success') {
@@ -118,12 +119,13 @@ class SAP{
         }
     }
 
-    function tracking($awb){
+    function tracking($awb)
+    {
 
         if ($this->Config['ENVIRONMENT'] == 'production') {
-            $url    = 'https://track.coresyssap.com/shipment/tracking/awb?awb_no='.$awb;
-        }else{
-            $url    = $this->Config['url'].'shipment/tracking/awb?awb_no='.$awb;
+            $url    = 'https://track.coresyssap.com/shipment/tracking/awb?awb_no=' . $awb;
+        } else {
+            $url    = $this->Config['url'] . 'shipment/tracking/awb?awb_no=' . $awb;
         }
 
         $headers = [
@@ -135,7 +137,7 @@ class SAP{
 
         DB::table('sap_request_log')->insert([
             'payload'   =>  $url,
-            'response'  =>$response
+            'response'  => $response
         ]);
 
         $result = $response->json();

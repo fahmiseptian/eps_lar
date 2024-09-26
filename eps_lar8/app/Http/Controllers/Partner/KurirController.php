@@ -11,7 +11,8 @@ use App\Models\Shop;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class KurirController extends Controller {
+class KurirController extends Controller
+{
     protected $Config;
     protected $Models;
     protected $Libraries;
@@ -155,30 +156,32 @@ class KurirController extends Controller {
     // End Get data Order
 
     // Pickup
-    function anter(Request $request) {
-		$id_courier = $request->id_courier;
-		$id_order_shop = $request->id_order_shop;
-		$id_shop 	= $this->Models['Shop']->getIdShopByOrder($id_order_shop);
+    function anter(Request $request)
+    {
+        $id_courier = $request->id_courier;
+        $id_order_shop = $request->id_order_shop;
+        $id_shop     = $this->Models['Shop']->getIdShopByOrder($id_order_shop);
 
-		if ($id_courier == "1") {
-			$create = $this->pickupJne($id_order_shop, $id_shop);
-		} else if ($id_courier == "4") {
-			$create = $this->pickup_rpx($id_order_shop, $id_shop);
-		}
+        if ($id_courier == "1") {
+            $create = $this->pickupJne($id_order_shop, $id_shop);
+        } else if ($id_courier == "4") {
+            $create = $this->pickup_rpx($id_order_shop, $id_shop);
+        }
 
         return response()->json($create);
-	}
+    }
 
-    function pickup(Request $request){
+    function pickup(Request $request)
+    {
         $id_courier = $request->id_courier;
-		$id_order_shop = $request->id_order_shop;
-		$id_shop 	= $this->Models['Shop']->getIdShopByOrder($id_order_shop);
+        $id_order_shop = $request->id_order_shop;
+        $id_shop     = $this->Models['Shop']->getIdShopByOrder($id_order_shop);
 
         if ($id_courier == "4") {
-			$create = $this->pickup_rpx2($id_order_shop, $id_shop);
-		} else if ($id_courier == "6") {
-			$create = $this->pickup_sap($id_order_shop, $id_shop);
-		}
+            $create = $this->pickup_rpx2($id_order_shop, $id_shop);
+        } else if ($id_courier == "6") {
+            $create = $this->pickup_sap($id_order_shop, $id_shop);
+        }
 
         return response()->json($create);
     }
@@ -438,7 +441,7 @@ class KurirController extends Controller {
                 $goods_amounts += $insurance_cost;
             }
 
-            $post_array['OLSHOP_ORDERID'] = $data_order['invoice'].'-'.$id_cart_shop;
+            $post_array['OLSHOP_ORDERID'] = $data_order['invoice'] . '-' . $id_cart_shop;
 
             $post_array['OLSHOP_GOODSTYPE'] = '1';
             $post_array['OLSHOP_INS_FLAG'] = "N";
@@ -446,7 +449,7 @@ class KurirController extends Controller {
             $post_array['OLSHOP_COD_AMOUNT'] = "0";
 
             $post_array['OLSHOP_SHIPPER_NAME'] = $data_shipper['address_name'];
-            $post_array['OLSHOP_SHIPPER_ADDR1'] = $data_shipper['address'];
+            $post_array['OLSHOP_SHIPPER_ADDR1'] = str_replace("\n", "", $data_shipper['address']);
             $post_array['OLSHOP_SHIPPER_ADDR2'] = "";
             $post_array['OLSHOP_SHIPPER_CITY'] = $data_shipper['city_name'];
             $post_array['OLSHOP_SHIPPER_ZIP'] = $data_shipper['postal_code'];
@@ -477,7 +480,6 @@ class KurirController extends Controller {
             }
 
             $post_array['OLSHOP_GOODSVALUE'] = $goods_amounts;
-
         } else {
             return response()->json(['status' => 'error'], 404);
         }
@@ -504,7 +506,8 @@ class KurirController extends Controller {
         return false;
     }
 
-    function pickup_sap($id_cart_shop, $id_shop) {
+    function pickup_sap($id_cart_shop, $id_shop)
+    {
         $post_array = [];
         $is_data_exists = false;
         $is_insurance_ = 1;
@@ -531,7 +534,7 @@ class KurirController extends Controller {
                 // $goods_amounts += $insurance_cost;
             }
 
-            $post_array['reference_no']  = $data_order['invoice'].'-'.$id_cart_shop;
+            $post_array['reference_no']  = $data_order['invoice'] . '-' . $id_cart_shop;
             $post_array['pickup_name']  = $data_shipper['address_name'];
             $post_array['pickup_address'] = $data_shipper['address'];
             $post_array['pickup_phone'] = $data_shipper['phone'];
@@ -567,7 +570,7 @@ class KurirController extends Controller {
 
             $post_array['quantity'] = 1;
             $post_array['item_value'] = $goods_amounts;
-        }else {
+        } else {
             return response()->json(['status' => 'error'], 404);
         }
 
@@ -582,7 +585,7 @@ class KurirController extends Controller {
                     ->where('id_shop', $id_shop)
                     ->update([
                         'no_resi' => $no_awb,
-                        'pickup_number' => $data_order['invoice'].'-'.$id_cart_shop,
+                        'pickup_number' => $data_order['invoice'] . '-' . $id_cart_shop,
                         'status' => 'send_by_seller',
                         'delivery_start' => now()
                     ]);
@@ -596,9 +599,11 @@ class KurirController extends Controller {
 
 
     // Tracking
-    function Tracking(Request $request) {
+    function Tracking(Request $request)
+    {
         $id_courier = $request->id_courier;
         $resi       = $request->resi;
+        $cartShop   = $request->cart_shop ?? null;
 
         if ($id_courier == 1) {
             $track = $this->Libraries['JNE']->tracking($resi);
@@ -606,8 +611,37 @@ class KurirController extends Controller {
             $track = $this->Libraries['RPX']->tracking($resi);
         } elseif ($id_courier == 6) {
             $track = $this->Libraries['SAP']->tracking($resi);
+        } elseif ($id_courier == 0) {
+            $track =  $this->Models['CCS']->getTrackforfreeshipping($cartShop);
+            return view('partner.tracking', ['tracking' =>  $track]);
         }
 
         return $track;
+    }
+
+    function trackingReturnView(Request $request)
+    {
+        $id_courier = $request->id_courier;
+        $resi       = $request->resi;
+        $cartShop   = $request->cart_shop ?? null;
+
+        if ($id_courier == 1) {
+            $track = $this->Libraries['JNE']->tracking($resi);
+            return view('partner.tracking', ['tracking' =>  $track, 'id_courier' => $id_courier]);
+        } elseif ($id_courier == 4) {
+            $track = $this->Libraries['RPX']->tracking($resi);
+            $trackData = json_decode($track, true);
+            return view('partner.tracking', ['tracking' => $trackData['RPX']['DATA'], 'id_courier' => $id_courier]); 
+        } elseif ($id_courier == 6) {
+            $track = $this->Libraries['SAP']->tracking($resi);
+            return view('partner.tracking', ['tracking' =>  $track, 'id_courier' => $id_courier]); // Pastikan view dipanggil di sini
+
+        } elseif ($id_courier == 0) {
+            $track =  $this->Models['CCS']->getTrackforfreeshipping($cartShop);
+            return view('partner.tracking', ['tracking' =>  $track, 'id_courier' => $id_courier]); // Pastikan view dipanggil di sini
+        }
+
+
+        return response()->json(['tracking' =>  $track, 'id_courier' => $id_courier], 200); // Kembalikan JSON untuk courier lain
     }
 }

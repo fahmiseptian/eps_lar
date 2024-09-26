@@ -1,8 +1,113 @@
+<style>
+    .header-detail-trx {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: -10px;
+    }
+
+    .header-detail-trx>p {
+        color: #007bff;
+        font-weight: bold;
+        margin-right: 20px;
+    }
+
+    .btn-back {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s, transform 0.2s;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-transaksi {
+        background-color: #007bff;
+    }
+
+    .btn-upload {
+        background-color: #28a745;
+    }
+
+    .btn-back:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+    }
+
+    .btn-back:active {
+        transform: translateY(0);
+    }
+</style>
+
 <div class="detail-transaksi-container">
-    <h2 class="transaction-title">Detail Transaksi</h2>
+
+    @php
+    $subtotal_non_ppn = 0;
+    $subtotal_sebelum_ppn = 0;
+    $subtotal_ongkir_sebelum_ppn = 0;
+    $subtotal_asuransi_sebelum_ppn = 0;
+    $biaya_penganan_sebelum_ppn = 0;
+    $total_ppn = 0;
+    $total_transaksi = 0;
+    $payment = '' ;
+    $payment_method = null;
+    $va_number = null;
+    $id_cart = null;
+    @endphp
+
+    @php
+    $firstTransaction = $transactions[0] ?? null;
+
+    if ($firstTransaction) {
+    $payment = $firstTransaction['detailOrder']->status_pembayaran_top;
+
+    if ($firstTransaction['detailOrder']->status_pembayaran_top == '1' && $firstTransaction['detailOrder']->bukti_transfer != null) {
+    $payment = 'Lunas';
+    } elseif ($firstTransaction['detailOrder']->status_pembayaran_top == '0' && $firstTransaction['detailOrder']->bukti_transfer != null) {
+    $payment = 'Menunggu_Pengecekan_Pembayaran';
+    } else {
+    $payment = 'Belum_Bayar';
+    }
+    } else {
+    $payment = 'Tidak ada transaksi'; // Atau nilai default lainnya jika tidak ada transaksi
+    }
+    @endphp
+
+    <div class="header-detail-trx">
+        <h2 class="transaction-title">Detail Transaksi</h2>
+        <p>{{ ucfirst(str_replace('_', ' ', $payment)) }}</p>
+    </div>
 
     @if(!empty($transactions))
     @foreach($transactions as $transaction)
+    @php
+    $subtotal_non_ppn += $transaction['total_barang_tanpa_PPN'];
+    $subtotal_sebelum_ppn += $transaction['total_barang_dengan_PPN'];
+    $subtotal_ongkir_sebelum_ppn += $transaction['detailOrder']->sum_shipping;
+    $subtotal_asuransi_sebelum_ppn += $transaction['detailOrder']->insurance_nominal;
+    $biaya_penganan_sebelum_ppn += $transaction['detailOrder']->handling_cost_non_ppn;
+    $total_ppn +=($transaction['detailOrder']->ppn_price + $transaction['detailOrder']->ppn_shipping);
+    $total_transaksi += $transaction['detailOrder']->total;
+
+    $payment = $transaction['detailOrder']->status_pembayaran_top;
+
+
+    if ($transaction['detailOrder']->status_pembayaran_top == '1' && $transaction['detailOrder']->bukti_transfer != null) {
+    $payment = 'Lunas';
+    } elseif ($transaction['detailOrder']->status_pembayaran_top == '0' && $transaction['detailOrder']->bukti_transfer != null) {
+    $payment = 'Menunggu_Pengecekan_Pembayaran';
+    } else {
+    $payment = 'Belum_Bayar';
+    }
+
+    $payment_method = $transaction['detailOrder']->pembayaran;
+    $va_number = $transaction['detailOrder']->va_number;
+
+    $id_cart = $transaction['detailOrder']->id_cart;
+    @endphp
+
     <div class="transaction-block">
         <div class="transaction-info">
             <div class="info-section detail-info">
@@ -155,7 +260,7 @@
                 </div>
                 <div class="product-info-detail-trx">
                     <div class="product-details-detail-trx">
-                        <h5 class="product-name">{{ $product->nama }}</h5>
+                        <h5 class="product-name">{{ $product->nama }} {{ $product->val_ppn == 0 ? ' (Tidak Kena PPN)' : '' }}</h5>
                         <p class="product-price">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
                         <p class="product-quantity">Jumlah: {{ $product->qty }}</p>
                     </div>
@@ -190,33 +295,33 @@
             <h4>Ringkasan Pembayaran</h4>
             <div class="summary-item">
                 <span class="label">Subtotal produk tanpa PPN:</span>
-                <span class="value">Rp {{ number_format($transaction['detailOrder']->subtotal, 0, ',', '.') }}</span>
+                <span class="value">Rp {{ number_format($transaction['total_barang_tanpa_PPN'], 0, ',', '.') }}</span>
             </div>
             <div class="summary-item">
                 <span class="label">Subtotal produk sebelum PPN:</span>
-                <span class="value">Rp {{ number_format($transaction['detailOrder']->subtotal, 0, ',', '.') }}</span>
+                <span class="value">Rp {{ number_format($transaction['total_barang_dengan_PPN'], 0, ',', '.') }}</span>
             </div>
             <div class="summary-item">
                 <span class="label">Subtotal Ongkos Kirim sebelum PPN:</span>
-                <span class="value">Rp {{ number_format($transaction['detailOrder']->subtotal, 0, ',', '.') }}</span>
+                <span class="value">Rp {{ number_format($transaction['detailOrder']->sum_shipping, 0, ',', '.') }}</span>
             </div>
             <div class="summary-item">
                 <span class="label">Subtotal Asuransi Pengiriman sebelum PPN:</span>
-                <span class="value">Rp {{ number_format($transaction['detailOrder']->subtotal, 0, ',', '.') }}</span>
+                <span class="value">Rp {{ number_format($transaction['detailOrder']->insurance_nominal, 0, ',', '.') }}</span>
             </div>
             <div class="summary-item">
                 <span class="label">Biaya Penanganan sebelum PPN:</span>
-                <span class="value">Rp {{ number_format($transaction['detailOrder']->subtotal, 0, ',', '.') }}</span>
+                <span class="value">Rp {{ number_format($transaction['detailOrder']->handling_cost_non_ppn, 0, ',', '.') }}</span>
             </div>
             @if($transaction['detailOrder']->pmk != 59)
             <div class="summary-item">
                 <span class="label">PPN:</span>
-                <span class="value">Rp {{ number_format($transaction['detailOrder']->subtotal, 0, ',', '.') }}</span>
+                <span class="value">Rp {{ number_format(($transaction['detailOrder']->ppn_price + $transaction['detailOrder']->ppn_shipping), 0, ',', '.') }}</span>
             </div>
             @elseif ($transaction['detailOrder']->pmk == 59)
             <div class="summary-item">
                 <span class="label">PPn:</span>
-                <span class="value">Rp {{ number_format($transaction['detailOrder']->subtotal, 0, ',', '.') }}</span>
+                <span class="value">Rp {{ number_format($transaction['detailOrder']->ppn_price, 0, ',', '.') }}</span>
             </div>
             <div class="summary-item">
                 <span class="label">Subtotal:</span>
@@ -232,17 +337,59 @@
             </div>
             @endif
             <div class="summary-item total">
-                <span class="label">Total:</span>
+                <span class="label">Subtotal:</span>
                 <span class="value">Rp {{ number_format($transaction['detailOrder']->total, 0, ',', '.') }}</span>
             </div>
         </div>
+        @if ($transaction['detailOrder']->pmk == 59)
+        <button class="btn-back btn-transaksi" onclick="uploadPajak('{{ $transaction['detailOrder']->id_cart_shop }}')">Upload Surat Setor Pajak</button>
+        @endif
     </div>
     @endforeach
+    <hr>
+    <div class="transaction-summary">
+        <h4>Total Transaksi</h4>
+        <div class="summary-item">
+            <span class="label">Subtotal produk tanpa PPN:</span>
+            <span class="value">Rp {{ number_format($subtotal_non_ppn, 0, ',', '.') }}</span>
+        </div>
+        <div class="summary-item">
+            <span class="label">Subtotal produk sebelum PPN:</span>
+            <span class="value">Rp {{ number_format($subtotal_sebelum_ppn, 0, ',', '.') }}</span>
+        </div>
+        <div class="summary-item">
+            <span class="label">Subtotal Ongkos Kirim sebelum PPN:</span>
+            <span class="value">Rp {{ number_format($subtotal_ongkir_sebelum_ppn, 0, ',', '.') }}</span>
+        </div>
+        <div class="summary-item">
+            <span class="label">Subtotal Asuransi Pengiriman sebelum PPN:</span>
+            <span class="value">Rp {{ number_format($subtotal_asuransi_sebelum_ppn, 0, ',', '.') }}</span>
+        </div>
+        <div class="summary-item">
+            <span class="label">Biaya Penanganan sebelum PPN:</span>
+            <span class="value">Rp {{ number_format($biaya_penganan_sebelum_ppn, 0, ',', '.') }}</span>
+        </div>
+        <div class="summary-item">
+            <span class="label">PPN:</span>
+            <span class="value">Rp {{ number_format($total_ppn, 0, ',', '.') }}</span>
+        </div>
+        <div class="summary-item total">
+            <span class="label">Total:</span>
+            <span class="value">Rp {{ number_format($total_transaksi, 0, ',', '.') }}</span>
+        </div>
+    </div>
+
     @else
     <p class="not-found">Detail transaksi tidak ditemukan.</p>
     @endif
 
-    <button class="btn-back" onclick="loadTransaksi()">Kembali ke Daftar Transaksi</button>
+    <div style="display: flex; justify-content: space-between; margin: bottom 40px;">
+        <button class="btn-back btn-transaksi" onclick="loadTransaksi()">Kembali ke Daftar Transaksi</button>
+        @if ($payment == 'Belum_Bayar' )
+        <button class="btn-back btn-upload" onclick="uploadPayment('{{ $id_cart }}')" style="margin-left: 15px;">Upload Pembayaran</button>
+        @endif
+    </div>
+
 </div>
 
 <script>
@@ -267,9 +414,39 @@
         var resi = $(this).data('resi');
         var id_courier = $(this).data('id_courier');
         var id_cart_shop = $(this).data('id');
-        console.log('resi : ' + resi);
-        console.log('id_courier : ' + id_courier);
-        console.log('id_cart_shop : ' + id_cart_shop);
+        $.ajax({
+            url: appUrl + "/api/kurir/view-tracking",
+            method: "post",
+            data: {
+                id_courier: id_courier,
+                resi: resi,
+                cart_shop: id_cart_shop,
+                _token: csrfToken,
+            },
+            xhrFields: {
+                withCredentials: true,
+            },
+            success: function(response) {
+                Swal.fire({
+                    title: "Lacak Order",
+                    html: response,
+                    confirmButtonText: "OK",
+                    width: window.innerWidth <= 600 ? "100%" : "60%",
+                });
+            },
+            error: function(error) {
+                console.error("Terjadi kesalahan:", error);
+                Swal.fire({
+                    title: "Terjadi Kesalahan",
+                    text: "Silakan coba lagi nanti.",
+                    icon: "error",
+                    confirmButtonText: "OK",
+                });
+            },
+            complete: function() {
+                $("#overlay").hide(); // Sembunyikan loader setelah selesai
+            },
+        });
     });
 
     $('.openKontrak').click(function() {
@@ -283,4 +460,12 @@
         var url = "{{ route('profile.suratpesanan') }}?id=" + id_cart_shop;
         loadContent(url, $('#contentArea'));
     });
+
+    function uploadPayment(id_cart) {
+        console.log(id_cart);
+    }
+
+    function uploadPajak(id_cart_shop) {
+        console.log(id_cart_shop);
+    }
 </script>
