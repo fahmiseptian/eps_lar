@@ -31,7 +31,7 @@ class CartShop extends Model
                 'cs.is_insurance',
                 'cs.insurance_nominal',
                 'cs.base_price_asuransi',
-                // 'cs.sum_asuransi',
+                'cs.sum_asuransi',
                 'cs.ppn_price',
                 'cs.total',
                 'cs.discount',

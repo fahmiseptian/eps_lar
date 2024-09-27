@@ -12,33 +12,47 @@ class Calculation
         $this->data['config'] = DB::table('lpse_config')->select('*')->first();
     }
 
-    function OngkirAwal($ongkir_dasar)
+    function OngkirAwal($ongkir_dasar, $total_weight = 1000, $pmk = 58)
     {
+        $int_rounded =  100;
+
         $config = $this->data['config'];
         $ppn_percent = $config->ppn / 100;
         $pph_percent = $config->pph / 100;
+        $pph_percent_fixed = 2 / 100;
+
+        $total_weight = ceil($total_weight/1000);
 
         // Menghitung PPN dan PPh
-        $ppn_ongkir = $ppn_percent * $ongkir_dasar;
-        $pph_ongkir = $pph_percent * $ongkir_dasar;
+        $total_price = $ongkir_dasar * $total_weight ;
+        $ppn_ongkir = $ppn_percent * $total_price;
+        $pph_ongkir = $pph_percent_fixed * $total_price;
 
         // Menjumlahkan ongkir dasar dengan PPN dan PPh
-        $total_ongkir = $ongkir_dasar + $ppn_ongkir + $pph_ongkir;
+        $total_ongkir = $total_price + $ppn_ongkir + $pph_ongkir;
 
         // Membulatkan ke atas ke kelipatan terdekat dari 100
         $ongkir_sudah_ppn_dan_pph = ceil($total_ongkir / 100) * 100;
 
         $result = [
+            'ongkir_dasar' => $ongkir_dasar,
             'ongkir_sudah_ppn_dan_pph' => $ongkir_sudah_ppn_dan_pph,
+            'total_weight' => $total_weight,
             'ppn_ongkir' => $ppn_ongkir,
             'pph_ongkir' => $pph_ongkir,
+            'ppn' => $ppn_percent,
+            'pph' => $pph_percent_fixed,
+            'total_ongkir' => $total_ongkir,
+            'total_price' => $total_price,
         ];
 
         return $result;
     }
 
-    function OngkirSudahPPN($ongkir_dasar)
+    function OngkirSudahPPN($ongkir_dasar , $total_weight = 1000, $pmk = 58)
     {
+        $int_rounded =  100;
+
         $config = $this->data['config'];
         $ppn_percent = $config->ppn / 100;
         $pph_percent = $config->pph / 100;
@@ -80,7 +94,7 @@ class Calculation
         $pph = $dataArr['pph'] ?? $config->pph;
 
         $ppn = $ppn / 100;
-        $pph = $pph / 100;
+        $pph = 2 / 100;
 
         if ($is_insurance) {
             $query = DB::table('courier as a')->select('a.id', 'a.code', 'a.name', 'a.max_weight', 'a.insurance_fee_percent', 'a.insurance_fee_nominal')->join('shipping as b', 'b.id_courier', '=', 'a.id');

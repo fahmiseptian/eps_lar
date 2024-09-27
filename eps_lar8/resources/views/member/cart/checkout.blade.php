@@ -19,7 +19,8 @@
                     <span class="material-icons">radio_button_checked</span>
                     <p>{{ $cartAddress->address_name }} - {{ $cartAddress->phone }}</p>
                     <p>{{ $cartAddress->address }} <br> {{ $cartAddress->city }} - {{ $cartAddress->subdistrict_name }},
-                        {{ $cartAddress->province_name }}, {{ $cartAddress->postal_code }}</p>
+                        {{ $cartAddress->province_name }}, {{ $cartAddress->postal_code }}
+                    </p>
                 </div>
             </div>
 
@@ -31,65 +32,66 @@
                     <p>Subtotal Product</p>
                 </div>
                 @foreach ($cart->detail as $detail)
-                    {{-- seller --}}
-                    <div class="body-product">
-                        <p>{{ $detail->nama_seller }}</p>
-                        <hr>
-                        @foreach ($detail->products as $product)
-                            {{-- Product --}}
-                            <div class="data-product-checkout">
-                                <img src="{{ $product->gambar_product }}" alt="product">
-                                <p style="width: 35%">{{ $product->nama_product }}</p>
-                                <p id="no-mobile">Rp. {{ number_format($product->price, 0, ',', '.') }}</p>
-                                <p>{{ $product->qty }}</p>
-                                <p>Rp {{ number_format($product->total, 0, ',', '.') }}</p>
-                            </div>
-                            <hr>
-                        @endforeach
-                        <div class="checkout-item">
-                            <p><span class="material-icons" id="icon-kupon">confirmation_number</span> No Voucher
-                            </p>
-                            <p>Rp.-</p>
-                        </div>
-                        <div class="checkout-item">
-                            <input type="text" name="keperluan" id="keperluan"
-                                placeholder="Ketik Untuk Menambahkan Keperluan">
-                            <input type="text" name="pesan" id="pesan"
-                                placeholder="Ketik Untuk Menambahkan Pesan Ke Penjual">
-                        </div>
-                        <div class="checkout-item">
-                            <select class="jasa-pengiriman" name="jasa-pengiriman" data-id_cs="{{ $detail->id_cs }}">
-                                <option value="" disabled
-                                    {{ $detail->id_shipping == 0 || is_null($detail->id_shipping) ? 'selected' : '' }}>
-                                    Opsi Pengiriman</option>
-                                @foreach ($detail->pengiriman as $ongkir)
-                                    <option value="{{ $ongkir->id }}"
-                                        {{ $ongkir->deskripsi == $detail->deskripsi_pengiriman ? 'selected' : '' }}>
-                                        {{ $ongkir->deskripsi }}-({{ $ongkir->etd }} Hari) Rp.
-                                        {{ number_format($ongkir->sum_shipping, 0, ',', '.') }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <?php
-                                $ppn_shipping = $cart->ppn * $detail->sum_shipping;
-                                $total_ongkir = $detail->sum_shipping + $ppn_shipping;
-                            ?>
-                            <p id="ongkir-akhir">Rp.
-                                {{ number_format($total_ongkir, 0, ',', '.') }}</p>
-                        </div>
-
-                        <div class="checkout-item" id="asuransi-pengirimans">
-                            @if ($detail->is_insurance === 1)
-                                <p id="asuransi-pengiriman" data-id_cs="{{ $detail->id_cs }}" data-id_shop="{{ $detail->id_shop }}" data-id_courier="{{ $detail->id_courier }}" data-status="delete"><span class="material-icons">check </span> Asuransikan Pengiriman</p>
-                            @else
-                                <p id="asuransi-pengiriman" data-id_cs="{{ $detail->id_cs }}" data-id_shop="{{ $detail->id_shop }}" data-id_courier="{{ $detail->id_courier }}" data-status="add"><span class="material-icons">check_box_outline_blank</span> Asuransikan Pengiriman</p>
-                            @endif
-                            <p>Rp. {{ number_format($detail->sum_asuransi, 0, ',', '.') }}</p>
-                        </div>
-                        {{-- end Product --}}
-                        <hr>
+                {{-- seller --}}
+                <div class="body-product">
+                    <p>{{ $detail->nama_seller }}</p>
+                    <hr>
+                    @foreach ($detail->products as $product)
+                    {{-- Product --}}
+                    <div class="data-product-checkout">
+                        <img src="{{ $product->gambar_product }}" alt="product">
+                        <p style="width: 35%; text-align:left; margin-left: 10px;">{{ $product->nama_product }}</p>
+                        <p id="no-mobile">Rp. {{ number_format($product->price, 0, ',', '.') }}</p>
+                        <p>{{ $product->qty }}</p>
+                        <p>Rp {{ number_format($product->total, 0, ',', '.') }}</p>
                     </div>
-                    {{-- end seller --}}
+                    <hr>
+                    @endforeach
+                    <div class="checkout-item">
+                        <p><span class="material-icons" id="icon-kupon">confirmation_number</span> No Voucher
+                        </p>
+                        <p>Rp.-</p>
+                    </div>
+                    <div class="checkout-item">
+                        <input type="text" name="keperluan" id="keperluan"
+                            placeholder="Ketik Untuk Menambahkan Keperluan">
+                        <input type="text" name="pesan" id="pesan"
+                            placeholder="Ketik Untuk Menambahkan Pesan Ke Penjual">
+                    </div>
+                    <div class="checkout-item">
+                        <select class="jasa-pengiriman" name="jasa-pengiriman" data-id_cs="{{ $detail->id_cs }}">
+                            <option value="" disabled
+                                {{ $detail->id_shipping == 0 || is_null($detail->id_shipping) ? 'selected' : '' }}>
+                                Opsi Pengiriman</option>
+                            @foreach ($detail->pengiriman as $ongkir)
+                            <option value="{{ $ongkir->id }}"
+                                {{ $ongkir->deskripsi == $detail->deskripsi_pengiriman ? 'selected' : '' }}>
+                                {{ $ongkir->deskripsi }}-({{ $ongkir->etd }} Hari)  |Rp.{{number_format($ongkir->price, 0, ',', '.')}} | Rp.
+                                {{ number_format($ongkir->sum_shipping, 0, ',', '.') }}
+                            </option>
+                            @endforeach
+                        </select>
+                        <?php
+                        $ppn_shipping = $cart->ppn * $detail->sum_shipping;
+                        $total_ongkir = $detail->sum_shipping + $ppn_shipping;
+                        ?>
+                        <p id="ongkir-akhir">Rp.
+                            {{ number_format($total_ongkir, 0, ',', '.') }}
+                        </p>
+                    </div>
+
+                    <div class="checkout-item" id="asuransi-pengirimans">
+                        @if ($detail->is_insurance === 1)
+                        <p id="asuransi-pengiriman" data-id_cs="{{ $detail->id_cs }}" data-id_shop="{{ $detail->id_shop }}" data-id_courier="{{ $detail->id_courier }}" data-status="delete"><span class="material-icons">check </span> Asuransikan Pengiriman</p>
+                        @else
+                        <p id="asuransi-pengiriman" data-id_cs="{{ $detail->id_cs }}" data-id_shop="{{ $detail->id_shop }}" data-id_courier="{{ $detail->id_courier }}" data-status="add"><span class="material-icons">check_box_outline_blank</span> Asuransikan Pengiriman</p>
+                        @endif
+                        <p> Rp. {{ number_format($detail->base_price_asuransi, 0, ',', '.') }} ||Rp. {{ number_format($detail->sum_asuransi, 0, ',', '.') }}</p>
+                    </div>
+                    {{-- end Product --}}
+                    <hr>
+                </div>
+                {{-- end seller --}}
                 @endforeach
                 <div class="checkout-item">
                     <p><span class="material-icons" id="icon-kupon">confirmation_number</span>Voucher</p>
@@ -103,18 +105,18 @@
                 <div class="payment-checkout">
                     <p>Pilihan Pembayaran :</p>
                     @foreach ($cart->payment as $pay )
-                        <p id="paymend_method" data-id_pay="{{$pay->id}}"><span class="material-icons">{{ $pay->id == $cart->id_payment ? 'radio_button_checked' : 'radio_button_unchecked' }}</span>{{$pay->name}}</p>
+                    <p id="paymend_method" data-id_pay="{{$pay->id}}"><span class="material-icons">{{ $pay->id == $cart->id_payment ? 'radio_button_checked' : 'radio_button_unchecked' }}</span>{{$pay->name}}</p>
                     @endforeach
                 </div>
                 <hr>
                 @if ($cart->id_payment == 23 || $cart->id_payment == 30)
-                    <div class="payment-checkout">
-                        <p>Pilihan TOP :</p>
-                        <p id="updateTOP" data-top="7"><span class="material-icons">{{ 7 == $cart->jml_top ? 'radio_button_checked' : 'radio_button_unchecked' }}</span>7 hari</p>
-                        <p id="updateTOP" data-top="14"><span class="material-icons">{{ 14 == $cart->jml_top ? 'radio_button_checked' : 'radio_button_unchecked' }}</span>14 hari</p>
-                        <p id="updateTOP" data-top="30"><span class="material-icons">{{ 30 == $cart->jml_top ? 'radio_button_checked' : 'radio_button_unchecked' }}</span>30 hari</p>
-                    </div>
-                    <hr>
+                <div class="payment-checkout">
+                    <p>Pilihan TOP :</p>
+                    <p id="updateTOP" data-top="7"><span class="material-icons">{{ 7 == $cart->jml_top ? 'radio_button_checked' : 'radio_button_unchecked' }}</span>7 hari</p>
+                    <p id="updateTOP" data-top="14"><span class="material-icons">{{ 14 == $cart->jml_top ? 'radio_button_checked' : 'radio_button_unchecked' }}</span>14 hari</p>
+                    <p id="updateTOP" data-top="30"><span class="material-icons">{{ 30 == $cart->jml_top ? 'radio_button_checked' : 'radio_button_unchecked' }}</span>30 hari</p>
+                </div>
+                <hr>
                 @endif
 
                 <div class="container">

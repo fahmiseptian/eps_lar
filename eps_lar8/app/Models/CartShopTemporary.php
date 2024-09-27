@@ -636,7 +636,7 @@ class CartShopTemporary extends Model
             $data_shop['id_coupon'] = $shop->id_coupon;
             // $data_shop['ppn_price'] = round($data->sum_ppn + $shop->sum_shipping);
 
-            $shop = $this->_updateShop($shop->id, $data_shop);
+            $shop = $this->_updateShop($id_cart,$shop->id, $data_shop);
         }
         return true;
     }
@@ -861,7 +861,7 @@ class CartShopTemporary extends Model
         }
 
         $ppn = ($ppn / 100);
-        $pph = ($pph / 100);
+        $pph = (2 / 100);
 
         // NOTE grams to kg
         $total_weight = ceil($total_weight / 1000);
@@ -1719,16 +1719,18 @@ class CartShopTemporary extends Model
             'base_price' => $base_price_shipping,
         ];
 
+        $calc = new Calculation();
+
         $base_price_shipping_ = ceil($total_weight / 1000) * $base_price_shipping;
-        $result_calc_shipping = $this->calc_shipping_cost($dataArr_ship);
-        $sum_shipping = $result_calc_shipping['price'] ?? 0;
+        $result_calc_shipping = $calc->OngkirSudahPPN( $base_price_shipping, $total_weight);
+        $sum_shipping = $result_calc_shipping['Ongkir_akhir'] ?? 0;
         $sum_price = $data->sum_price ?? 0;
         $sum_price_non_ppn = $data->sum_price_non_ppn ?? 0;
         $qty = $data->sum_qty ?? 0;
 
         $data_shop = [
             'id_shipping' => 0, // muncul saat checkout
-            'base_rate' => 0, // muncul saat checkout
+            'base_rate' =>  $base_price_shipping, // muncul saat checkout
             'pph_shipping' => 0, // muncul saat checkout
             'discount' => 0, // muncul saat checkout
             'subtotal' => 0, // muncul saat checkout

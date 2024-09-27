@@ -243,8 +243,8 @@ class HomememberController extends Controller
     // tester
     public function tampil()
     {
-        $carts = new Cart();
-        $cart = $carts->getProductDetail(284);
+        $carts = new Calculation();
+        $cart = $carts->OngkirSudahPPN(9000);
         return response()->json(["test" => $cart]);
     }
 

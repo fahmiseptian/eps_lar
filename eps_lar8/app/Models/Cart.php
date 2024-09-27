@@ -1030,7 +1030,7 @@ class Cart extends Model
                     'subtotal' => $q->subtotal,
                     'total' => $q->total,
                     'note' => $q->note,
-                    'note_seller'=>$q->note_seller ? $q->note_seller : 0,
+                    'note_seller'=>$q->note_seller ,
                     'file_do'=>0,
                     'no_resi' => $q->no_resi,
                     'last_update' => $date_now,

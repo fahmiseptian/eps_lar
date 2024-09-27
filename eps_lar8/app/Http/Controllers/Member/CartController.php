@@ -241,6 +241,7 @@ class CartController extends Controller
                 'ppn_shipping' => $ongkir_akhir['ppn_ongkir'],
                 'pph_shipping' => $ongkir_akhir['pph_ongkir'],
                 'base_price_shipping' => $ongkir_akhir['base_price'],
+                'base_rate' => $ongkir_akhir['base_price'],
                 // 'base_rate' => $ongkir_akhir['base_price'],
             ]);
 
@@ -252,7 +253,7 @@ class CartController extends Controller
             $cartShop->refreshCartShop($id_cart, $id_shop);
             $cartShop->refreshCart($id_cart);
 
-            return response()->json(["ongkir" => $id_cart]);
+            return response()->json(["ongkir" => $ongkir_akhir]);
         } else {
             return response()->json(["error" => "Shipping price not found."], 404);
         }
