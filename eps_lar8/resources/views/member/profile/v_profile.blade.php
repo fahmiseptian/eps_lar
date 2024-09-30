@@ -19,7 +19,7 @@
                                 <a class="nav-link" href="{{ route('profile.transaksi') }}"><span class="material-icons">swap_horiz</span> Lihat Transaksi</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href=""><span class="material-icons">handshake</span> Nego</a>
+                                <a class="nav-link" href="{{ route('profile.nego') }}"><span class="material-icons">handshake</span> Nego</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="#favorite"><span class="material-icons">favorite</span> Favorite</a>
@@ -100,6 +100,55 @@
             </div>
         </div>
     </main>
+
+    <!-- Modal -->
+    <div class="modal fade" id="negoUlangModal" tabindex="-1" role="dialog" aria-labelledby="negoUlangModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="negoUlangModalLabel">Negosiasi Ulang</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="negoUlangForm">
+                        <div class="form-group">
+                            <label for="qty">Kuantitas</label>
+                            <input type="number" class="form-control" id="qty" value="" readonly>
+                            <input type="number" class="form-control" id="id_nego" readonly hidden>
+                            <input type="number" class="form-control" id="last_id" readonly hidden>
+                        </div>
+                        <div class="form-group">
+                            <label for="hargaResponseSatuan">Harga Response Penjual Satuan</label>
+                            <input type="text" class="form-control" id="hargaResponseSatuan" value="0" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="hargaResponseTotal">Harga Response Penjual Total</label>
+                            <input type="text" class="form-control" id="hargaResponseTotal" value=  "0" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="hargaNegoSatuan">Harga Nego Satuan</label>
+                            <input type="text" class="form-control" id="hargaNegoSatuan" value="">
+                        </div>
+                        <div class="form-group">
+                            <label for="hargaNegoTotal">Harga Nego Total</label>
+                            <input type="text" class="form-control" id="hargaNegoTotal" value="0" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="catatan">Catatan</label>
+                            <textarea class="form-control" id="catatan" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-primary" id="submitNegoUlang">Kirim Nego Ulang</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     @include('member.asset.footer')
 
@@ -257,6 +306,19 @@
                 }
             });
         }
+
+        $(document).on('click', '.negos-opsi', function(e) {
+            e.preventDefault();
+            const url = this.getAttribute('href');
+            loadContent(url, $('#contentArea'));
+        });
+
+        $(document).on('click', '.detail_nego', function(e) {
+            e.preventDefault();
+            var id_nego = $(this).data('id');
+            var url = "{{ route('profile.nego.detail') }}?id=" + id_nego;
+            loadContent(url, $('#contentArea'));
+        });
     </script>
 </body>
 

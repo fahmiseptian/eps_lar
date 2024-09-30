@@ -28,13 +28,6 @@
         'on_delivery' => ['Dalam_Pengiriman'],
         'rejected' => ['Pesanan_Dibatalkan']
         ];
-        //$statuses = [
-        //'all' => ['Menunggu Konfirmasi PPK', 'Menunggu Konfirmasi Penjual', 'Dalam Pengiriman', 'Pesanan Dibatalkan', 'Pesanan Selesai', 'Belum Di Bayar', 'Sudah Di Bayar', 'Menunggu Konfirmasi Pembayaran'],
-        //'pending' => ['Menunggu Konfirmasi PPK'],
-        //'approved' => ['Menunggu Konfirmasi Penjual'],
-        //'on_delivery' => ['Dalam Pengiriman'],
-        //'rejected' => ['Pesanan Dibatalkan']
-        //];
         @endphp
 
         @foreach($statuses as $tabId => $statusList)

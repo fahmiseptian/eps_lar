@@ -233,7 +233,7 @@ class NegoController extends Controller
                 ->where('id', $pn->id)
                 ->update([
                     'status' => '2',
-                    'catatan_pembeli' => $note
+                    'catatan_penjual' => $note
                 ]);
 
             // Check if 'product_nego' update was successful

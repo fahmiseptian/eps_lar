@@ -1119,7 +1119,8 @@ main {
     font-size: 14px;
 }
 
-.quantity-input {
+.quantity-input,
+.quantity-input-nego {
     display: flex;
     align-items: center;
     border: 2px solid #e0e0e0;
@@ -1135,12 +1136,17 @@ main {
     margin-right: 5px;
 }
 
+.quantity-input-nego{
+    margin-left: auto;
+    margin-right: auto;   
+}
+
 .quantity-input:focus-within {
     border-color: #fc6703;
     box-shadow: 0 0 0 3px rgba(252, 103, 3, 0.2);
 }
 
-.quantity-btn {
+.quantity-btn, .quantity-btn-nego {
     background-color: var(--putih);
     border: none;
     color: #fc6703;
@@ -1153,16 +1159,16 @@ main {
     justify-content: center;
 }
 
-.quantity-btn:hover {
+.quantity-btn:hover, .quantity-btn-nego:hover {
     background-color: rgba(252, 103, 3, 0.1);
 }
 
-.quantity-btn:disabled {
+.quantity-btn:disabled, .quantity-btn-nego:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
 
-.quantity-btn .material-icons {
+.quantity-btn .material-icons, .quantity-btn-nego .material-icons {
     font-size: 20px;
 }
 
@@ -1226,13 +1232,14 @@ main {
     gap: 8px;
 }
 
-.quantity-input {
+.quantity-input,
+.quantity-input-nego {
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.quantity-btn {
+.quantity-btn, .quantity-btn-nego {
     padding: 8px;
     border: none;
     background-color: #ccc;
@@ -3030,6 +3037,68 @@ main {
     background-color: white;
     padding: 15px;
 }
+
+/* CSS untuk modal */
+.modal {
+    display: none; /* Tersembunyi secara default */
+    position: fixed; /* Tetap di tempat */
+    z-index: 1000; /* Di atas elemen lain */
+    left: 0;
+    top: 0;
+    width: 100%; /* Lebar penuh */
+    height: 100%; /* Tinggi penuh */
+    background-color: rgba(0, 0, 0, 0.5); /* Latar belakang transparan */
+}
+
+.modal-content {
+    background-color: #fefefe; /* Latar belakang putih */
+    margin: 30px auto; /* Margin atas dan bawah */
+    padding: 20px; /* Padding di dalam modal */
+    border: 1px solid #888; /* Border abu-abu */
+    width: 80%; /* Lebar modal */
+    max-width: 500px; /* Lebar maksimum */
+    border-radius: 10px; /* Sudut melengkung */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Bayangan */
+}
+
+.close {
+    color: #aaa; /* Warna teks untuk tombol tutup */
+    float: right; /* Posisi di kanan */
+    font-size: 28px; /* Ukuran font */
+    font-weight: bold; /* Tebal */
+}
+
+.close:hover,
+.close:focus {
+    color: black; /* Warna saat hover */
+    text-decoration: none; /* Tanpa garis bawah */
+    cursor: pointer; /* Kursor pointer */
+}
+
+label {
+    display: block; /* Menampilkan label sebagai blok */
+    margin: 10px 0 5px; /* Margin untuk label */
+}
+
+.head-modal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-content input[type="text"],
+.modal-content textarea {
+    width: 100%; /* Lebar penuh */
+    padding: 10px; /* Padding di dalam input */
+    margin-bottom: 10px; /* Margin bawah */
+    border: 1px solid #ccc; /* Border abu-abu */
+    border-radius: 5px; /* Sudut melengkung */
+}
+
+.modal-content input[type="number"]{
+    border: none !important;
+}
+
 /* mobile */
 @media (max-width: 767px) {
     body {

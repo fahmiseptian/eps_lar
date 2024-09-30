@@ -233,6 +233,8 @@ Route::group(['middleware' => 'member'], function () {
     Route::get('/inv/{id_seller}/{id_cart_shop}',[CheckoutController::class,'cetak_Invoice']);
     Route::get('/kwitansi/{id_seller}/{id_cart_shop}',[CheckoutController::class,'cetak_Kwitansi']);
     Route::get('/profile/transaksi', [ProfilememberController::class, 'transaksi'])->name('profile.transaksi');
+    Route::get('/profile/nego', [ProfilememberController::class, 'getNegos'])->name('profile.nego');
+    Route::get('/profile/detail-nego', [ProfilememberController::class, 'getNegoDetail'])->name('profile.nego.detail');
     Route::get('/profile/detail-transaksi', [ProfilememberController::class, 'GetDetailTransaction'])->name('profile.transaksi.detail');
     Route::get('/cetak-invoice', [ProfilememberController::class, 'cetakInvoice'])->name('cetak.invoice');
     Route::get('/cetak-kwitansi', [ProfilememberController::class, 'cetakKwitansi'])->name('cetak.kwitansi');

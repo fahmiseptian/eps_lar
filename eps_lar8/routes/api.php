@@ -192,6 +192,9 @@ Route::group(['middleware' => 'member'], function () {
     Route::post('/updateqtyCart', [CartController::class, 'updateqtyCart']);
     Route::post('/member/storeAddress', [ProfilememberController::class, 'storeAddress']);
     Route::post('/member/update-Address', [ProfilememberController::class, 'UpdateAddress']);
+    Route::post('/member/nego/accNego', [ProfilememberController::class, 'accNego']);
+    Route::post('/member/nego/tolak_nego', [ProfilememberController::class, 'tolak_nego']);
+    Route::post('/member/nego/reqNego', [ProfilememberController::class, 'addRequestNego']);
     // Route::get('/bni/create-billing', [BniController::class, 'createBilling']);
 
 });
@@ -207,3 +210,7 @@ Route::get('/config/getCity/{id}', [LoginSellerController::class, 'getCity']);
 Route::get('/config/getdistrict/{id}', [LoginSellerController::class, 'getdistrict']);
 
 Route::get('/keranjang/{id_member}', [HomememberController::class, 'keranjang']);
+
+
+// calc
+Route::post('/calc_nego', [HomememberController::class, 'calc_nego']);

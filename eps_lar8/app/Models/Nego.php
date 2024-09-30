@@ -112,6 +112,48 @@ class Nego extends Model
         return $negos;
     }
 
+    public function getNegoByid_member($id_member)
+    {
+        $negos = DB::table('nego as n')
+            ->select(
+                'n.id',
+                'n.harga_awal_satuan as harga_awal',
+                'n.qty',
+                'n.status as status',
+                'n.status_nego as status_ulang',
+                'n.complete_checkout as is_checkout',
+                DB::raw('(SELECT base_price FROM product_nego WHERE id_nego = n.id ORDER BY id DESC LIMIT 1) AS harga_nego'),
+                DB::raw('(SELECT status FROM product_nego WHERE id_nego = n.id ORDER BY id DESC LIMIT 1) AS status_nego'),
+                DB::raw('(SELECT id_product FROM product_nego WHERE id_nego = n.id ORDER BY id DESC LIMIT 1) AS id_product'),
+                DB::raw('(SELECT name FROM products WHERE id = id_product ) AS nama_produk'),
+                DB::raw('(SELECT image50 FROM product_image WHERE id_product = (SELECT id_product FROM product_nego WHERE id_nego = n.id ORDER BY id DESC LIMIT 1) AND is_default = "yes" LIMIT 1) AS image')
+            )
+            ->where('n.member_id', $id_member)
+            ->orderBy('n.id', 'DESC')
+            ->get();
+
+        return $negos;
+    }
+
+    function getdetailNego($id_nego)
+    {
+        $query = DB::table('nego as n')
+            ->select(
+                'n.*',
+                's.name as nama_toko',
+                DB::raw('(SELECT base_price FROM product_nego WHERE id_nego = n.id ORDER BY id DESC LIMIT 1) AS harga_nego'),
+                DB::raw('(SELECT status FROM product_nego WHERE id_nego = n.id ORDER BY id DESC LIMIT 1) AS status_nego'),
+                DB::raw('(SELECT id_product FROM product_nego WHERE id_nego = n.id ORDER BY id DESC LIMIT 1) AS id_product'),
+                DB::raw('(SELECT name FROM products WHERE id = id_product ) AS nama_produk'),
+                DB::raw('(SELECT image50 FROM product_image WHERE id_product = (SELECT id_product FROM product_nego WHERE id_nego = n.id ORDER BY id DESC LIMIT 1) AND is_default = "yes" LIMIT 1) AS image')
+            )
+            ->join('shop as s', 's.id', 'n.id_shop')
+            ->where('n.id', $id_nego)
+            ->first();
+
+        return $query;
+    }
+
 
 
     function DetailNego($id_shop, $id_nego)
@@ -174,20 +216,10 @@ class Nego extends Model
                         'status_nego' => '2',
                     ]);
 
-                if ($updatedNego > 0) {
-                    // Insert new data into product_nego
-                    $inserted = DB::table('product_nego')->insert($data);
-
-                    if ($inserted) {
-                        return true;
-                    } else {
-                        return '1';
-                    }
-                } else {
-                    return '2';
-                }
+                $inserted = DB::table('product_nego')->insert($data);
+                return false;
             } else {
-                return '3';
+                return false;
             }
         } catch (\Exception $e) {
             // Log the exception or handle it as needed

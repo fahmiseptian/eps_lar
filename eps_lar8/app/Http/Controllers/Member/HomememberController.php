@@ -15,10 +15,12 @@ use App\Models\Invoice;
 use App\Models\Lpse_config;
 use App\Models\Member;
 use App\Models\Nego;
+use App\Models\ProductCategory;
 use App\Models\Products;
 use App\Models\Shop;
 use App\Models\Shop_courier;
 use App\Models\ShopBanner;
+use App\Models\ShopCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -27,6 +29,7 @@ class HomememberController extends Controller
     protected $data;
     protected $user_id;
     protected $model;
+    protected $Libraries;
 
     public function __construct(Request $request)
     {
@@ -34,10 +37,14 @@ class HomememberController extends Controller
         $sessionData = $request->session()->all();
         $this->user_id = $sessionData['id'] ?? null;
 
+        $this->Libraries['Calculation'] = new Calculation();
+
         $this->model['products'] = new Products();
         $this->model['shop_banner'] = new ShopBanner();
         $this->model['shop'] = new Shop();
         $this->model['member'] = new Member();
+        $this->model['ProductCategory'] = new ProductCategory();
+        $this->model['ShopCategory'] = new ShopCategory();
         $this->data['nama_user'] = '';
         $this->data['id_user'] =  $sessionData['id'] ?? null;
 
@@ -273,5 +280,106 @@ class HomememberController extends Controller
         ];
         $cart = $carts->calc_handling_cost($dataArr);
         return response()->json(["test" => $cart]);
+    }
+
+    function calc_nego(Request $request)
+    {
+        $qty        = $request->quantity;
+        $id_product = $request->id_produk;
+        $harga      = $request->nego_price;
+        $note      = $request->note;
+
+        $cf         = Lpse_config::first();
+        $ppn        = $cf->ppn;
+
+        $product = Products::Find($id_product);
+
+        $id_kategori = $product->id_category;
+        $idtipeProduk = $product->id_tipe;
+
+        // PPh menggunkan default barang
+        $pph            = 1.5;
+
+        $checkPPh         = $this->model['ProductCategory']->jenisProduct($id_kategori);
+
+        // check PPN
+        $CheckppnProduct   = $this->model['ProductCategory']->check_ppn($id_product);
+        $checkShop         = $this->model['shop']->getShopCategory($product->id_shop);
+
+        if ($checkShop) {
+            $checkKategori     = $this->model['ShopCategory']->getSpesialKategori($checkShop->shop_category);
+            $spesial_cat_product = in_array($CheckppnProduct->id_category, [1949, 1947, 1952, 1948]) ? 1 : 0;
+
+            if (isset($checkKategori->spesial_kategori) && $checkKategori->spesial_kategori == 1 && $spesial_cat_product == 1) {
+                $ppn = 0;
+            } else {
+                $cek_ppn = $CheckppnProduct->barang_kena_ppn;
+                if ($cek_ppn == '0') {
+                    $ppn = 0;
+                }
+            }
+        } else {
+            $cek_ppn = $CheckppnProduct->barang_kena_ppn;
+            if ($cek_ppn == '0') {
+                $ppn = 0;
+            }
+        }
+
+        // Set PPh
+        if ($checkPPh == 1) {
+            // Jasa biasa
+            $pph = 2;
+        }
+
+        if ($idtipeProduk == 3 && $checkPPh == 1) {
+            // untuk jasa sewa ruangan
+            $pph = 10;
+        }
+
+        $dataArr = [
+            'harga' => $harga,
+            'ppn' => $ppn,
+            'pph' => $pph,
+        ];
+
+        $calculation    = $this->Libraries['Calculation']->calc_nego_harga($dataArr);
+        $SellerPrice    = $calculation['harga_vendor_final'];
+
+        $harga_tayang = DB::table('lpse_price')->where('id_product', $id_product)->value('price_lpse');
+
+        // save Nego
+        $save = DB::table('nego')->insertGetId([
+            'member_id' => $this->user_id,
+            'id_shop' => $product->id_shop,
+            'status' => 0,
+            'complete_checkout' => 0,
+            'status_nego' => 0,
+            'created_date' => date('Y-m-d H:i:s'),
+            'qty' => $qty,
+            'harga_awal_satuan' => $harga_tayang,
+            'harga_awal_total' => ($harga_tayang * $qty),
+            'harga_input_seller' => $product->price,
+        ]);
+
+        // save product
+        DB::table('product_nego')->insert([
+            'id_nego' => $save,
+            'id_product' => $id_product,
+            'qty' => $qty,
+            'harga_nego' => ($harga * $qty),
+            'base_price' => $harga,
+            'nominal_didapat' => ($calculation['harga_vendor_final'] * $qty),
+            'status' => 0,
+            'timestamp' => date('Y-m-d H:i:s'),
+            'update_date' => date('Y-m-d H:i:s'),
+            'catatan_pembeli' => $note,
+            'send_by' => 0
+        ]);
+
+        return response()->json([
+            'data' => $calculation,
+            'error' => 0,
+            'info' => 'Berhasil menghitung nego harga'
+        ]);
     }
 }

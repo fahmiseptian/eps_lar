@@ -3,11 +3,18 @@
 namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
+use App\Libraries\Calculation;
 use App\Libraries\Terbilang;
+use App\Models\Cart;
 use App\Models\CompleteCartShop;
 use App\Models\Invoice;
+use App\Models\Lpse_config;
 use App\Models\Member;
+use App\Models\Nego;
+use App\Models\ProductCategory;
+use App\Models\Products;
 use App\Models\Shop;
+use App\Models\ShopCategory;
 use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -26,7 +33,11 @@ class ProfilememberController extends Controller
         $sessionData = $request->session()->all();
         $this->data['id_user'] = $sessionData['id'] ?? null;
         $this->model['member'] = new Member();
+        $this->model['nego'] = new Nego();
+        $this->model['ProductCategory'] = new ProductCategory();
         $this->model['invoice'] = new Invoice();
+        $this->model['ShopCategory'] = new ShopCategory();
+        $this->model['cart'] = new Cart();
         $this->model['Shop'] = new Shop();
         $this->model['CompleteCartShop'] = new CompleteCartShop();
         $this->Liberies['terbilang'] = new Terbilang();
@@ -109,6 +120,43 @@ class ProfilememberController extends Controller
         return view('member.profile.transaksi', $this->data);
     }
 
+    public function getNegos(Request $request)
+    {
+        $status = $request->input('status', 'all'); // Mendapatkan status dari request (default 'all')
+
+        $negos = $this->model['nego']->getNegoByid_member($this->data['id_user']);
+
+        // Proses status untuk setiap nego
+        foreach ($negos as $nego) {
+            if ($nego->status_ulang == 0 && $nego->status == 0) {
+                $nego->status = 'diajukan';
+            } elseif ($nego->status_ulang == 2 && $nego->status == 0) {
+                $nego->status = 'nego_ulang';
+            } elseif ($nego->status_ulang == 2 && $nego->status == 1) {
+                $nego->status = 'nego_diterima';
+            } elseif ($nego->status_ulang == 2 && $nego->status == 2) {
+                $nego->status = 'nego_ditolak';
+            } elseif ($nego->status_ulang == 1 && $nego->is_checkout == 1) {
+                $nego->status = 'selesai';
+            } else {
+                $nego->status = 'Status_Tidak_Diketahui';
+            }
+        }
+
+        // Filter negos berdasarkan status yang dipilih
+        if ($status !== 'all') {
+            $negos = $negos->filter(function ($nego) use ($status) {
+                return $nego->status === $status;
+            });
+        }
+
+        $this->data['negos'] = $negos;
+        $this->data['selected_status'] = $status; // Menyimpan status yang dipilih untuk digunakan di view
+        return view('member.profile.nego', $this->data);
+    }
+
+
+
     public function GetDetailTransaction(Request $request)
     {
         $id_cart = $request->query('id');
@@ -187,6 +235,194 @@ class ProfilememberController extends Controller
         // return response()->json($this->data);
 
         return view('member.profile.detail_transaksi', $this->data);
+    }
+
+    public function getNegoDetail(Request $request)
+    {
+        $nego = $this->model['nego']->getdetailNego($request->input('id'));
+
+        if ($nego->status_nego == 0 && $nego->status == 0) {
+            $nego->status = 'diajukan';
+        } elseif ($nego->status_nego >= 2 && $nego->status == 0) {
+            $nego->status = 'nego_ulang';
+        } elseif ($nego->status_nego >= 2 && $nego->status == 1) {
+            $nego->status = 'nego_diterima';
+        } elseif ($nego->status_nego >= 2 && $nego->status == 2) {
+            $nego->status = 'nego_ditolak';
+        } elseif ($nego->status_nego >= 1 && $nego->is_checkout == 1) {
+            $nego->status = 'selesai';
+        } else {
+            $nego->status = 'Status_Tidak_Diketahui';
+        }
+        $history = DB::table('product_nego')->where('id_nego', $nego->id)->get();
+        $nego->history = $history;
+        //  return response()->json($nego);
+        $this->data['nego'] = $nego;
+
+        return view('member.profile.detail_nego', $this->data);
+    }
+
+    function accNego(Request $request)
+    {
+        $id_nego = $request->input('id_nego');
+        $data_nego = DB::table('nego')->where('id', $id_nego)->first();
+        $accNego = $this->model['nego']->acc_nego($id_nego);
+
+        if ($accNego) {
+            $tocart = $this->model['cart']->update_cart_after_nego($data_nego->id_shop, $id_nego);
+            if ($tocart) {
+                return response()->json([
+                    'code' => 200,
+                    'message' => 'Berhasil Mengupdate Keranjang',
+                ]);
+            }
+            return response()->json([
+                'code' => 200,
+                'message' => 'Berhasil Nego Barang',
+            ]);
+        }
+        return response()->json([
+            'code' => 404,
+            'message' => 'Gagal Nego Produk',
+        ]);
+    }
+
+    public function tolak_nego(Request $request)
+    {
+        $id_nego = $request->input('id_nego');
+        $note    = $request->input('reason');
+
+        // Update 'nego' table
+        $negoUpdate = DB::table('nego')
+            ->where('id', $id_nego)
+            ->update([
+                'status' => '2',
+                'status_nego' => '2'
+            ]);
+
+        // Check if 'nego' update was successful
+        if ($negoUpdate) {
+            // Get the latest product_nego id
+            $pn = DB::table('product_nego')
+                ->where('id_nego', $id_nego)
+                ->orderBy('id', 'DESC')
+                ->limit(1)
+                ->first();
+
+            // Update 'product_nego' table
+            $productNegoUpdate = DB::table('product_nego')
+                ->where('id', $pn->id)
+                ->update([
+                    'status' => '2',
+                    'catatan_pembeli' => $note
+                ]);
+
+            // Check if 'product_nego' update was successful
+            if ($productNegoUpdate) {
+                return response()->json(['status' => 'Success']);
+            } else {
+                return response()->json(['status' => 'Error updating product_nego'], 500);
+            }
+        } else {
+            return response()->json(['status' => 'Error updating nego'], 500);
+        }
+    }
+
+    function addRequestNego(Request $request)
+    {
+        $id_nego = $request->input('id_nego');
+        $last_id = $request->input('last_id');
+        $nego_price = $request->input('nego_price');
+        $qty = $request->input('qty');
+        $note = $request->input('catatan');
+        $id_product = DB::table('product_nego')->where('id', $last_id)->value('id_product');
+        $calc = new Calculation();
+
+        $cf         = Lpse_config::first();
+        $ppn        = $cf->ppn;
+        $product    = Products::Find($id_product);
+
+        $id_kategori = $product->id_category;
+        $idtipeProduk = $product->id_tipe;
+
+        // PPh menggunkan default barang
+        $pph            = 1.5;
+
+        // cek Jenis PPh
+        $checkPPh         = $this->model['ProductCategory']->jenisProduct($id_kategori);
+
+        // check PPN
+        $CheckppnProduct   = $this->model['ProductCategory']->check_ppn($id_product);
+        $checkShop         = $this->model['Shop']->getShopCategory($product->id_shop);
+
+        if ($checkShop) {
+            $checkKategori     = $this->model['ShopCategory']->getSpesialKategori($checkShop->shop_category);
+            $spesial_cat_product = in_array($CheckppnProduct->id_category, [1949, 1947, 1952, 1948]) ? 1 : 0;
+
+            if (isset($checkKategori->spesial_kategori) && $checkKategori->spesial_kategori == 1 && $spesial_cat_product == 1) {
+                $ppn = 0;
+            } else {
+                $cek_ppn = $CheckppnProduct->barang_kena_ppn;
+                if ($cek_ppn == '0') {
+                    $ppn = 0;
+                }
+            }
+        } else {
+            $cek_ppn = $CheckppnProduct->barang_kena_ppn;
+            if ($cek_ppn == '0') {
+                $ppn = 0;
+            }
+        }
+
+        // Set PPh
+        if ($checkPPh == 1) {
+            // Jasa biasa
+            $pph = 2;
+        }
+
+        if ($idtipeProduk == 3 && $checkPPh == 1) {
+            // untuk jasa sewa ruangan
+            $pph = 10;
+        }
+
+        $dataArr = [
+            'harga' => $nego_price,
+            'ppn' => $ppn,
+            'pph' => $pph,
+        ];
+
+        // Perhitungan
+        $calculation    = $calc->calc_nego_harga($dataArr);
+        $hargaDiterimaSatuan    = $calculation['harga_vendor_final'];
+
+        $data   =   [
+            'id_nego'           => $id_nego,
+            'id_product'        => $id_product,
+            'qty'               => $qty,
+            'base_price'        => $nego_price,
+            'harga_nego'        => $nego_price * $qty,
+            'nominal_didapat'   => $hargaDiterimaSatuan,
+            'catatan_pembeli'   => $note,
+            'send_by'           => '0'
+        ];
+
+        $saveNego = $this->model['nego']->add_respon($data,$last_id);
+
+        if ($saveNego) {
+            return response()->json([
+                'code' => 200,
+                'message' => 'Berhasil Menambahkan Request Nego',
+            ]);
+        } else {
+            return response()->json([
+                'code' => 404,
+                'message' => 'Gagal Menambahkan Request Nego',
+            ]);
+        }
+        // return response()->json([
+        //     'code' => 404,
+        //     'message' => $data,
+        // ]);
     }
 
     public function address()

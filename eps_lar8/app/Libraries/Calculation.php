@@ -447,6 +447,8 @@ class Calculation
 
         return $result;
     }
+
+    
 }
 
 ?>

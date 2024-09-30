@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="id">
-
 @include('member.asset.header')
 
 <body>
@@ -77,8 +76,8 @@
                 <div class="action-buttons">
                     <button class="cart-btn" data-id_user="{{$id_user}}" data-id="{{$id}}"><span class="material-icons">add_shopping_cart</span>
                         Keranjang</button>
-                    <button class="buy-btn"  data-id_user="{{$id_user}}" data-id="{{$id}}">Beli Sekarang</button>
-                    <button class="nego-btn">Nego</button>
+                    <button class="buy-btn" data-id_user="{{$id_user}}" data-id="{{$id}}">Beli Sekarang</button>
+                    <button class="nego-btn" onclick="openNegoModal()">Nego</button>
                 </div>
                 <div class="deskripsi-product">
                     <ul>
@@ -155,7 +154,7 @@
                 <button class="cart-btn" data-id="{{$id}}"><span class="material-icons">add_shopping_cart</span>
                     Keranjang</button>
                 <button class="buy-btn">Beli Sekarang</button>
-                <button class="nego-btn">Nego</button>
+                <button class="nego-btn" onclick="openNegoModal()">Nego</button>
             </div>
 
             <div class="deskripsi-product-mobile">
@@ -256,8 +255,114 @@
 
     </main>
 
-    @include('member.asset.footer')
+    <div id="negoModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="head-modal">
+                <h2>Nego Harga</h2>
+                <span class="close" onclick="closeNegoModal()">&times;</span>
+            </div>
+            <div class="quantity-input-nego">
+                <button type="button" class="quantity-btn-nego minus" onclick="updateQuantityNego(-1)">-</button>
+                <input type="number" id="quantity-nego" name="quantity-nego" min="1" max="{{$stock}}" value="1" step="1">
+                <button type="button" class="quantity-btn-nego plus" onclick="updateQuantityNego(1)">+</button>
+            </div>
+            <p>Stok tersisa: <span id="stock-remaining">{{$stock}}</span></p>
 
+            <label for="initial-price">Harga Awal Satuan:</label>
+            <input type="text" id="initial-price" value="Rp {{ number_format($hargaTayang, 0, ',', '.') }}" readonly>
+
+            <label for="nego-price">Harga Nego Satuan:</label>
+            <input type="text" data-id_produk="{{ $id }}" data-price="{{ $hargaTayang }}" id="nego-price">
+
+            <label for="total-price">Harga Nego Total:</label>
+            <input type="text" id="total-price-nego" readonly>
+
+            <label for="note-nego">Catatan:</label>
+            <textarea id="note-nego"></textarea>
+
+            <button style="margin-top: 40px;" onclick="submitNego()" class="nego-btn">Kirim Nego</button>
+        </div>
+    </div>
+
+    @include('member.asset.footer')
+    <script>
+        function openNegoModal() {
+            document.getElementById('negoModal').style.display = 'block';
+        }
+
+        function closeNegoModal() {
+            document.getElementById('negoModal').style.display = 'none';
+        }
+
+        function submitNego() {
+            var id_produk = $('#nego-price').data('id_produk');
+            const quantity = $('#quantity-nego').val();
+            const note = $('#note-nego').val();
+            var price = unformatRupiah($('#nego-price').val());
+            $.ajax({
+                type: 'POST',
+                url: '/api/calc_nego',
+                data: {
+                    id_produk: id_produk,
+                    quantity: quantity,
+                    nego_price: price,
+                    note: note
+                },
+                success: function(response) {
+                    if (response.error === 0) {
+                        alert('Berhasil menghitung nego harga. Silakan lanjutkan dengan proses berikutnya.');
+                    } else {
+                        alert('Gagal menghitung nego harga. Silakan coba lagi.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert('Terjadi kesalahan saat menghitung nego harga. Silakan coba lagi.');
+                }
+            });
+            closeNegoModal();
+        }
+
+        $('#nego-price').on('input', function() {
+            var price = $(this).data('price')
+            const quantity = $('#quantity-nego').val();
+            const negoPrice = $(this).val().replace(/[^0-9]/g, '');
+            if (negoPrice > price) {
+                $(this).val(formatRupiah(price));
+                update_total(quantity, price)
+            } else {
+                $(this).val(formatRupiah(negoPrice));
+                update_total(quantity, negoPrice)
+            }
+        });
+
+        function update_total(qty , price) {
+            var total = (qty * price);
+            $("#total-price-nego").val(formatRupiah(total));
+        }
+
+        function updateQuantityNego(amount) {
+            var $quantityInput = $("#quantity-nego");
+            var currentQuantity = parseInt($quantityInput.val());
+            var maxStock = parseInt($quantityInput.attr("max"));
+            var newQuantity = currentQuantity + amount;
+
+            if (newQuantity >= 1 && newQuantity <= maxStock) {
+                $quantityInput.val(newQuantity);
+                updateButtonStates();
+            }
+        }
+
+        function updateButtonStates() {
+            var currentQuantity = parseInt($("#quantity-nego").val());
+            var maxStock = parseInt($("#quantity-nego").attr("max"));
+            var price = unformatRupiah($('#nego-price').val());
+            update_total(currentQuantity, price)
+            $(".quantity-btn-nego.minus").prop("disabled", currentQuantity <= 1);
+            $(".quantity-btn-nego.plus").prop("disabled", currentQuantity >= maxStock);
+        }
+
+        updateButtonStates();
+    </script>
     <script src="{{ asset('/js/function/member/home.js') }}" type="text/javascript"></script>
     {{-- <script src="{{ secure_asset('/js/function/member/home.js') }}" type="text/javascript"></script> --}}
 </body>
