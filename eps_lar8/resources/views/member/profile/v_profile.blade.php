@@ -2,7 +2,9 @@
 <html lang="id">
 @include('member.asset.header')
 <link href="{{ asset('/css/profile.css') }}" rel="stylesheet" type="text/css" />
-
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 
 <body>
 
@@ -22,16 +24,16 @@
                                 <a class="nav-link" href="{{ route('profile.nego') }}"><span class="material-icons">handshake</span> Nego</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="#favorite"><span class="material-icons">favorite</span> Favorite</a>
+                                <a class="nav-link" href="{{ route('profile.wish') }}"><span class="material-icons">favorite</span> Favorite</a>
                             </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" id="settingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <span class="material-icons">settings</span> Setting
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="settingDropdown">
-                                    <li><a class="dropdown-item" href="#profile"><span class="material-icons">person</span> Profile</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('profile.view') }}"><span class="material-icons">person</span> Profile</a></li>
                                     <li><a class="dropdown-item" href="{{ route('profile.address') }}"><span class="material-icons">location_on</span> Alamat</a></li>
-                                    <li><a class="dropdown-item" href="#gantiPassword"><span class="material-icons">vpn_key</span> Ganti Password</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('profile.update_password') }}"><span class="material-icons">vpn_key</span> Ganti Password</a></li>
                                 </ul>
                             </li>
                             <li class="nav-item dropdown">
@@ -39,9 +41,9 @@
                                     <span class="material-icons">manage_accounts</span> Manajemen
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="manajemenDropdown">
-                                    <li><a class="dropdown-item" href="#userPemohon"><span class="material-icons">person_add</span> User Pemohon</a></li>
-                                    <li><a class="dropdown-item" href="#userPenyetuju"><span class="material-icons">how_to_reg</span> User Penyetuju</a></li>
-                                    <li><a class="dropdown-item" href="#userFinance"><span class="material-icons">account_balance</span> User Finance</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('profile.user', ['tipe' => 'pemohon']) }}"><span class="material-icons">person_add</span> User Pemohon</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('profile.user', ['tipe' => 'Penyetuju_Pemohonan']) }}"><span class="material-icons">how_to_reg</span> User Penyetuju</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('profile.user', ['tipe' => 'finance']) }}"><span class="material-icons">account_balance</span> User Finance</a></li>
                                 </ul>
                             </li>
                             <li class="nav-item">
@@ -125,7 +127,7 @@
                         </div>
                         <div class="form-group">
                             <label for="hargaResponseTotal">Harga Response Penjual Total</label>
-                            <input type="text" class="form-control" id="hargaResponseTotal" value=  "0" readonly>
+                            <input type="text" class="form-control" id="hargaResponseTotal" value="0" readonly>
                         </div>
                         <div class="form-group">
                             <label for="hargaNegoSatuan">Harga Nego Satuan</label>
@@ -149,6 +151,75 @@
         </div>
     </div>
 
+    <!-- Add Data Modal -->
+    <div class="modal fade" id="addDataPPModal" tabindex="-1" aria-labelledby="addDataPPLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addDataPPLabel">Tambah Data User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="close_modal_pp()">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addUserFormPP">
+                        <div class="form-group">
+                            <label for="fullName">Nama Lengkap</label>
+                            <input type="text" class="form-control" id="fullName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="department">Departemen</label>
+                            <input type="text" class="form-control" id="department" value="{{ $member->satker }}" readonly required>
+                        </div>
+                        <div class="form-group">
+                            <label for="jabatan">Jabatan</label>
+                            <input type="text" class="form-control" id="jabatan" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="role">Role</label>
+                            <select class="form-control" id="role">
+                                <option value="3">Pemohon</option>
+                                <option value="4">Penyetuju Pemohon</option>
+                                <option value="6">Finance</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">No Handphone</label>
+                            <input type="text" class="form-control" id="phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select class="form-control" id="status">
+                                <option value="Y">Aktif</option>
+                                <option value="N">Tidak Aktif</option>
+                            </select>
+                        </div>
+
+                        <!-- Additional Fields for 'Penyetuju Pemohon' Role -->
+                        <div id="additionalFields" style="display: none;">
+                            <div class="form-group">
+                                <label for="batasAwal">Batas Awal</label>
+                                <input type="text" class="form-control" id="batasAwal" value="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="batasAkhir">Batas Akhir</label>
+                                <input type="text" class="form-control" id="batasAkhir" value="0" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="close_modal_pp()">Tutup</button>
+                    <button type="submit" class="btn btn-primary" onclick="saveUserBtn()">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     @include('member.asset.footer')
 
@@ -163,6 +234,10 @@
                 const contentArea = document.getElementById('contentArea');
                 const menuText = this.textContent.trim();
                 const url = this.getAttribute('href');
+
+                if (url == '' || url == null) {
+                    return false;
+                }
 
                 // Menampilkan pesan loading
                 contentArea.innerHTML = `<h5>Memuat konten untuk ${menuText}...</h5>`;
@@ -193,6 +268,30 @@
     </script>
 
     <script>
+        function formatRupiah(angka) {
+            var number_string = angka.toString().replace(/[^,\d]/g, ""),
+                split = number_string.split(","),
+                sisa = split[0].length % 3,
+                rupiah = split[0].substr(0, sisa),
+                ribuan = split[0].substr(sisa).match(/\d{3}/gi);
+
+            if (ribuan) {
+                separator = sisa ? "." : "";
+                rupiah += separator + ribuan.join(".");
+            }
+
+            rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
+            return "Rp. " + rupiah;
+        }
+
+        function unformatRupiah(formattedRupiah) {
+            var number_string = formattedRupiah.replace(/[^,\d]/g, "");
+            return parseInt(number_string.replace(/[.,]/g, ""));
+        }
+
+        function parseRupiah(rupiahString) {
+            return parseInt(rupiahString.replace(/[^0-9]/g, ""));
+        }
         $(document).on('click', '.detail-transaction', function(e) {
             e.preventDefault();
             var id_cart = $(this).data('id');
@@ -319,6 +418,270 @@
             var url = "{{ route('profile.nego.detail') }}?id=" + id_nego;
             loadContent(url, $('#contentArea'));
         });
+
+        $('#submitNegoUlang').click(function() {
+            const id_nego = $('#id_nego').val();
+            const last_id = $('#last_id').val();
+            const nego_price = unformatRupiah($('#hargaNegoSatuan').val());
+            const qty = $('#qty').val();
+            const catatan = $('#catatan').val();
+
+            // Perform AJAX to submit the new negotiation
+            $.ajax({
+                url: appUrl + '/api/member/nego/reqNego', // Replace with your actual endpoint
+                type: 'POST',
+                data: {
+                    id_nego: id_nego,
+                    last_id: last_id,
+                    nego_price: nego_price,
+                    qty: qty,
+                    catatan: catatan,
+                },
+                success: function(response) {
+                    Swal.fire({
+                        title: 'Negosiasi Dikirim!',
+                        text: 'Negosiasi ulang berhasil dikirim.',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    });
+                    $('#negoUlangModal').modal('hide');
+                    backtomenu();
+                },
+                error: function(xhr, status, error) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan saat mengirim negosiasi ulang. Silakan coba lagi.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        });
+
+        function togglePasswordVisibility(inputSelector, iconElement) {
+            var $passwordInput = $(inputSelector);
+            var $icon = $(iconElement).find('i');
+
+            if ($passwordInput.attr('type') === 'password') {
+                $passwordInput.attr('type', 'text');
+                $icon.text('visibility_off');
+            } else {
+                $passwordInput.attr('type', 'password');
+                $icon.text('visibility');
+            }
+        }
+
+        // Handle form submission with jQuery AJAX
+        function Update_password() {
+            event.preventDefault(); // Prevent default form submission
+
+            var currentPassword = $('#currentPassword').val();
+            var newPassword = $('#newPassword').val();
+            var confirmPassword = $('#confirmPassword').val();
+
+            // Check if new password and confirm password match
+            if (newPassword !== confirmPassword) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Password baru dan konfirmasi password tidak sama.',
+                });
+                return;
+            }
+
+            // Prepare the data to be sent
+            var data = {
+                current_password: currentPassword,
+                new_password: newPassword,
+                confirm_password: confirmPassword
+            };
+
+            // Send the data via jQuery AJAX
+            $.ajax({
+                url: appUrl + '/api/member/update-password',
+                method: 'POST',
+                data: data,
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sukses!',
+                            text: 'Password berhasil diupdate.',
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Terjadi kesalahan',
+                            text: response.error,
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error:', xhr);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: 'Gagal mengirim permintaan. Silakan coba lagi.',
+                    });
+                }
+            });
+        }
+
+        function open_modal_pp() {
+            $('#addDataPPModal').modal('show');
+        }
+
+        $('#role').change(function() {
+            if ($(this).val() === '4') { // If 'Penyetuju Pemohon' is selected
+                $('#additionalFields').show();
+            } else {
+                $('#additionalFields').hide();
+                $('#batasAwal').val(0); // Reset to default value
+                $('#batasAkhir').val(0); // Reset to default value
+            }
+        });
+
+        function close_modal_pp() {
+            $('#addDataPPModal').modal('hide');
+        }
+
+        function saveUserBtn() {
+            // Gather form data
+            var name = $('#fullName').val();
+            var email = $('#email').val();
+            var department = $('#department').val();
+            var jabatan = $('#jabatan').val();
+            var role = $('#role').val();
+            var no_hp = $('#phone').val();
+            var status = $('#status').val();
+            var batas_awal = unformatRupiah($('#batasAwal').val()) || 0; // Default to 0 if empty
+            var batas_akhir = unformatRupiah($('#batasAkhir').val()) || 0; // Default to 0 if empty
+
+            // Create an object to hold the data
+            var data = {
+                name: name,
+                email: email,
+                department: department,
+                jabatan: jabatan,
+                role: role,
+                no_hp: no_hp,
+                status: status,
+                batas_awal: batas_awal,
+                batas_akhir: batas_akhir
+            };
+
+            // Perform AJAX request
+            $.ajax({
+                url: appUrl + '/api/member/add-user',
+                method: 'POST',
+                data: data,
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Sukses!',
+                            text: 'User berhasil ditambahkan.',
+                        }).then(() => {
+                            location.reload();
+                            $('#addUserFormPP')[0].reset();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: response.message || 'Terjadi kesalahan saat menambahkan user.',
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error:', xhr);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: 'Gagal mengirim permintaan. Silakan coba lagi.',
+                    });
+                }
+            });
+        }
+
+        $('#batasAwal').on('input', function() {
+            $('#batasAwal').val(formatRupiah($('#batasAwal').val()));
+        });
+
+        $('#batasAkhir').on('input', function() {
+            $('#batasAkhir').val(formatRupiah($('#batasAkhir').val()));
+        });
+
+        function detailUser(id) {
+            $.ajax({
+                url: appUrl + '/profile/get-user/' + id,
+                method: 'get',
+                success: function(response) {
+                    Swal.fire({
+                        title: 'Detail User',
+                        html: response,
+                    })
+                },
+                error: function(xhr) {
+                    console.error('Error:', xhr);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: 'Gagal mengirim permintaan. Silakan coba lagi.',
+                    });
+                }
+            });
+        }
+
+        function deleteUser(id) {
+            Swal.fire({
+                title: 'Apakah kamu yakin?',
+                text: "Kamu tidak akan bisa mengembalikan data pengguna ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: appUrl + '/api/member/delete-user/',
+                        method: 'post',
+                        data: {
+                            id: id,
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Sukses!',
+                                    text: 'User berhasil dihapus.',
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error!',
+                                    text: response.message || 'Terjadi kesalahan saat menghapus user.',
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            console.error('Error:', xhr);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal!',
+                                text: 'Gagal mengirim permintaan. Silakan coba lagi.',
+                            });
+                        }
+                    });
+                }
+            });
+        }
     </script>
 </body>
 

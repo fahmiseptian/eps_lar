@@ -631,4 +631,20 @@ class Products extends Model implements HasMedia
         $results = $query->first();
         return $results;
     }
+
+    function getwishmember($id_member)
+    {
+        return DB::table('member_wishlist as mw')
+            ->select(
+                'p.*',
+                's.nama_pt',
+                'l.price_lpse as harga_tayang',
+                DB::raw('(SELECT image300 FROM product_image WHERE id_product = p.id AND is_default = "yes" LIMIT 1) AS image')
+            )
+            ->join('products as p', 'p.id', '=', 'mw.id_product')
+            ->join('shop as s', 's.id', '=', 'p.id_shop')
+            ->join('lpse_price as l', 'l.id_product', '=', 'p.id')
+            ->where('mw.id_member', $id_member)
+            ->get(); 
+    }
 }

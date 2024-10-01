@@ -228,7 +228,7 @@ class Member extends Model
                 'ma.member_address_id',
                 'ma.phone',
                 'ma.address_name',
-            'ma.address',
+                'ma.address',
                 'ma.postal_code',
                 'p.province_name',
                 's.subdistrict_name',
@@ -257,10 +257,10 @@ class Member extends Model
             ->join('city as c', 'ma.city_id', 'c.city_id')
             ->join('subdistrict as s', 's.subdistrict_id', 'ma.subdistrict_id')
             ->where('m.id', $id_member)
-            ->where('ma.active_status','active')
+            ->where('ma.active_status', 'active')
             ->get();
         return $data;
-    }   
+    }
 
     public function getDataMember($id)
     {
@@ -304,5 +304,21 @@ class Member extends Model
             ->where('ma.member_address_id', $address)
             ->first();
         return $address;
+    }
+
+    function get_member_satker($id_member, $role)
+    {
+        $query = DB::table('member_satker as ms')
+            ->select(
+                'm.*',
+                'ms.id as id_ms'
+            )
+            ->join('member as m', 'm.id', 'ms.id_member')
+            ->where('ms.created_user', $id_member)
+            ->where('m.id_member_type', $role)
+            ->where('m.member_status', '!=' , 'delete')
+            ->get();
+
+        return $query;
     }
 }

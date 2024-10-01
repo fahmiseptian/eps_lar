@@ -331,43 +331,4 @@
                 $('#hargaNegoTotal').val(formatRupiah(total));
             }
         });
-
-    $('#submitNegoUlang').click(function() {
-        const id_nego = $('#id_nego').val();
-        const last_id = $('#last_id').val();
-        const nego_price = unformatRupiah($('#hargaNegoSatuan').val());
-        const qty = $('#qty').val();
-        const catatan = $('#catatan').val();
-
-        // Perform AJAX to submit the new negotiation
-        $.ajax({
-            url: appUrl + '/api/member/nego/reqNego', // Replace with your actual endpoint
-            type: 'POST',
-            data: {
-                id_nego: id_nego,
-                last_id: last_id,
-                nego_price: nego_price,
-                qty: qty,
-                catatan: catatan,
-            },
-            success: function(response) {
-                Swal.fire({
-                    title: 'Negosiasi Dikirim!',
-                    text: 'Negosiasi ulang berhasil dikirim.',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                });
-                $('#negoUlangModal').modal('hide');
-                backtomenu();
-            },
-            error: function(xhr, status, error) {
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Terjadi kesalahan saat mengirim negosiasi ulang. Silakan coba lagi.',
-                    icon: 'error',
-                    confirmButtonText: 'OK'
-                });
-            }
-        });
-    });
 </script>

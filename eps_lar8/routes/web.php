@@ -234,11 +234,16 @@ Route::group(['middleware' => 'member'], function () {
     Route::get('/kwitansi/{id_seller}/{id_cart_shop}',[CheckoutController::class,'cetak_Kwitansi']);
     Route::get('/profile/transaksi', [ProfilememberController::class, 'transaksi'])->name('profile.transaksi');
     Route::get('/profile/nego', [ProfilememberController::class, 'getNegos'])->name('profile.nego');
+    Route::get('/profile/wish', [ProfilememberController::class, 'getwish'])->name('profile.wish');
     Route::get('/profile/detail-nego', [ProfilememberController::class, 'getNegoDetail'])->name('profile.nego.detail');
     Route::get('/profile/detail-transaksi', [ProfilememberController::class, 'GetDetailTransaction'])->name('profile.transaksi.detail');
     Route::get('/cetak-invoice', [ProfilememberController::class, 'cetakInvoice'])->name('cetak.invoice');
     Route::get('/cetak-kwitansi', [ProfilememberController::class, 'cetakKwitansi'])->name('cetak.kwitansi');
     Route::get('/profile/kontrak', [ProfilememberController::class, 'getKontrak'])->name('profile.kontrak');
+    Route::get('/profile/view', [ProfilememberController::class, 'getprofile'])->name('profile.view');
+    Route::get('/profile/user', [ProfilememberController::class, 'getuser'])->name('profile.user');
+    Route::get('/profile/get-user/{id}', [ProfilememberController::class, 'getDetailUser'])->name('profile.get-user');
+    Route::get('/profile/update-password', [ProfilememberController::class, 'v_update_password'])->name('profile.update_password');
     Route::get('/profile/suratpesanan', [ProfilememberController::class, 'getSuratPesanan'])->name('profile.suratpesanan');
     Route::get('/profile/create-kontrak', [ProfilememberController::class, 'createKontrak'])->name('profile.create-kontrak');
     Route::get('/profile/create-suratpesanan', [ProfilememberController::class, 'createSuratPesanan'])->name('profile.create-suratpesanan');

@@ -205,6 +205,8 @@ class CartController extends Controller
         $cart->pph = $cf->pph / 100;
         $cart->payment = $payment;
 
+        // $this->data['']
+
         // Mengembalikan data cart yang sudah digabung
         // return response()->json(["cart"=>$cart]);
         return view('member.cart.checkout', $this->data, ["cart" => $cart]);

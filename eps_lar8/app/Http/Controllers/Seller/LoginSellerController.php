@@ -170,6 +170,7 @@ class LoginSellerController extends Controller
             'npwp_address' => $request->alamat_npwp,
             'npwp' => $request->npwp,
             'username' => $request->nama_pemilik,
+            'id_member_type' => 2,
             'activation_key' => Str::random(32),
         ];
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
 use App\Libraries\Calculation;
+use App\Libraries\Encryption;
 use App\Libraries\Terbilang;
 use App\Models\Cart;
 use App\Models\CompleteCartShop;
@@ -34,6 +35,7 @@ class ProfilememberController extends Controller
         $this->data['id_user'] = $sessionData['id'] ?? null;
         $this->model['member'] = new Member();
         $this->model['nego'] = new Nego();
+        $this->model['products'] = new Products();
         $this->model['ProductCategory'] = new ProductCategory();
         $this->model['invoice'] = new Invoice();
         $this->model['ShopCategory'] = new ShopCategory();
@@ -41,6 +43,7 @@ class ProfilememberController extends Controller
         $this->model['Shop'] = new Shop();
         $this->model['CompleteCartShop'] = new CompleteCartShop();
         $this->Liberies['terbilang'] = new Terbilang();
+        $this->Liberies['encryption'] = new Encryption();
 
         $this->data['nama_user'] = '';
 
@@ -406,7 +409,7 @@ class ProfilememberController extends Controller
             'send_by'           => '0'
         ];
 
-        $saveNego = $this->model['nego']->add_respon($data,$last_id);
+        $saveNego = $this->model['nego']->add_respon($data, $last_id);
 
         if ($saveNego) {
             return response()->json([
@@ -425,11 +428,175 @@ class ProfilememberController extends Controller
         // ]);
     }
 
+    function getwish()
+    {
+        $this->data['wishlists'] = $this->model['products']->getwishmember($this->data['id_user']);
+        // return response()->json($this->data);
+        return view('member.profile.wishlist', $this->data);
+    }
+
+    function getprofile()
+    {
+        $this->data['user'] = $this->model['member']->find($this->data['id_user']);
+        return view('member.profile.profile', $this->data);
+    }
+
+    function v_update_password()
+    {
+        return view('member.profile.update_password', $this->data);
+    }
+
+    function store_password(Request $request)
+    {
+        $password = $request->input('current_password');
+        $new_password = $request->input('new_password');
+
+        $old_password_enc = DB::table('member')->where('id', $this->data['id_user'])->value('password');
+        $old_password_des =  $this->Liberies['encryption']->decrypt($old_password_enc);
+
+        if ($password != $old_password_des) {
+            return response()->json([
+                'success' => false,
+                'code' => 400,
+                'error' => 'Password lama salah!'
+            ]);
+        }
+        $new_password_enc = $this->Liberies['encryption']->encrypt($new_password);
+        $update = DB::table('member')->where('id', $this->data['id_user'])->update(['password' => $new_password_enc]);
+        if ($update) {
+            return response()->json([
+                'success' => true,
+                'code' => 200,
+                'error' => 'Password berhasil diubah!'
+            ]);
+        }
+        return response()->json([
+            'success' => false,
+            'code' => 400,
+            'error' => 'Gagal mengubah password!'
+        ]);
+    }
+
     public function address()
     {
         $this->data['addresses'] =  $this->model['member']->getaddressbyIdMember($this->data['id_user']);
         // return response()->json($this->data);
         return view('member.profile.v_alamat', $this->data);
+    }
+
+    public function getuser(Request $request)
+    {
+        $tipe = $request->input('tipe');
+        $this->data['tipe'] = $tipe;
+        if ($tipe == 'pemohon') {
+            $role = 3;
+        } elseif ($tipe == 'Penyetuju_Pemohonan') {
+            $role = 4;
+        } elseif ($tipe == 'finance') {
+            $role = 6;
+        }
+
+        $this->data['member_satker'] = $this->model['member']->get_member_satker($this->data['id_user'], $role);
+        // return response()->json($this->data);
+        return view('member.profile.v_user', $this->data);
+    }
+
+    function DeleteUser(Request $request) {
+        $update = DB::table('member')->where('id', $request->input('id'))->update(['member_status' => 'delete']);
+
+        if ($update) {
+            return response()->json([
+                'success' => true,
+                'code' => 200,
+                'message' => 'Berhasil Menghapus User',
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'code' => 404,
+                'message' => 'Gagal Menghapus User',
+            ]);
+        }
+    }
+
+    function getDetailUser($id)
+    {
+        $this->data['user'] = DB::table('member')->join('member_satker as ms', 'ms.id_member', 'member.id')->where('member.id', $id)->first();
+        // return response()->json($data);
+        return view('member.profile.detail_user', $this->data);
+    }
+
+    function store_user(Request $request)
+    {
+        $status = 'pending';
+
+        if ($request->input('status') == 'Y') {
+            $status = 'active';
+        }
+
+        $data_user = DB::table('member')->where('id', $this->data['id_user'])->first();
+
+        $data = [
+            'nama' => $request->input('name'),
+            'username' => ' ',
+            'password' => $this->Liberies['encryption']->encrypt('usereps'),
+            'email' => $request->input('email'),
+            'no_hp' => $request->input('no_hp'),
+            'id_member_type' => $request->input('role'),
+            'member_status' => $status,
+            'activation_key' => ' ',
+            'is_email_subscribe' => $data_user->is_email_subscribe,
+            'registered_member' => 1,
+            'last_update' => now(),
+            'instansi' => $data_user->instansi,
+            'satker' => $data_user->satker,
+            'bidang' => $data_user->bidang,
+            'id_instansi_lpse' => $data_user->id_instansi_lpse,
+            'id_satker_lpse' => $data_user->id_satker_lpse,
+            'id_bidang_lpse' => $data_user->id_bidang_lpse,
+            'id_instansi' => $data_user->id_instansi,
+            'id_satker' => $data_user->id_satker,
+            'id_bidang' => $data_user->id_bidang,
+        ];
+
+        $id_member = DB::table('member')->insertGetId($data);
+
+        if ($request->input('role') == 3) {
+            $role = 'pemohon';
+        } elseif ($request->input('role') == 4) {
+            $role = 'penyetuju';
+        } elseif ($request->input('role') == 6) {
+            $role = 'finance';
+        }
+
+        if ($id_member) {
+            $data_satker = array(
+                'id_member' => $id_member,
+                'id_instansi' => $data_user->id_instansi,
+                'id_satker' => $data_user->id_satker,
+                'list_role' => $role,
+                'jabatan' => $request->input('jabatan'),
+                'limit_start' => $request->input('batas_awal'),
+                'limit_end' => $request->input('batas_akhir'),
+                'created_user' => $data_user->id,
+                'created_date' => now(),
+                'updated_date' => now(),
+            );
+
+            $insert = DB::table('member_satker')->insert($data_satker);
+            if ($insert) {
+                return response()->json([
+                    'success' => true,
+                    'code' => 200,
+                    'message' => 'Berhasil Menambah User',
+                ]);
+            }
+        }
+        return response()->json([
+            'success' => false,
+            'code' => 400,
+            'message' => 'Gagal Menambah User',
+        ]);
     }
 
     function editAddress(Request $request)

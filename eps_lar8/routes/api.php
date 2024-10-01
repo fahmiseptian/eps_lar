@@ -195,6 +195,9 @@ Route::group(['middleware' => 'member'], function () {
     Route::post('/member/nego/accNego', [ProfilememberController::class, 'accNego']);
     Route::post('/member/nego/tolak_nego', [ProfilememberController::class, 'tolak_nego']);
     Route::post('/member/nego/reqNego', [ProfilememberController::class, 'addRequestNego']);
+    Route::post('/member/update-password', [ProfilememberController::class, 'store_password']);
+    Route::post('/member/add-user', [ProfilememberController::class, 'store_user']);
+    Route::post('/member/delete-user', [ProfilememberController::class, 'DeleteUser']);
     // Route::get('/bni/create-billing', [BniController::class, 'createBilling']);
 
 });
