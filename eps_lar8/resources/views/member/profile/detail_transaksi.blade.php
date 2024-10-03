@@ -410,7 +410,7 @@
         @else
         <button class="btn-back btn-transaksi" onclick="loadTransaksi()">Kembali ke Daftar Transaksi</button>
         @endif
-        @if ($payment == 'Belum_Bayar' && $status != 'Menunggu_Konfirmasi_PPK' && $member->id_member_type == 3 || $member->id_member_type == 6 && $status != 'Pesanan_Dibatalkan')
+        @if ($payment != 'sudah_bayar' && ($member->id_member_type == 3 || $member->id_member_type == 6) && $status != 'Menunggu_Konfirmasi_PPK' && $status != 'Pesanan_Dibatalkan')
         <button class="btn-back btn-upload" id="upload-payment" data-id_cart="{{ $id_cart }}" data-total="{{ $total_transaksi }}" style="margin-left: 15px;">Upload Pembayaran</button>
         @endif
         @if($status == 'Menunggu_Konfirmasi_PPK' && $member->id_member_type == 4)
@@ -424,6 +424,7 @@
 <script>
     var bukti_transfer = "{{ $bukti_transfer }}";
     console.log(bukti_transfer);
+
     function loadTransaksi() {
         loadContent("{{ route('profile.transaksi') }}", $('#contentArea'));
     }
@@ -614,7 +615,7 @@
                             text: "Pembayaran telah diunggah.",
                             icon: "success",
                         }).then(function() {
-                           location.reload();
+                            location.reload();
                         });
                     },
                     error: function(xhr, status, error) {

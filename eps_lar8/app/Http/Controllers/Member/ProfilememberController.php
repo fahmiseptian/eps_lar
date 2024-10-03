@@ -115,6 +115,10 @@ class ProfilememberController extends Controller
                     $transaction->status_pembayaran = 'belum_bayar';
                 }
 
+                if ($transaction->status_pembayaran == 0 && $transaction->bukti_transfer != null) {
+                    $transaction->status_pembayaran = 'menunggu_pengecekan_pembayaran';
+                }
+
                 $transaction->items = DB::table('complete_cart_shop_detail')
                     ->where('id_cart', $transaction->id)
                     ->where('id_shop', $transaction->id_shop)
