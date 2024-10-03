@@ -189,6 +189,9 @@ $(document).ready(function () {
                         } else if (order.status === "on_packing_process") {
                             statusBadge =
                                 '<span style="width:100%; background-color:#DEDEDE; color:black;" class="badge">Perlu Dikemas</span>';
+                        } else if (order.status === "waiting_approve_by_ppk") {
+                            statusBadge =
+                                '<span style="width:100%; background-color:#DEDEDE; color:black;" class="badge">Menunggu Persetujuan PPK</span>';
                         } else {
                             statusBadge =
                                 '<span style="width:100%; background-color:#FF5C5C; color:white;" class="badge">Pesanan Dibatalkan</span>';

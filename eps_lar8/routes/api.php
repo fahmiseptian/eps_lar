@@ -198,6 +198,9 @@ Route::group(['middleware' => 'member'], function () {
     Route::post('/member/update-password', [ProfilememberController::class, 'store_password']);
     Route::post('/member/add-user', [ProfilememberController::class, 'store_user']);
     Route::post('/member/delete-user', [ProfilememberController::class, 'DeleteUser']);
+    Route::post('/cart/update-note', [CartController::class, 'UpdateNote']);
+    Route::post('/approveTransaction', [ProfilememberController::class, 'approveTransaction']);
+    Route::post('/rejectTransaction', [ProfilememberController::class, 'rejectTransaction']);
     // Route::get('/bni/create-billing', [BniController::class, 'createBilling']);
 
 });

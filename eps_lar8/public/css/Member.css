@@ -22,11 +22,9 @@ body {
 
 main {
     padding-top: var(--navbar-height);
-    max-width: 1200px;
-    /* Batas lebar maksimal konten utama */
+    max-width: 1300px;
     margin: 0 auto;
     padding: 20px;
-    /* Beri jarak di dalam konten utama */
 }
 
 .search-container {

@@ -130,6 +130,9 @@ class Cart extends Model
             'ma.address_name',
             'ma.address',
             'ma.postal_code',
+            'ma.province_id',
+            'ma.city_id',
+            'ma.subdistrict_id',
             'p.province_name',
             's.subdistrict_name',
             'c.city_name as city',
@@ -451,7 +454,7 @@ class Cart extends Model
         $service_array = explode(",", $service);
         $response = $this->_jne_get_rates($jne_origin, $jne_destination, $weight);
         Log::info('Raw API Response:', $response);
-        if ($response) {
+        if (array_key_exists('price', $response)) {
             foreach ($response['price'] as $price) {
                 if (!empty($price['price']) && in_array($price['service_display'], $service_array)) {
                     // Konversi harga menjadi dalam satuan yang benar

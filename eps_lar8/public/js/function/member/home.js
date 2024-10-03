@@ -1271,9 +1271,20 @@ $(document).on("click", "#tambah-qty", function () {
 $(document).on("click", ".cart-btn", function () {
     const quantity = getQuantity();
     var id_product = $(this).data("id");
+    var tipe_user = $(this).data("tipe-user");
     var id_user = $(this).data("id_user");
-    console.log(id_user);
     var qty = quantity;
+
+    if (tipe_user !== 3) {
+        Swal.fire({
+            title: "Perhatian",
+            text: "Anda tidak di Perbolehkan berbelanja.",
+            icon: "warning",
+            confirmButtonText: "Tutup",
+            cancelButtonText: "Batal",
+        });
+        return;
+    }
 
     if (id_user == null || id_user == "") {
         Swal.fire({
@@ -1325,9 +1336,21 @@ $(document).on("click", ".cart-btn", function () {
 $(document).on("click", ".buy-btn", function () {
     const quantity = getQuantity();
     var id_product = $(this).data("id");
+    var tipe_user = $(this).data("tipe-user");
     var id_user = $(this).data("id_user");
     console.log(id_user);
     var qty = quantity;
+
+    if (tipe_user !== 3) {
+        Swal.fire({
+            title: "Perhatian",
+            text: "Anda tidak di Perbolehkan berbelanja.",
+            icon: "warning",
+            confirmButtonText: "Tutup",
+            cancelButtonText: "Batal",
+        });
+        return;
+    }
 
     if (id_user == null || id_user == "") {
         Swal.fire({
@@ -1580,88 +1603,6 @@ $(document).on("click", "#updateTOP", function () {
     });
 });
 
-$(document).on("click", "#upload-payment", function () {
-    var id_cart = $(this).data("id_cart");
-    var total = $(this).data("total");
-
-    var html = `
-        <p>
-            Nama Bank Tujuan    : PT. Elite Proxy Sistem <br>
-            Bank Tujuan         : Bank BNI <br>
-            No Rek Tujuan       : <b> 03975-60583 </b> <br>
-            Total Pembayaran    : <b> ${formatRupiah(total)} </b>
-        </p>
-        <img id="swal2-image-preview" src="#" alt="Bukti Transfer" style="max-width: 200px; max-height: 200px; display: none;"> <!-- Tempat untuk menampilkan preview gambar -->
-        <input type="file" id="swal2-file" name="img" accept="image/*" style="display: block; margin-top: 10px;">
-    `;
-
-    Swal.fire({
-        title: "Upload Pembayaran",
-        html: html,
-        showCancelButton: true,
-        confirmButtonText: "Unggah",
-        cancelButtonText: "Batal",
-        showLoaderOnConfirm: true,
-        preConfirm: () => {
-            return new Promise((resolve, reject) => {
-                var fileInput = document.getElementById("swal2-file");
-                var file = fileInput.files[0];
-                if (!file) {
-                    reject("Anda harus memilih file gambar.");
-                } else {
-                    resolve(file);
-                }
-            });
-        },
-        allowOutsideClick: () => !Swal.isLoading(),
-    }).then((result) => {
-        if (result.isConfirmed) {
-            var file = result.value;
-            var formData = new FormData();
-            formData.append("id_cart", id_cart);
-            formData.append("img", file);
-
-            $.ajax({
-                url: appUrl + "/api/upload-payment",
-                type: "POST",
-                data: formData,
-                contentType: false,
-                processData: false,
-                success: function (response) {
-                    Swal.fire({
-                        title: "Upload Berhasil",
-                        text: "Pembayaran telah diunggah.",
-                        icon: "success",
-                    });
-                },
-                error: function (xhr, status, error) {
-                    Swal.fire({
-                        title: "Upload Gagal",
-                        text: "Terjadi kesalahan saat mengunggah pembayaran.",
-                        icon: "error",
-                    });
-                },
-            });
-        }
-    });
-});
-
-$(document).on("change", "#swal2-file", function () {
-    previewImage(this);
-});
-
-function previewImage(input) {
-    if (input.files && input.files[0]) {
-        var reader = new FileReader();
-
-        reader.onload = function (e) {
-            $("#swal2-image-preview").attr("src", e.target.result).show();
-        };
-
-        reader.readAsDataURL(input.files[0]);
-    }
-}
-
 $(document).on("click", "#request-checkout", function () {
     var id_cart = $(this).data("id_cart");
     Swal.fire({
@@ -1720,7 +1661,6 @@ $(document).on("click", "#request-checkout", function () {
                             });
                         },
                     });
-                    console.log("Pesanan selesai = " + id_cart);
                 } else {
                     console.log("Pesanan dibatalkan");
                 }
@@ -1728,6 +1668,35 @@ $(document).on("click", "#request-checkout", function () {
         } else {
             console.log("User tidak setuju dengan Syarat dan Ketentuan");
         }
+    });
+});
+$(document).on("click", "#request-checkout-withPPK", function () {
+    var id_cart = $(this).data("id_cart");
+    var formData = new FormData();
+    formData.append("id_cart", id_cart);
+    formData.append("status", "request_ppk");
+    $.ajax({
+        url: appUrl + "/api/finishCheckout",
+        type: "POST",
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function (response) {
+            Swal.fire({
+                title: "Pesanan Berhasil Diproses",
+                text: "Silahkan lihat pesanan anda di transaksi.",
+                icon: "success",
+            }).then(function () {
+                window.location.href = appUrl + "/cart"; // redirect to cart page
+            });
+        },
+        error: function (xhr, status, error) {
+            Swal.fire({
+                title: "Pesanan gagal Diproses",
+                text: "Terjadi kesalahan saat Memproses Transaksi.",
+                icon: "error",
+            });
+        },
     });
 });
 
@@ -2515,4 +2484,96 @@ function updateProductList(products) {
 $("#sortOrder").on("change", function () {
     const selectedValue = $(this).val();
     applySort(null, null, null, selectedValue);
+});
+
+$("#keperluan").on("input", function () {
+    clearTimeout(searchTimer);
+
+    searchTimer = setTimeout(() => {
+        var keperluan = $("#keperluan").val();
+        var idCs = $("#keperluan").data("id_cs");
+        if (keperluan != "") {
+            $.ajax({
+                type: "POST",
+                url: appUrl + "/api/cart/update-note",
+                data: {
+                    note: keperluan,
+                    id_cs: idCs,
+                    tipe: "keperluan",
+                },
+                success: function (data) {
+                    console.log(data);
+                },
+            });
+        }
+    }, 1000);
+});
+
+$("#note_seller").on("input", function () {
+    clearTimeout(searchTimer);
+
+    searchTimer = setTimeout(() => {
+        var keperluan = $("#note_seller").val();
+        var idCs = $("#note_seller").data("id_cs");
+        if (keperluan != "") {
+            $.ajax({
+                type: "POST",
+                url: appUrl + "/api/cart/update-note",
+                data: {
+                    note: keperluan,
+                    id_cs: idCs,
+                    tipe: "pesan_seller",
+                },
+                success: function (data) {
+                    console.log(data);
+                },
+            });
+        }
+    }, 1000);
+});
+
+$("#payment-method").on("change", function () {
+    var id_payment = $(this).val();
+    $.ajax({
+        url: appUrl + "/api/update-payment",
+        type: "POST",
+        data: {
+            _token: $('meta[name="csrf-token"]').attr("content"),
+            id_payment: id_payment,
+        },
+        success: function (response) {
+            if (response.success) {
+                location.reload();
+            } else {
+                Swal.fire({
+                    title: "Error",
+                    icon: "error",
+                    text: response.payment,
+                });
+            }
+        },
+        error: function (error) {
+            console.error(error);
+            alert("Terjadi kesalahan saat memperbarui Payment");
+        },
+    });
+});
+
+$("#TOP-opsi").on("change", function () {
+    var top = $(this).val();
+    $.ajax({
+        url: appUrl + "/api/update-top/" + top,
+        type: "get",
+        success: function (response) {
+            location.reload();
+        },
+        error: function (error) {
+            console.error(error);
+            Swal.fire({
+                title: "Error",
+                icon: "error",
+                text: "Terjadi kesalahan saat Menambah TOP",
+            });
+        },
+    });
 });

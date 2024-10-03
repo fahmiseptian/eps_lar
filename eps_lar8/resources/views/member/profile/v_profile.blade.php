@@ -17,6 +17,12 @@
                     <div class="card-body">
                         <h5 class="card-title">Menu Profil</h5>
                         <ul class="nav flex-column">
+                            @if($member->id_member_type != 3)
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ route('profile.transaksi.pemohon') }}"><span class="material-icons">swap_horiz</span> Lihat Transaksi</a>
+                            </li>
+                            @endif
+                            @if($member->id_member_type == 3)
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('profile.transaksi') }}"><span class="material-icons">swap_horiz</span> Lihat Transaksi</a>
                             </li>
@@ -27,16 +33,6 @@
                                 <a class="nav-link" href="{{ route('profile.wish') }}"><span class="material-icons">favorite</span> Favorite</a>
                             </li>
                             <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" id="settingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="material-icons">settings</span> Setting
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="settingDropdown">
-                                    <li><a class="dropdown-item" href="{{ route('profile.view') }}"><span class="material-icons">person</span> Profile</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('profile.address') }}"><span class="material-icons">location_on</span> Alamat</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('profile.update_password') }}"><span class="material-icons">vpn_key</span> Ganti Password</a></li>
-                                </ul>
-                            </li>
-                            <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" id="manajemenDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <span class="material-icons">manage_accounts</span> Manajemen
                                 </a>
@@ -44,6 +40,19 @@
                                     <li><a class="dropdown-item" href="{{ route('profile.user', ['tipe' => 'pemohon']) }}"><span class="material-icons">person_add</span> User Pemohon</a></li>
                                     <li><a class="dropdown-item" href="{{ route('profile.user', ['tipe' => 'Penyetuju_Pemohonan']) }}"><span class="material-icons">how_to_reg</span> User Penyetuju</a></li>
                                     <li><a class="dropdown-item" href="{{ route('profile.user', ['tipe' => 'finance']) }}"><span class="material-icons">account_balance</span> User Finance</a></li>
+                                </ul>
+                            </li>
+                            @endif
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" id="settingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="material-icons">settings</span> Setting
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="settingDropdown">
+                                    <li><a class="dropdown-item" href="{{ route('profile.view') }}"><span class="material-icons">person</span> Profile</a></li>
+                                    @if($member->id_member_type == 3)
+                                    <li><a class="dropdown-item" href="{{ route('profile.address') }}"><span class="material-icons">location_on</span> Alamat</a></li>
+                                    @endif
+                                    <li><a class="dropdown-item" href="{{ route('profile.update_password') }}"><span class="material-icons">vpn_key</span> Ganti Password</a></li>
                                 </ul>
                             </li>
                             <li class="nav-item">

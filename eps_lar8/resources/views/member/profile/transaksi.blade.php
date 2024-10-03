@@ -48,9 +48,15 @@
                             <h4>{{ $invoice }}</h4>
                             <p>Tanggal: {{ \Carbon\Carbon::parse($group[0]->created_date)->format('d M Y') }}</p>
                         </div>
+                        @if($group[0]->status_invoice == 'Pesanan Dibatalkan')
                         <p class="transaction-status status-{{ $group[0]->status_invoice }}">
                             {{ ucfirst(str_replace('_', ' ', $group[0]->status_invoice)) }}
                         </p>
+                        @else
+                        <p class="transaction-status status-{{ $group[0]->status_pembayaran }}">
+                            {{ ucfirst(str_replace('_', ' ', $group[0]->status_pembayaran)) }}
+                        </p>
+                        @endif
                     </div>
                     @foreach($group as $transaction)
                     <div class="transaction-item">

@@ -12,7 +12,7 @@ class Member extends Model
     protected $table = 'member';
     public $timestamps = false;
 
-    protected $visible = ['nama', 'no_hp', 'alamat', 'email', 'instansi', 'satker', 'npwp', 'npwp_address'];
+    protected $visible = ['nama', 'no_hp', 'alamat', 'email', 'instansi', 'satker', 'npwp', 'npwp_address', 'id_member_type'];
     protected $fillable = [
         'email',
         'nama',
@@ -316,9 +316,24 @@ class Member extends Model
             ->join('member as m', 'm.id', 'ms.id_member')
             ->where('ms.created_user', $id_member)
             ->where('m.id_member_type', $role)
-            ->where('m.member_status', '!=' , 'delete')
+            ->where('m.member_status', '!=', 'delete')
             ->get();
 
+        return $query;
+    }
+
+    function getlimitppk($id_member)
+    {
+        $query =  DB::table('member_satker as ms')
+            ->select(
+                'ms.limit_start as batas_awal',
+                'ms.limit_end as batas_akhir'
+            )
+            ->join('member as m', 'm.id', 'ms.id_member')
+            ->where('ms.created_user',  $id_member)
+            ->where('m.id_member_type', 4)
+            ->where('m.member_status', 'active')
+            ->first();
         return $query;
     }
 }

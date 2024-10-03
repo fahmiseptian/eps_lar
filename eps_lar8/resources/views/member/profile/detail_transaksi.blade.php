@@ -39,6 +39,12 @@
     .btn-back:active {
         transform: translateY(0);
     }
+
+    .transaction-item {
+        background-color: red;
+        border: solid 1px black;
+        color: white;
+    }
 </style>
 
 <div class="detail-transaksi-container">
@@ -62,6 +68,8 @@
 
     if ($firstTransaction) {
     $payment = $firstTransaction['detailOrder']->status_pembayaran_top;
+
+    $bukti_transfer = $firstTransaction['detailOrder']->bukti_transfer;
 
     if ($firstTransaction['detailOrder']->status_pembayaran_top == '1' && $firstTransaction['detailOrder']->bukti_transfer != null) {
     $payment = 'Lunas';
@@ -105,8 +113,20 @@
     $payment_method = $transaction['detailOrder']->pembayaran;
     $va_number = $transaction['detailOrder']->va_number;
 
+    $status = $transaction['detailOrder']->status;
+    $note = $transaction['detailOrder']->note ? $transaction['detailOrder']->note : $transaction['detailOrder']->note_seller;
+
     $id_cart = $transaction['detailOrder']->id_cart;
     @endphp
+
+    @if($status == 'Pesanan_Dibatalkan')
+    <div class="transaction-item cancelled">
+        <b>Pesanan dibatalkan </b>
+        <p>
+            alasan pembatalan {{$note}}
+        </p>
+    </div>
+    @endif
 
     <div class="transaction-block">
         <div class="transaction-info">
@@ -122,7 +142,7 @@
                     </div>
                     <div class="info-item">
                         <span class="label">Departemen:</span>
-                        <span class="value">{{ $transaction['detailOrder']->instansi }}</span>
+                        <span class="value">{{ $transaction['detailOrder']->satker }}</span>
                     </div>
                     <div class="info-item">
                         <span class="label">Nama Penjual :</span>
@@ -134,7 +154,7 @@
                     </div>
                     <div class="info-item">
                         <span class="label">Pesan ke Penjual:</span>
-                        <span class="value">{{ $transaction['detailOrder']->note_seller }}</span>
+                        <span class="value">{{ $transaction['detailOrder']->pesan_seller }}</span>
                     </div>
                 </div>
             </div>
@@ -210,7 +230,7 @@
                     </div>
                 </div>
             </div>
-
+            @if($member->id_member_type == 3)
             <div class="info-section">
                 <div class="action-buttons-detail-trx">
                     @if($transaction['detailOrder']->no_resi != '')
@@ -245,6 +265,7 @@
                     @endif
                 </div>
             </div>
+            @endif
         </div>
 
         <div class="product-list-detail-trx">
@@ -341,7 +362,7 @@
                 <span class="value">Rp {{ number_format($transaction['detailOrder']->total, 0, ',', '.') }}</span>
             </div>
         </div>
-        @if ($transaction['detailOrder']->pmk == 59)
+        @if ($transaction['detailOrder']->pmk == 59 && $member->id_member_type == 3)
         <button class="btn-back btn-transaksi" onclick="uploadPajak('{{ $transaction['detailOrder']->id_cart_shop }}')">Upload Surat Setor Pajak</button>
         @endif
     </div>
@@ -384,17 +405,88 @@
     @endif
 
     <div style="display: flex; justify-content: space-between; margin: bottom 40px;">
+        @if($member->id_member_type != 3)
+        <button class="btn-back btn-transaksi" onclick="loadTransaksiPemohon()">Kembali ke Daftar Transaksi</button>
+        @else
         <button class="btn-back btn-transaksi" onclick="loadTransaksi()">Kembali ke Daftar Transaksi</button>
-        @if ($payment == 'Belum_Bayar' )
-        <button class="btn-back btn-upload" onclick="uploadPayment('{{ $id_cart }}')" style="margin-left: 15px;">Upload Pembayaran</button>
+        @endif
+        @if ($payment == 'Belum_Bayar' && $status != 'Menunggu_Konfirmasi_PPK' && $member->id_member_type == 3 || $member->id_member_type == 6 && $status != 'Pesanan_Dibatalkan')
+        <button class="btn-back btn-upload" id="upload-payment" data-id_cart="{{ $id_cart }}" data-total="{{ $total_transaksi }}" style="margin-left: 15px;">Upload Pembayaran</button>
+        @endif
+        @if($status == 'Menunggu_Konfirmasi_PPK' && $member->id_member_type == 4)
+        <button class="btn-back btn-danger" onclick="TolakPPK('{{ $id_cart }}')" style="margin-left: 15px;">Tolak</button>
+        <button class="btn-back btn-upload" onclick="setujuinPPK('{{ $id_cart }}')" style="margin-left: 15px;">Setujui Pesanan</button>
         @endif
     </div>
 
 </div>
 
 <script>
+    var bukti_transfer = "{{ $bukti_transfer }}";
+    console.log(bukti_transfer);
     function loadTransaksi() {
         loadContent("{{ route('profile.transaksi') }}", $('#contentArea'));
+    }
+
+    function loadTransaksiPemohon() {
+        loadContent("{{ route('profile.transaksi.pemohon') }}", $('#contentArea'));
+    }
+
+    function setujuinPPK(id_cart) {
+        Swal.fire({
+            title: "Konfirmasi Persetujuan PPK",
+            text: "Apakah Anda yakin ingin mengizinkan transaksi ini?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Ya, Setujui",
+            cancelButtonText: "Tidak, Batal"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // If user clicks "Ya, Setujui", send AJAX request to approve the transaction
+                $.ajax({
+                    url: appUrl + "/api/approveTransaction",
+                    type: "POST",
+                    data: {
+                        id_cart: id_cart
+                    },
+                    success: function(response) {
+                        loadTransaksiPemohon();
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle error response
+                        console.log("Error approving transaction: " + error);
+                    }
+                });
+            }
+        });
+    }
+
+    function TolakPPK(id_cart) {
+        Swal.fire({
+            title: "Konfirmasi Persetujuan PPK",
+            text: "Apakah Anda yakin ingin membatalkan transaksi ini?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Ya, batalkan",
+            cancelButtonText: "Tidak"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: appUrl + "/api/rejectTransaction",
+                    type: "POST",
+                    data: {
+                        id_cart: id_cart
+                    },
+                    success: function(response) {
+                        loadTransaksiPemohon();
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle error response
+                        console.log("Error approving transaction: " + error);
+                    }
+                });
+            }
+        });
     }
 
     $('.cetakInvoice').click(function() {
@@ -467,5 +559,89 @@
 
     function uploadPajak(id_cart_shop) {
         console.log(id_cart_shop);
+    }
+
+    $(document).on("click", "#upload-payment", function() {
+        var id_cart = $(this).data("id_cart");
+        var total = $(this).data("total");
+
+        var html = `
+        <p>
+            Nama Bank Tujuan    : PT. Elite Proxy Sistem <br>
+            Bank Tujuan         : Bank BNI <br>
+            No Rek Tujuan       : <b> 03975-60583 </b> <br>
+            Total Pembayaran    : <b> ${formatRupiah(total)} </b>
+        </p>
+        <img id="swal2-image-preview" src="${ bukti_transfer ? bukti_transfer : '#' }" alt="Bukti Transfer" style="max-width: 200px; max-height: 200px; display: ${ bukti_transfer ? '' : 'none' };">
+        <input type="file" id="swal2-file" name="img" accept="image/*" style="display: block; margin-top: 10px;">
+    `;
+
+        Swal.fire({
+            title: "Upload Pembayaran",
+            html: html,
+            showCancelButton: true,
+            confirmButtonText: "Unggah",
+            cancelButtonText: "Batal",
+            showLoaderOnConfirm: true,
+            preConfirm: () => {
+                return new Promise((resolve, reject) => {
+                    var fileInput = document.getElementById("swal2-file");
+                    var file = fileInput.files[0];
+                    if (!file) {
+                        reject("Anda harus memilih file gambar.");
+                    } else {
+                        resolve(file);
+                    }
+                });
+            },
+            allowOutsideClick: () => !Swal.isLoading(),
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var file = result.value;
+                var formData = new FormData();
+                formData.append("id_cart", id_cart);
+                formData.append("img", file);
+
+                $.ajax({
+                    url: appUrl + "/api/upload-payment",
+                    type: "POST",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        Swal.fire({
+                            title: "Upload Berhasil",
+                            text: "Pembayaran telah diunggah.",
+                            icon: "success",
+                        }).then(function() {
+                           location.reload();
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            title: "Upload Gagal",
+                            text: "Terjadi kesalahan saat mengunggah pembayaran.",
+                            icon: "error",
+                        });
+                    },
+                });
+            }
+        });
+    });
+
+    $(document).on("change", "#swal2-file", function() {
+        previewImage(this);
+    });
+
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+                $("#swal2-image-preview").attr("src", e.target.result).show();
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
     }
 </script>

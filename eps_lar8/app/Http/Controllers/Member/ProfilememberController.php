@@ -109,6 +109,12 @@ class ProfilememberController extends Controller
                     $transaction->status = 'Pesanan_Dikembalikan';
                 }
 
+                if ($transaction->status_pembayaran == 1) {
+                    $transaction->status_pembayaran = 'sudah_bayar';
+                } else {
+                    $transaction->status_pembayaran = 'belum_bayar';
+                }
+
                 $transaction->items = DB::table('complete_cart_shop_detail')
                     ->where('id_cart', $transaction->id)
                     ->where('id_shop', $transaction->id_shop)
@@ -120,6 +126,167 @@ class ProfilememberController extends Controller
 
         // return response()->json($groupedTransactions);
 
+        return view('member.profile.transaksi', $this->data);
+    }
+
+    function approveTransaction(Request $request)
+    {
+        $id_cart = $request->input('id_cart');
+        $approve = DB::table('tr_approval_cart')
+            ->where('id_cart', $id_cart)
+            ->update([
+                'status_approve' => 1,
+                'approved_by' => $this->data['id_user'],
+            ]);
+
+        if ($approve) {
+            $status = 'waiting_approve_by_ppk';
+
+            DB::table('complete_cart_shop')
+                ->where('id_cart', $id_cart)
+                ->update([
+                    'status' => 'waiting_accept_order',
+                    'last_update' => now(),
+                ]);
+
+            DB::table('complete_cart')
+                ->where('id', $id_cart)
+                ->update([
+                    'status' => 'pending',
+                    'last_update' => now(),
+                ]);
+
+            return response()->json([
+                'success' => true,
+                'code' => 200,
+                'massage' => 'Berhasil mengizinkan transaksi'
+            ]);
+        }
+        return response()->json([
+            'success' => false,
+            'code' => 400,
+            'massage' => 'Gagal memberi izin transaksi'
+        ]);
+    }
+
+    function rejectTransaction(Request $request)
+    {
+        $id_cart = $request->input('id_cart');
+        $approve = DB::table('tr_approval_cart')
+            ->where('id_cart', $id_cart)
+            ->update([
+                'status_approve' => 2,
+                'approved_by' => $this->data['id_user'],
+            ]);
+
+        if ($approve) {
+            $status = 'waiting_approve_by_ppk';
+
+            DB::table('complete_cart_shop')
+                ->where('id_cart', $id_cart)
+                ->update([
+                    'status' => 'cancel_manual_by_user',
+                    'last_update' => now(),
+                    'note' => 'Canceled by PPK'
+                ]);
+
+            DB::table('complete_cart')
+                ->where('id', $id_cart)
+                ->update([
+                    'status' => 'cancel',
+                    'last_update' => now(),
+                    'note' => 'Canceled by PPK'
+                ]);
+
+            return response()->json([
+                'success' => true,
+                'code' => 200,
+                'massage' => 'Berhasil mengizinkan transaksi'
+            ]);
+        }
+        return response()->json([
+            'success' => false,
+            'code' => 400,
+            'massage' => 'Gagal memberi izin transaksi'
+        ]);
+    }
+
+    public function transaksi_pemohon()
+    {
+        $id_creator = DB::table('member_satker')->where('id_member', $this->data['id_user'])->value('created_user');
+        $transactions = $this->model['invoice']->getTransaction($id_creator);
+
+        // Mengelompokkan transaksi berdasarkan id_cart
+        $groupedTransactions = $transactions->groupBy('invoice');
+
+        // Mengambil detail item untuk setiap transaksi
+        foreach ($groupedTransactions as $invoice => $group) {
+            foreach ($group as $transaction) {
+                if ($transaction->status_invoice == 'waiting_approve_by_ppk') {
+                    $transaction->status_invoice = 'Menunggu Konfirmasi PPK';
+                } elseif ($transaction->status_invoice == 'pending') {
+                    $transaction->status_invoice = 'Menunggu Konfirmasi Penjual';
+                } elseif ($transaction->status_invoice == 'on_delivery') {
+                    $transaction->status_invoice = 'Dalam Pengiriman';
+                } elseif ($transaction->status_invoice == 'cancel' || $transaction->status_invoice == 'cancel_part' || $transaction->status_invoice == 'expired') {
+                    $transaction->status_invoice = 'Pesanan Dibatalkan';
+                } elseif ($transaction->status_invoice == 'complete_payment' && $transaction->payment == '0') {
+                    $transaction->status_invoice = 'Menunggu Konfirmasi Pembayaran';
+                } elseif ($transaction->status_invoice == 'complete_payment' && $transaction->payment == '1') {
+                    $transaction->status_invoice = 'Sudah Di Bayar';
+                } elseif ($transaction->status_invoice == 'complete' && $transaction->payment == '0') {
+                    $transaction->status_invoice = 'Belum Di Bayar';
+                } elseif ($transaction->status_invoice == 'complete' && $transaction->payment == '1') {
+                    $transaction->status_invoice = 'Pesanan Selesai';
+                }
+
+                if ($transaction->status_pembayaran == 1) {
+                    $transaction->status_pembayaran = 'sudah_bayar';
+                } else {
+                    $transaction->status_pembayaran = 'belum_bayar';
+                }
+
+                if ($transaction->status == 'waiting_approve_by_ppk') {
+                    $transaction->status = 'Menunggu_Konfirmasi_PPK';
+                    $transaction->status_pembayaran = 'Menunggu_Konfirmasi_PPK';
+                } elseif ($transaction->status == 'waiting_accept_order') {
+                    $transaction->status = 'Menunggu_Konfirmasi_Penjual';
+                } elseif ($transaction->status == 'send_by_seller') {
+                    $transaction->status = 'Dalam_Pengiriman';
+                } elseif ($transaction->status == 'cancel_by_seller' || $transaction->status == 'cancel_by_time' || $transaction->status == 'cancel_by_marketplace' || $transaction->status == 'cancel_time_by_user' || $transaction->status == 'cancel_manual_by_user') {
+                    $transaction->status = 'Pesanan_Dibatalkan';
+                    $transaction->status_pembayaran = 'pesanan_dibatalkan';
+                } elseif ($transaction->status == 'on_packing_process') {
+                    $transaction->status = 'Packing';
+                } elseif ($transaction->status == 'complete') {
+                    $transaction->status = 'Selesai';
+                } elseif ($transaction->status == 'refund') {
+                    $transaction->status = 'Pesanan_Dikembalikan';
+                }
+
+                if ($transaction->status_pembayaran != 1 && $transaction->jml_top !== null && $transaction->batas_pembayaran_top !== null && $transaction->batas_pembayaran_top < now()) {
+                    $transaction->status_pembayaran = 'sudah_jatuh_tempo';
+                }
+
+                if ($transaction->status_pembayaran == 0 && $transaction->bukti_transfer != null) {
+                    $transaction->status_pembayaran = 'menunggu_pengecekan_pembayaran';
+                }
+
+
+                $transaction->items = DB::table('complete_cart_shop_detail')
+                    ->where('id_cart', $transaction->id)
+                    ->where('id_shop', $transaction->id_shop)
+                    ->get();
+            }
+        }
+
+        $this->data['transactions'] = $groupedTransactions;
+
+        // return response()->json($this->data);
+
+        if ($this->data['member']->id_member_type == 6) {
+            return view('member.profile.v_transaksi_finance', $this->data);
+        }
         return view('member.profile.transaksi', $this->data);
     }
 
@@ -501,7 +668,8 @@ class ProfilememberController extends Controller
         return view('member.profile.v_user', $this->data);
     }
 
-    function DeleteUser(Request $request) {
+    function DeleteUser(Request $request)
+    {
         $update = DB::table('member')->where('id', $request->input('id'))->update(['member_status' => 'delete']);
 
         if ($update) {
@@ -935,5 +1103,18 @@ class ProfilememberController extends Controller
             return response()->json(['success' => true,]);
         }
         return response()->json(['success' => false,]);
+    }
+
+    public function Upload_payment(Request $request)
+    {
+        $inv = $request->input('inv');
+        $bukti_payment = $request->file('file');
+
+        $cart = $this->model['invoice']->where('no_invoice', $inv)->frist(); 
+        $media = $cart->addMedia($bukti_payment)
+            ->usingFileName(time() . '.' . $bukti_payment->getClientOriginalExtension())
+            ->toMediaCollection($jenis, $jenis);
+
+        $url = $media->getUrl();
     }
 }

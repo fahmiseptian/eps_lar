@@ -45,22 +45,24 @@ class CartController extends Controller
         $cart = Cart::where('id_user', $id_member)->select('id', 'total', 'qty')->first();
 
         if ($cart) {
-            $cart->qty = $this->model['CartShopTemporary']->sumqtySelected($cart->id);
-            $cart->detail = $this->model['CartShop']->getdetailcartByIdcart($cart->id);
+            if ($cart->qty > 0) {
+                $cart->qty = $this->model['CartShopTemporary']->sumqtySelected($cart->id);
+                $cart->detail = $this->model['CartShop']->getdetailcartByIdcart($cart->id);
 
-            foreach ($cart->detail as $detail) {
-                $products = $this->model['CartShopTemporary']->getDetailCartByIdShop($detail->id_shop, $cart->id);
-                $detail->products = $products;
+                foreach ($cart->detail as $detail) {
+                    $products = $this->model['CartShopTemporary']->getDetailCartByIdShop($detail->id_shop, $cart->id);
+                    $detail->products = $products;
+                }
+
+                $sumprice = $this->model['CartShopTemporary']->sumPriceSelectProductCart($cart->id);
+                $cart->sumprice = $sumprice;
+
+                // return response()->json(["cart"=>$cart]);
+                return view('member.cart.keranjang', $this->data, ["cart" => $cart]);
             }
-
-            $sumprice = $this->model['CartShopTemporary']->sumPriceSelectProductCart($cart->id);
-            $cart->sumprice = $sumprice;
-
-            // return response()->json(["cart"=>$cart]);
-            return view('member.cart.keranjang', $this->data, ["cart" => $cart]);
-        } else {
             return view('member.cart.empty-cart', $this->data);
         }
+        return view('member.cart.empty-cart', $this->data);
     }
 
     function updateProductCart(Request $request)
@@ -166,7 +168,9 @@ class CartController extends Controller
         $insert_handling_cost = $carts->insertHandlingCost($id_member);
 
         $this->data['cartAddress']  = $carts->getaddressCart($cart->id_address_user);
-        $cart->detail = $this->model['CartShop']->getdetailcartByIdcart($cart->id);
+        $cart->detail = $this->model['CartShop']->Detailcsis_selected($cart->id);
+
+        $this->data['provinces'] = DB::table('province')->get();
 
         $total_barang_dengan_PPN = 0;
         $total_barang_tanpa_PPN = 0;
@@ -205,11 +209,12 @@ class CartController extends Controller
         $cart->pph = $cf->pph / 100;
         $cart->payment = $payment;
 
-        // $this->data['']
+        $this->data['satker_ppk'] =  $this->model['member']->getlimitppk($this->data['id_user']);
+
 
         // Mengembalikan data cart yang sudah digabung
-        // return response()->json(["cart"=>$cart]);
-        return view('member.cart.checkout', $this->data, ["cart" => $cart]);
+        // return response()->json([$cart]);
+        return view('member.cart.v_checkout', $this->data, ["cart" => $cart]);
     }
 
     function getaddress()
@@ -251,6 +256,9 @@ class CartController extends Controller
             $id_shop = $shop->id_shop;
             $cart = Cart::getCart($this->data['id_user']);
             $id_cart = $cart->id;
+            $id_courier = DB::table('shipping')->where('id', $id_shipping)->value('id_courier');
+
+            $this->model['CartShop']->insurance($this->data['id_user'], $id_shop, $id_courier, 'false', $id);
 
             $cartShop->refreshCartShop($id_cart, $id_shop);
             $cartShop->refreshCart($id_cart);
@@ -290,10 +298,17 @@ class CartController extends Controller
         if ($updatecart) {
             $insert_handling_cost = $carts->insertHandlingCost($id_member);
             $detail = $carts->where('id', $id_cart)->first();
-            return response()->json(['payment' => $detail]);
-        } else {
-            return response()->json(['payment' => 'tidak ditemukan']);
+            return response()->json([
+                'code' => 200,
+                'payment' => $detail,
+                'success' => true,
+            ]);
         }
+        return response()->json([
+            'code' => 400,
+            'payment' => 'payment tidak ditemukan',
+            'success' => false,
+        ]);
     }
 
     function updateTOP($top)
@@ -313,12 +328,25 @@ class CartController extends Controller
         $id_user = $this->data['id_user'];
         // $data_user = Member::getDataMember($id_user);
         $id_cart = $request->id_cart;
+        $status = $request->status;
+
+        $id_payment = DB::table('cart')->where('id', $id_cart)->value('id_payment');
+
+        if ($id_payment == 30) {
+            // BCA Virtual Account
+        } elseif ($id_payment == 22) {
+            //  Midtrans KKP
+        } elseif ($id_payment == 31) {
+            // BNI Virtual Account
+        }
 
         $data         = array('id_user' => $id_user, 'id' => $id_cart);
         // $migrate_checkout =$carts->migrate_checkout($data);
-        $migrate_checkout = $complete_cart->migrate_cart_checkout_cond($id_user, $id_cart);
-
-
+        if ($status != null) {
+            $migrate_checkout = $complete_cart->migrate_cart_checkout_cond($id_user, $id_cart, true);
+        } else {
+            $migrate_checkout = $complete_cart->migrate_cart_checkout_cond($id_user, $id_cart);
+        }
         if ($migrate_checkout) {
             return response()->json(['status' => 'success', 'id_cart' => $id_cart]);
         } else {
@@ -383,5 +411,29 @@ class CartController extends Controller
         ];
 
         return response()->json(['carts' => $carts], 200);
+    }
+
+    function UpdateNote(Request $request)
+    {
+        $id_cart_shop = $request->input('id_cs');
+        $note = $request->input('note');
+        $tipe = $request->input('tipe');
+
+        $update = DB::table('cart_shop')->where('id', $id_cart_shop)->update([
+            $tipe => $note,
+        ]);
+
+        if ($update) {
+            return response()->json([
+                'code' =>  200,
+                'massage' =>  'Berhasil Mengupdate catatan',
+                'success' => true,
+            ]);
+        }
+        return response()->json([
+            'code' =>  400,
+            'massage' =>  'gagal memngupdate catatan',
+            'success' => false,
+        ]);
     }
 }

@@ -66,7 +66,6 @@
     $(document).ready(function() {
         // Jika ada alamat yang sudah ada, ambil data kota dan kecamatan
         var address = '{!! json_encode($address) !!}'; // Hapus tanda kutip tambahan
-        console.log(address);
         if (address != 'empty') {
             ajaxCity('{{ $address->province_id ?? null }}', function() {
                 $('#kota').val('{{ $address->city_id ?? null }}');
