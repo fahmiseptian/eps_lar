@@ -1275,15 +1275,17 @@ $(document).on("click", ".cart-btn", function () {
     var id_user = $(this).data("id_user");
     var qty = quantity;
 
-    if (tipe_user !== 3) {
-        Swal.fire({
-            title: "Perhatian",
-            text: "Anda tidak di Perbolehkan berbelanja.",
-            icon: "warning",
-            confirmButtonText: "Tutup",
-            cancelButtonText: "Batal",
-        });
-        return;
+    if (tipe_user != '') {
+        if (tipe_user !== 3) {
+            Swal.fire({
+                title: "Perhatian",
+                text: "Anda tidak di Perbolehkan berbelanja.",
+                icon: "warning",
+                confirmButtonText: "Tutup",
+                cancelButtonText: "Batal",
+            });
+            return;
+        }
     }
 
     if (id_user == null || id_user == "") {
@@ -1340,16 +1342,17 @@ $(document).on("click", ".buy-btn", function () {
     var id_user = $(this).data("id_user");
     console.log(id_user);
     var qty = quantity;
-
-    if (tipe_user !== 3) {
-        Swal.fire({
-            title: "Perhatian",
-            text: "Anda tidak di Perbolehkan berbelanja.",
-            icon: "warning",
-            confirmButtonText: "Tutup",
-            cancelButtonText: "Batal",
-        });
-        return;
+    if (tipe_user != '') {
+        if (tipe_user !== 3) {
+            Swal.fire({
+                title: "Perhatian",
+                text: "Anda tidak di Perbolehkan berbelanja.",
+                icon: "warning",
+                confirmButtonText: "Tutup",
+                cancelButtonText: "Batal",
+            });
+            return;
+        }
     }
 
     if (id_user == null || id_user == "") {
@@ -1605,6 +1608,7 @@ $(document).on("click", "#updateTOP", function () {
 
 $(document).on("click", "#request-checkout", function () {
     var id_cart = $(this).data("id_cart");
+    var pm = $("#payment-method").val();
     Swal.fire({
         title: "Syarat dan Ketentuan",
         html: `
@@ -1647,11 +1651,10 @@ $(document).on("click", "#request-checkout", function () {
                         contentType: false,
                         processData: false,
                         success: function (response) {
-                            Swal.fire({
-                                title: "Pesanan Berhasil Diproses",
-                                text: "Silahkan lihat pesanan anda di transaksi.",
-                                icon: "success",
-                            });
+                            if (pm == 30) {
+                                generatebca(id_cart);
+                                return;
+                            }
                         },
                         error: function (xhr, status, error) {
                             Swal.fire({
@@ -1670,6 +1673,33 @@ $(document).on("click", "#request-checkout", function () {
         }
     });
 });
+
+function generatebca(id_cart) {
+    var formData = new FormData();
+    formData.append("id_cart", id_cart);
+    $.ajax({
+        url: appUrl + "/bca/payment",
+        type: "POST",
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function (response) {
+            Swal.fire({
+                title: "Pesanan Berhasil Diproses",
+                text: "Silahkan lihat pesanan anda di transaksi.",
+                icon: "success",
+            });
+        },
+        error: function (xhr, status, error) {
+            Swal.fire({
+                title: "Erorr",
+                text: "Terjadi kesalahan saat Membuat Virtual Account.",
+                icon: "error",
+            });
+        },
+    });
+}
+
 $(document).on("click", "#request-checkout-withPPK", function () {
     var id_cart = $(this).data("id_cart");
     var formData = new FormData();

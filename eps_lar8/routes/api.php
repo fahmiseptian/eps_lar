@@ -8,6 +8,7 @@ use App\Http\Controllers\Member\ProfilememberController;
 use App\Http\Controllers\Partner\BniController;
 use App\Http\Controllers\Partner\KurirController;
 use App\Http\Controllers\Member\SearchController;
+use App\Http\Controllers\Partner\BcaController;
 use App\Http\Controllers\Seller\DeliveryController;
 use App\Http\Controllers\Seller\FinanceController;
 use App\Http\Controllers\Seller\LoginSellerController;
@@ -220,3 +221,7 @@ Route::get('/keranjang/{id_member}', [HomememberController::class, 'keranjang'])
 
 // calc
 Route::post('/calc_nego', [HomememberController::class, 'calc_nego']);
+
+// BCA
+Route::get('/bca/generate-token', [BcaController::class, 'getTokenEps']);
+Route::post('/bca/payment', [BcaController::class, 'payment']);

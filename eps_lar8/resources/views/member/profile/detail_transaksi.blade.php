@@ -100,6 +100,11 @@
     $total_transaksi += $transaction['detailOrder']->total;
 
     $payment = $transaction['detailOrder']->status_pembayaran_top;
+    $va_status = false;
+
+    if ($transaction['detailOrder']->id_payment == 30 || $transaction['detailOrder']->id_payment == 31 ) {
+    $va_status = true;
+    }
 
 
     if ($transaction['detailOrder']->status_pembayaran_top == '1' && $transaction['detailOrder']->bukti_transfer != null) {
@@ -410,8 +415,12 @@
         @else
         <button class="btn-back btn-transaksi" onclick="loadTransaksi()">Kembali ke Daftar Transaksi</button>
         @endif
-        @if ($payment != 'sudah_bayar' && ($member->id_member_type == 3 || $member->id_member_type == 6) && $status != 'Menunggu_Konfirmasi_PPK' && $status != 'Pesanan_Dibatalkan')
+        @if ($payment != 'sudah_bayar' && ($member->id_member_type == 3 || $member->id_member_type == 6) && $status != 'Menunggu_Konfirmasi_PPK' && $status != 'Pesanan_Dibatalkan' )
+        @if ($va_status)
+        <button class="btn-back btn-upload" id="upload-payment-va" data-va_number="{{ $transaction['detailOrder']->va_number }}" data-id_payment="{{ $transaction['detailOrder']->id_payment }}" data-id_cart="{{ $id_cart }}" data-total="{{ $total_transaksi }}" style="margin-left: 15px;">Lakukan Pembayaran</button>
+        @else
         <button class="btn-back btn-upload" id="upload-payment" data-id_cart="{{ $id_cart }}" data-total="{{ $total_transaksi }}" style="margin-left: 15px;">Upload Pembayaran</button>
+        @endif
         @endif
         @if($status == 'Menunggu_Konfirmasi_PPK' && $member->id_member_type == 4)
         <button class="btn-back btn-danger" onclick="TolakPPK('{{ $id_cart }}')" style="margin-left: 15px;">Tolak</button>
@@ -561,6 +570,80 @@
     function uploadPajak(id_cart_shop) {
         console.log(id_cart_shop);
     }
+
+    $(document).on("click", "#upload-payment-va", function() {
+        var id_cart = $(this).data("id_cart");
+        var total = $(this).data("total");
+        var va_number = $(this).data("va_number");
+        var id_payment = $(this).data("id_payment");
+
+        if (id_payment == 30) {
+            var html = `
+                <p>
+                    Nama Bank Tujuan    : PT. Elite Proxy Sistem <br>
+                    Bank Tujuan         : Bank BCA Virtual Acount <br>
+                    No Virtual Acount   : <b> ${va_number} </b> <br>
+                    Total Pembayaran    : <b> ${formatRupiah(total)} </b>
+                </p>
+                <img id="swal2-image-preview" src="${ bukti_transfer ? bukti_transfer : '#' }" alt="Bukti Transfer" style="max-width: 200px; max-height: 200px; display: ${ bukti_transfer ? '' : 'none' };">
+                <input type="file" id="swal2-file" name="img" accept="image/*" style="display: block; margin-top: 10px;">
+            `;
+
+            Swal.fire({
+                title: "Pembayaran Virtual Account ",
+                html: html,
+                showCancelButton: true,
+                confirmButtonText: "Unggah",
+                cancelButtonText: "Batal",
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                    return new Promise((resolve, reject) => {
+                        var fileInput = document.getElementById("swal2-file");
+                        var file = fileInput.files[0];
+                        if (!file) {
+                            reject("Anda harus memilih file gambar.");
+                        } else {
+                            resolve(file);
+                        }
+                    });
+                },
+                allowOutsideClick: () => !Swal.isLoading(),
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var file = result.value;
+                    var formData = new FormData();
+                    formData.append("id_cart", id_cart);
+                    formData.append("img", file);
+
+                    $.ajax({
+                        url: appUrl + "/api/upload-payment",
+                        type: "POST",
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function(response) {
+                            Swal.fire({
+                                title: "Upload Berhasil",
+                                text: "Pembayaran telah diunggah.",
+                                icon: "success",
+                            }).then(function() {
+                                location.reload();
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                title: "Upload Gagal",
+                                text: "Terjadi kesalahan saat mengunggah pembayaran.",
+                                icon: "error",
+                            });
+                        },
+                    });
+                }
+            });
+        } else if (id_payment == 31) {
+            console.log("BNI VA");
+        }
+    });
 
     $(document).on("click", "#upload-payment", function() {
         var id_cart = $(this).data("id_cart");

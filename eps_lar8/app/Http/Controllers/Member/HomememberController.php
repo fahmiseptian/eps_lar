@@ -47,6 +47,7 @@ class HomememberController extends Controller
         $this->model['ShopCategory'] = new ShopCategory();
         $this->data['nama_user'] = '';
         $this->data['id_user'] =  $sessionData['id'] ?? null;
+        $this->data['member'] = null ;
 
         if ($this->user_id != null) {
             $this->data['member'] = $this->model['member']->find($this->user_id);
@@ -116,7 +117,7 @@ class HomememberController extends Controller
         $this->data['id_user'] = $this->user_id;
         $produkToko = $this->model['products']->get5ProductByIdShop($this->data->idToko);
         $gambarProduct = $this->model['products']->getGambarProduct($id);
-
+        $this->data['member'] = null;
 
         if ($this->data['id_user'] != null) {
             $this->data['member'] = $this->model['member']->find($this->data['id_user']);

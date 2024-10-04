@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
+use App\Libraries\Bca;
 use App\Libraries\Terbilang;
 use App\Models\Bast;
 use App\Models\Cart;
@@ -103,12 +104,19 @@ class CheckoutController extends Controller
         $order = $this->data['complate_cart']->getOrder($id_cart);
         $date = now();
 
+        DB::table('complete_cart')->where('id',$id_cart)->update(['status'=>'complete_payment']);
+
         $payment = UploadPayment::create([
             'invoice' => $order->invoice,
             'nominal' => $order->total,
             'created_dt' => $date,
             'file_upload' => ''
         ]);
+
+        if ($order->id_pembayaran == 30) {
+            $bca = new Bca();
+            $update = $bca->updatePayment($id_cart);
+        }
 
         if ($img) {
             $payment->addMedia($img)

@@ -74,10 +74,10 @@
                     </div>
                 </div>
                 <div class="action-buttons">
-                    <button class="cart-btn" data-id_user="{{$id_user}}" data-tipe-user="{{ $member->id_member_type }}" data-id="{{$id}}"><span class="material-icons">add_shopping_cart</span>
+                    <button class="cart-btn" data-id_user="{{$id_user}}" data-tipe-user="{{ $member ? $member->id_member_type :'' }}" data-id="{{$id}}"><span class="material-icons">add_shopping_cart</span>
                         Keranjang</button>
-                    <button class="buy-btn" data-id_user="{{$id_user}}" data-id="{{$id}}" data-tipe-user="{{ $member->id_member_type }}">Beli Sekarang</button>
-                    <button class="nego-btn" onclick="openNegoModal()" data-tipe-user="{{ $member->id_member_type }}">Nego</button>
+                    <button class="buy-btn" data-id_user="{{$id_user}}" data-id="{{$id}}" data-tipe-user="{{ $member ? $member->id_member_type :'' }}">Beli Sekarang</button>
+                    <button class="nego-btn" onclick="openNegoModal()" data-tipe-user="{{ $member ? $member->id_member_type :'' }}">Nego</button>
                 </div>
                 <div class="deskripsi-product">
                     <ul>
@@ -151,7 +151,7 @@
         </section class="ulasan-product">
         <div class="Penlaian-product">
             <div class="action-cart-mobile">
-                <button class="cart-btn" data-id="{{$id}}" data-tipe-user="{{ $member->id_member_type }}"><span class="material-icons">add_shopping_cart</span>
+                <button class="cart-btn" data-id="{{$id}}" data-tipe-user="{{ $member ? $member->id_member_type :'' }}"><span class="material-icons">add_shopping_cart</span>
                     Keranjang</button>
                 <button class="buy-btn">Beli Sekarang</button>
                 <button class="nego-btn" onclick="openNegoModal()">Nego</button>
@@ -286,15 +286,33 @@
     @include('member.asset.footer')
     <script>
         function openNegoModal() {
+            var id_user = $(".cart-btn").data("id_user");
             var tipe_user = $(".buy-btn").data("tipe-user");
+            if (tipe_user != '') {
+                if (tipe_user !== 3) {
+                    Swal.fire({
+                        title: "Perhatian",
+                        text: "Anda tidak di Perbolehkan Nego Barang.",
+                        icon: "warning",
+                        confirmButtonText: "Tutup",
+                        cancelButtonText: "Batal",
+                    });
+                    return;
+                }
+            }
 
-            if (tipe_user !== 3) {
+            if (id_user == null || id_user == "") {
                 Swal.fire({
                     title: "Perhatian",
-                    text: "Anda tidak di Perbolehkan Nego Barang.",
+                    text: "Harap login terlebih dahulu untuk menambahkan produk ke keranjang.",
                     icon: "warning",
-                    confirmButtonText: "Tutup",
+                    confirmButtonText: "OK",
+                    showCancelButton: true,
                     cancelButtonText: "Batal",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = appUrl + "/login";
+                    }
                 });
                 return;
             }

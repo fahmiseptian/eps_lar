@@ -31,6 +31,7 @@ class CartController extends Controller
         $this->data['id_user'] = $sessionData['id'] ?? null;
 
         $this->data['nama_user'] = '';
+        $this->data['member'] = null ;
 
         if ($this->data['id_user'] != null) {
             $this->data['member'] = $this->model['member']->find($this->data['id_user']);
@@ -331,14 +332,6 @@ class CartController extends Controller
         $status = $request->status;
 
         $id_payment = DB::table('cart')->where('id', $id_cart)->value('id_payment');
-
-        if ($id_payment == 30) {
-            // BCA Virtual Account
-        } elseif ($id_payment == 22) {
-            //  Midtrans KKP
-        } elseif ($id_payment == 31) {
-            // BNI Virtual Account
-        }
 
         $data         = array('id_user' => $id_user, 'id' => $id_cart);
         // $migrate_checkout =$carts->migrate_checkout($data);
