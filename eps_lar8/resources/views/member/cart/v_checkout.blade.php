@@ -403,6 +403,12 @@
                             <span class="payment-detail-label">Subtotal Asuransi Pengiriman sebelum PPN:</span>
                             <span class="payment-detail-value">Rp. {{ number_format($cart->total_insurance, 0, ',', '.') }}</span>
                         </li>
+                        @if ($cart->id_payment != 23)
+                        <li>
+                            <span class="payment-detail-label">Biaya Penanganan sebelum PPN:</span>
+                            <span class="payment-detail-value">Rp. {{ number_format($cart->handling_cost_non_ppn,  0, ',', '.') }}</span>
+                        </li>
+                        @endif
                         <li>
                             <span class="payment-detail-label">PPN:</span>
                             <span class="payment-detail-value">Rp. {{ number_format($cart->total_ppn,  0, ',', '.') }}</span>

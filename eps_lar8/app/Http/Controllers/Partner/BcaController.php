@@ -111,7 +111,7 @@ class BcaController extends Controller
         $insert             =  $this->libraries['BCA']->insertBcaReq($data_req);
 
         if ($r['code'] == 2002500) {
-            DB::table('complete_cart')->where('id',$id_cart)->update(['va_number',$r['va_number']]);
+            DB::table('complete_cart')->where('id', $id_cart)->update(['va_number' => $r['va_number']]);
         }
         // save VA Number
         return response()->json($r);

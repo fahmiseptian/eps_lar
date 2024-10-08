@@ -9,6 +9,7 @@ use App\Http\Controllers\Partner\BniController;
 use App\Http\Controllers\Partner\KurirController;
 use App\Http\Controllers\Member\SearchController;
 use App\Http\Controllers\Partner\BcaController;
+use App\Http\Controllers\Partner\MidtransController;
 use App\Http\Controllers\Seller\DeliveryController;
 use App\Http\Controllers\Seller\FinanceController;
 use App\Http\Controllers\Seller\LoginSellerController;
@@ -225,3 +226,9 @@ Route::post('/calc_nego', [HomememberController::class, 'calc_nego']);
 // BCA
 Route::get('/bca/generate-token', [BcaController::class, 'getTokenEps']);
 Route::post('/bca/payment', [BcaController::class, 'payment']);
+
+// Midtrans Test
+Route::post('/midtrans/request-payment', [MidtransController::class, 'payment_request']);
+Route::get('/midtrans/status', [MidtransController::class, 'get_refresh_token']);
+Route::post('/midtrans/send-email', [MidtransController::class, 'send_email']);
+Route::get('/midtrans/test', [MidtransController::class, 'test']);

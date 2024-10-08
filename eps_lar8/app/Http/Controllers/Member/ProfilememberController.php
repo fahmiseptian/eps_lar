@@ -109,14 +109,16 @@ class ProfilememberController extends Controller
                     $transaction->status = 'Pesanan_Dikembalikan';
                 }
 
-                if ($transaction->status_pembayaran == 1) {
-                    $transaction->status_pembayaran = 'sudah_bayar';
-                } else {
+                if ($transaction->status_pembayaran == 0) {
                     $transaction->status_pembayaran = 'belum_bayar';
                 }
 
                 if ($transaction->status_pembayaran == 0 && $transaction->bukti_transfer != null) {
                     $transaction->status_pembayaran = 'menunggu_pengecekan_pembayaran';
+                }
+
+                if ($transaction->status_pembayaran == 1) {
+                    $transaction->status_pembayaran = 'sudah_bayar';
                 }
 
                 $transaction->items = DB::table('complete_cart_shop_detail')
@@ -249,7 +251,7 @@ class ProfilememberController extends Controller
                 } else {
                     $transaction->status_pembayaran = 'belum_bayar';
                 }
-
+                
                 if ($transaction->status == 'waiting_approve_by_ppk') {
                     $transaction->status = 'Menunggu_Konfirmasi_PPK';
                     $transaction->status_pembayaran = 'Menunggu_Konfirmasi_PPK';

@@ -71,9 +71,9 @@
 
     $bukti_transfer = $firstTransaction['detailOrder']->bukti_transfer;
 
-    if ($firstTransaction['detailOrder']->status_pembayaran_top == '1' && $firstTransaction['detailOrder']->bukti_transfer != null) {
+    if ($firstTransaction['detailOrder']->status_pembayaran_top == '1' && $firstTransaction['detailOrder']->invoice_status == 'complete_payment') {
     $payment = 'Lunas';
-    } elseif ($firstTransaction['detailOrder']->status_pembayaran_top == '0' && $firstTransaction['detailOrder']->bukti_transfer != null) {
+    } elseif ($firstTransaction['detailOrder']->status_pembayaran_top == '0' && $firstTransaction['detailOrder']->invoice_status == 'complete_payment') {
     $payment = 'Menunggu_Pengecekan_Pembayaran';
     } else {
     $payment = 'Belum_Bayar';
@@ -107,9 +107,9 @@
     }
 
 
-    if ($transaction['detailOrder']->status_pembayaran_top == '1' && $transaction['detailOrder']->bukti_transfer != null) {
+    if ($transaction['detailOrder']->status_pembayaran_top == '1' && $transaction['detailOrder']->invoice_status == 'complete_payment') {
     $payment = 'Lunas';
-    } elseif ($transaction['detailOrder']->status_pembayaran_top == '0' && $transaction['detailOrder']->bukti_transfer != null) {
+    } elseif ($transaction['detailOrder']->status_pembayaran_top == '0' && $transaction['detailOrder']->invoice_status == 'complete_payment') {
     $payment = 'Menunggu_Pengecekan_Pembayaran';
     } else {
     $payment = 'Belum_Bayar';
@@ -186,8 +186,10 @@
                         <span class="value">{{ $transaction['detailOrder']->pembayaran }}</span>
                     </div>
                     <div class="info-item">
+                        @if ($transaction['detailOrder']->jml_top != 0 || $transaction['detailOrder']->jml_top != null)
                         <span class="label">TOP:</span>
                         <span class="value">{{ $transaction['detailOrder']->jml_top }} Hari</span>
+                        @endif
                     </div>
                     <div class="info-item">
                         <span class="label">Untuk Keperluan:</span>
@@ -409,17 +411,21 @@
     <p class="not-found">Detail transaksi tidak ditemukan.</p>
     @endif
 
-    <div style="display: flex; justify-content: space-between; margin: bottom 40px;">
+    <div style="display: flex; justify-content: space-between; margin-bottom: 40px;">
         @if($member->id_member_type != 3)
         <button class="btn-back btn-transaksi" onclick="loadTransaksiPemohon()">Kembali ke Daftar Transaksi</button>
         @else
         <button class="btn-back btn-transaksi" onclick="loadTransaksi()">Kembali ke Daftar Transaksi</button>
         @endif
-        @if ($payment != 'sudah_bayar' && ($member->id_member_type == 3 || $member->id_member_type == 6) && $status != 'Menunggu_Konfirmasi_PPK' && $status != 'Pesanan_Dibatalkan' )
+        @if ($payment != 'Lunas' && ($member->id_member_type == 3 || $member->id_member_type == 6) && $status != 'Menunggu_Konfirmasi_PPK' && $status != 'Pesanan_Dibatalkan' )
         @if ($va_status)
         <button class="btn-back btn-upload" id="upload-payment-va" data-va_number="{{ $transaction['detailOrder']->va_number }}" data-id_payment="{{ $transaction['detailOrder']->id_payment }}" data-id_cart="{{ $id_cart }}" data-total="{{ $total_transaksi }}" style="margin-left: 15px;">Lakukan Pembayaran</button>
         @else
+        @if ($transaction['detailOrder']->id_payment == 22 && $payment != 'lunas')
+        <button class="btn-back btn-upload" id="bayar-midtrans" data-id_cart="{{ $id_cart }}" data-id_member="{{ $member->id }}" style="margin-left: 15px;">Bayar Sekarang </button>
+        @else
         <button class="btn-back btn-upload" id="upload-payment" data-id_cart="{{ $id_cart }}" data-total="{{ $total_transaksi }}" style="margin-left: 15px;">Upload Pembayaran</button>
+        @endif
         @endif
         @endif
         @if($status == 'Menunggu_Konfirmasi_PPK' && $member->id_member_type == 4)
@@ -429,7 +435,6 @@
     </div>
 
 </div>
-
 <script>
     var bukti_transfer = "{{ $bukti_transfer }}";
     console.log(bukti_transfer);
@@ -546,7 +551,7 @@
                 });
             },
             complete: function() {
-                $("#overlay").hide(); // Sembunyikan loader setelah selesai
+                $("#overlay").hide();
             },
         });
     });
@@ -569,163 +574,5 @@
 
     function uploadPajak(id_cart_shop) {
         console.log(id_cart_shop);
-    }
-
-    $(document).on("click", "#upload-payment-va", function() {
-        var id_cart = $(this).data("id_cart");
-        var total = $(this).data("total");
-        var va_number = $(this).data("va_number");
-        var id_payment = $(this).data("id_payment");
-
-        if (id_payment == 30) {
-            var html = `
-                <p>
-                    Nama Bank Tujuan    : PT. Elite Proxy Sistem <br>
-                    Bank Tujuan         : Bank BCA Virtual Acount <br>
-                    No Virtual Acount   : <b> ${va_number} </b> <br>
-                    Total Pembayaran    : <b> ${formatRupiah(total)} </b>
-                </p>
-                <img id="swal2-image-preview" src="${ bukti_transfer ? bukti_transfer : '#' }" alt="Bukti Transfer" style="max-width: 200px; max-height: 200px; display: ${ bukti_transfer ? '' : 'none' };">
-                <input type="file" id="swal2-file" name="img" accept="image/*" style="display: block; margin-top: 10px;">
-            `;
-
-            Swal.fire({
-                title: "Pembayaran Virtual Account ",
-                html: html,
-                showCancelButton: true,
-                confirmButtonText: "Unggah",
-                cancelButtonText: "Batal",
-                showLoaderOnConfirm: true,
-                preConfirm: () => {
-                    return new Promise((resolve, reject) => {
-                        var fileInput = document.getElementById("swal2-file");
-                        var file = fileInput.files[0];
-                        if (!file) {
-                            reject("Anda harus memilih file gambar.");
-                        } else {
-                            resolve(file);
-                        }
-                    });
-                },
-                allowOutsideClick: () => !Swal.isLoading(),
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    var file = result.value;
-                    var formData = new FormData();
-                    formData.append("id_cart", id_cart);
-                    formData.append("img", file);
-
-                    $.ajax({
-                        url: appUrl + "/api/upload-payment",
-                        type: "POST",
-                        data: formData,
-                        contentType: false,
-                        processData: false,
-                        success: function(response) {
-                            Swal.fire({
-                                title: "Upload Berhasil",
-                                text: "Pembayaran telah diunggah.",
-                                icon: "success",
-                            }).then(function() {
-                                location.reload();
-                            });
-                        },
-                        error: function(xhr, status, error) {
-                            Swal.fire({
-                                title: "Upload Gagal",
-                                text: "Terjadi kesalahan saat mengunggah pembayaran.",
-                                icon: "error",
-                            });
-                        },
-                    });
-                }
-            });
-        } else if (id_payment == 31) {
-            console.log("BNI VA");
-        }
-    });
-
-    $(document).on("click", "#upload-payment", function() {
-        var id_cart = $(this).data("id_cart");
-        var total = $(this).data("total");
-
-        var html = `
-        <p>
-            Nama Bank Tujuan    : PT. Elite Proxy Sistem <br>
-            Bank Tujuan         : Bank BNI <br>
-            No Rek Tujuan       : <b> 03975-60583 </b> <br>
-            Total Pembayaran    : <b> ${formatRupiah(total)} </b>
-        </p>
-        <img id="swal2-image-preview" src="${ bukti_transfer ? bukti_transfer : '#' }" alt="Bukti Transfer" style="max-width: 200px; max-height: 200px; display: ${ bukti_transfer ? '' : 'none' };">
-        <input type="file" id="swal2-file" name="img" accept="image/*" style="display: block; margin-top: 10px;">
-    `;
-
-        Swal.fire({
-            title: "Upload Pembayaran",
-            html: html,
-            showCancelButton: true,
-            confirmButtonText: "Unggah",
-            cancelButtonText: "Batal",
-            showLoaderOnConfirm: true,
-            preConfirm: () => {
-                return new Promise((resolve, reject) => {
-                    var fileInput = document.getElementById("swal2-file");
-                    var file = fileInput.files[0];
-                    if (!file) {
-                        reject("Anda harus memilih file gambar.");
-                    } else {
-                        resolve(file);
-                    }
-                });
-            },
-            allowOutsideClick: () => !Swal.isLoading(),
-        }).then((result) => {
-            if (result.isConfirmed) {
-                var file = result.value;
-                var formData = new FormData();
-                formData.append("id_cart", id_cart);
-                formData.append("img", file);
-
-                $.ajax({
-                    url: appUrl + "/api/upload-payment",
-                    type: "POST",
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    success: function(response) {
-                        Swal.fire({
-                            title: "Upload Berhasil",
-                            text: "Pembayaran telah diunggah.",
-                            icon: "success",
-                        }).then(function() {
-                            location.reload();
-                        });
-                    },
-                    error: function(xhr, status, error) {
-                        Swal.fire({
-                            title: "Upload Gagal",
-                            text: "Terjadi kesalahan saat mengunggah pembayaran.",
-                            icon: "error",
-                        });
-                    },
-                });
-            }
-        });
-    });
-
-    $(document).on("change", "#swal2-file", function() {
-        previewImage(this);
-    });
-
-    function previewImage(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-
-            reader.onload = function(e) {
-                $("#swal2-image-preview").attr("src", e.target.result).show();
-            };
-
-            reader.readAsDataURL(input.files[0]);
-        }
     }
 </script>

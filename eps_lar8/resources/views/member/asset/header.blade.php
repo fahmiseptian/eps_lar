@@ -13,5 +13,7 @@
     <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
+<!-- <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-BifLmcHRgJ2C-ich"></script> -->
 
+<script type="text/javascript" src="{{ env('MIDTRANS_SNAP_PAYMENT_URL') }}/snap/snap.js" data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
 <script src="https://cdn.tiny.cloud/1/f8waatczv445eylx4uaey67x4mj5uh7l669o6t6paor20czb/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>

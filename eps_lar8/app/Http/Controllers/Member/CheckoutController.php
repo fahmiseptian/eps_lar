@@ -104,7 +104,12 @@ class CheckoutController extends Controller
         $order = $this->data['complate_cart']->getOrder($id_cart);
         $date = now();
 
-        DB::table('complete_cart')->where('id',$id_cart)->update(['status'=>'complete_payment']);
+        DB::table('complete_cart')
+        ->where('id',$id_cart)
+        ->update([
+            'status'=>'complete_payment',
+            'tanggal_bayar' => now()
+        ]);
 
         $payment = UploadPayment::create([
             'invoice' => $order->invoice,

@@ -239,4 +239,127 @@ class Invoice extends Model implements HasMedia
 
         return $transactions;
     }
+
+    public function getCompleteOrder($id_cart, $id_shop = null)
+    {
+        $query = DB::table('complete_cart as cc')
+            ->select('cc.*', 'm.nama', 'm.email', 'm.no_hp', 'm.username', 'ma.address as shipping_address', 'ap.payload')
+            ->leftJoin('api_log_report as ap', 'ap.id_cart', '=', 'cc.id')
+            ->leftJoin('member as m', 'm.id', '=', 'cc.id_user')
+            ->leftJoin('member_address as ma', 'ma.member_address_id', '=', 'cc.id_address_user')
+            ->where('cc.id', $id_cart)
+            ->get();
+
+        $cart = [];
+
+        foreach ($query as $data) {
+            $cart[$data->id] = $data;
+            $cart[$data->id]->shop = $this->getOrderShop($data->id, $data->id_address_user, $id_shop);
+        }
+
+        return $cart;
+    }
+
+    public function getOrderShop($id_cart, $id_address_user, $id_shop)
+    {
+        $query = DB::table('complete_cart_shop as cs')
+            ->select(
+                'cs.*',
+                's.name',
+                's.nik_pemilik',
+                's.npwp as shop_npwp',
+                's.id as shop_id',
+                's.type as shop_type',
+                'c.code as coupon_code',
+                'total_weight',
+                'sp.deskripsi',
+                'sp.service',
+                'sp.etd',
+                'sp.price as price_ship',
+                'courier.url_track',
+                'm.email as shop_email',
+                'sc.is_email_order',
+                'ma.province_id',
+                'ma.city_id',
+                DB::raw('(select province_name from province where province_id = ma.province_id) as province_name'),
+                DB::raw('(select city_name from city where city_id = ma.city_id) as city_name')
+            )
+            ->leftJoin('shop as s', 's.id', '=', 'cs.id_shop')
+            ->leftJoin('member as m', 'm.id', '=', 's.id_user')
+            ->leftJoin('member_address as ma', 'ma.member_id', '=', 's.id_user')
+            ->leftJoin('shop_config as sc', 'sc.id_shop', '=', 's.id')
+            ->leftJoin('coupon as c', 'c.id', '=', 'cs.id_coupon')
+            ->leftJoin('shipping as sp', 'sp.id', '=', 'cs.id_shipping')
+            ->leftJoin('courier', 'courier.id', '=', 'sp.id_courier')
+            ->where('ma.is_shop_address', 'yes')
+            ->where('ma.active_status', 'active')
+            ->where('cs.id_cart', $id_cart)
+            ->get();
+
+        $dataShop = [];
+
+        foreach ($query as $data) {
+            $dataShop[$data->id] = $data;
+            $dataShop[$data->id]->address = $this->getAddress($id_address_user);
+            if ($id_shop == null) {
+                $dataShop[$data->id]->detail = $this->getOrderShopDetail($id_cart, $data->id_shop);
+            } else {
+                $dataShop[$data->id]->detail = $this->getOrderShopDetail($id_cart, $id_shop);
+            }
+        }
+
+        return $dataShop;
+    }
+
+    public function getAddress($id_address)
+    {
+        $result = DB::table('member_address as ma')
+            ->select('address', 'member_address_id', 'postal_code', 'address_name', 'phone', 'province_name', 'city_name', 'subdistrict_name', 'ma.province_id', 'ma.city_id', 'ma.subdistrict_id', 'is_default_shipping', 'is_shop_address')
+            ->leftJoin('province as p', 'p.province_id', '=', 'ma.province_id')
+            ->leftJoin('city as c', 'c.city_id', '=', 'ma.city_id')
+            ->leftJoin('subdistrict as s', 's.subdistrict_id', '=', 'ma.subdistrict_id')
+            ->where('ma.active_status', 'active')
+            ->where('ma.member_address_id', $id_address)
+            ->get();
+
+        return $result;
+    }
+
+    public function getOrderShopDetail($id_cart, $id_shop)
+    {
+        $data_detail = DB::table('complete_cart_shop_detail as csd')
+            ->select(
+                'csd.*',
+                'csd.id as id_temp',
+                'csd.price as base_price',
+                'p.*',
+                DB::raw('(SELECT image50 FROM product_image WHERE id_product = csd.id_product AND is_default = "yes") as image50'),
+                DB::raw('(SELECT image800 FROM product_image WHERE id_product = csd.id_product AND is_default = "yes") as image800')
+            )
+            ->leftJoin('products as p', 'p.id', '=', 'csd.id_product')
+            ->where('id_cart', $id_cart)
+            ->where('csd.id_shop', $id_shop)
+            ->get();
+
+        return $data_detail;
+    }
+
+    public function getPopularSearch()
+    {
+        $query = DB::table('log_search as ls')
+            ->select(
+                'ls.*',
+                'p.id',
+                'p.id_shop',
+                'p.seoname',
+                DB::raw('(SELECT image800 FROM product_image WHERE id_product = p.id AND is_default = "yes" LIMIT 1) as default_image')
+            )
+            ->leftJoin('product as p', 'p.id', '=', 'ls.first_product')
+            ->where('first_product', '>', '0')
+            ->orderBy('search_count', 'desc')
+            ->limit(5)
+            ->get();
+
+        return $query;
+    }
 }

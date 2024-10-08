@@ -1275,7 +1275,7 @@ $(document).on("click", ".cart-btn", function () {
     var id_user = $(this).data("id_user");
     var qty = quantity;
 
-    if (tipe_user != '') {
+    if (tipe_user != "") {
         if (tipe_user !== 3) {
             Swal.fire({
                 title: "Perhatian",
@@ -1342,7 +1342,7 @@ $(document).on("click", ".buy-btn", function () {
     var id_user = $(this).data("id_user");
     console.log(id_user);
     var qty = quantity;
-    if (tipe_user != '') {
+    if (tipe_user != "") {
         if (tipe_user !== 3) {
             Swal.fire({
                 title: "Perhatian",
@@ -1654,6 +1654,14 @@ $(document).on("click", "#request-checkout", function () {
                             if (pm == 30) {
                                 generatebca(id_cart);
                                 return;
+                            } else {
+                                Swal.fire({
+                                    title: "Pesanan Berhasil Diproses",
+                                    text: "Silahkan lihat pesanan anda di transaksi.",
+                                    icon: "success",
+                                }).then(function () {
+                                    window.location.href = appUrl + "/cart"; // redirect to cart page
+                                });
                             }
                         },
                         error: function (xhr, status, error) {
@@ -1678,7 +1686,7 @@ function generatebca(id_cart) {
     var formData = new FormData();
     formData.append("id_cart", id_cart);
     $.ajax({
-        url: appUrl + "/bca/payment",
+        url: appUrl + "/api/bca/payment",
         type: "POST",
         data: formData,
         contentType: false,
@@ -1688,6 +1696,8 @@ function generatebca(id_cart) {
                 title: "Pesanan Berhasil Diproses",
                 text: "Silahkan lihat pesanan anda di transaksi.",
                 icon: "success",
+            }).then(function () {
+                window.location.href = appUrl + "/cart"; // redirect to cart page
             });
         },
         error: function (xhr, status, error) {
@@ -2595,7 +2605,7 @@ $("#TOP-opsi").on("change", function () {
         url: appUrl + "/api/update-top/" + top,
         type: "get",
         success: function (response) {
-            location.reload();
+            // location.reload();
         },
         error: function (error) {
             console.error(error);

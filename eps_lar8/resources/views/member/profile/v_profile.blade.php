@@ -691,6 +691,257 @@
                 }
             });
         }
+
+        $(document).on("click", "#bayar-midtrans", function() {
+            var id_cart = $(this).data("id_cart");
+            var id_member = $(this).data("id_member");
+            var cond = 'payment';
+
+            Swal.fire({
+                title: "Pembayran Kartu Kredit digital",
+                text: "Apakah Anda yakin ingin melakukan pembayran transaksi ini?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Ya, Bayar",
+                cancelButtonText: "Tidak"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: appUrl + "/api/midtrans/request-payment",
+                        type: "POST",
+                        data: {
+                            id_cart: id_cart,
+                            id_member: id_member,
+                            cond: cond
+                        },
+                        success: function(response) {
+                            if (response && response.token) {
+                                var token = response.token;
+                                console.log("Token yang diambil:", token);
+                                snap.pay(token, {
+                                    onSuccess: function(result) {
+                                        console.log("Payment Success:", result);
+                                        getnewtoken(id_member, id_cart, cond);
+                                    },
+                                    // Optional
+                                    onPending: function(result) {
+                                        console.log("Payment Pending:", result);
+                                        getnewtoken(id_member, id_cart, cond);
+                                    },
+                                });
+                            } else {
+                                console.log("Token tidak ditemukan dalam respons");
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.log("Error approving transaction: " + error);
+                        }
+                    });
+                }
+            });
+        });
+
+        function getnewtoken(id_user, id_cart, cond) {
+            console.log('masuk');
+            $.ajax({
+                url: appUrl + "/api/midtrans/status",
+                type: "get",
+                data: {
+                    id_user: id_user,
+                    id_cart: id_cart,
+                    cond: cond,
+                },
+                dataType: "JSON",
+                success: function(response) {
+                    kembaliKemenuTransaksi();
+                },
+                error: function(xhr, status, error) {
+                    console.log("Error approving transaction: " + error);
+                }
+            });
+        }
+
+        $(document).on("click", "#upload-payment-va", function() {
+            var id_cart = $(this).data("id_cart");
+            var total = $(this).data("total");
+            var va_number = $(this).data("va_number");
+            var id_payment = $(this).data("id_payment");
+
+            if (id_payment == 30) {
+                var html = `
+                <p>
+                    Nama Bank Tujuan    : PT. Elite Proxy Sistem <br>
+                    Bank Tujuan         : Bank BCA Virtual Acount <br>
+                    No Virtual Acount   : <b> ${va_number} </b> <br>
+                    Total Pembayaran    : <b> ${formatRupiah(total)} </b>
+                </p>
+                <img id="swal2-image-preview" src="${ bukti_transfer ? bukti_transfer : '#' }" alt="Bukti Transfer" style="max-width: 200px; max-height: 200px; display: ${ bukti_transfer ? '' : 'none' };">
+                <input type="file" id="swal2-file" name="img" accept="image/*" style="display: block; margin-top: 10px;">
+            `;
+
+                Swal.fire({
+                    title: "Pembayaran Virtual Account ",
+                    html: html,
+                    showCancelButton: true,
+                    confirmButtonText: "Unggah",
+                    cancelButtonText: "Batal",
+                    showLoaderOnConfirm: true,
+                    preConfirm: () => {
+                        return new Promise((resolve, reject) => {
+                            var fileInput = document.getElementById("swal2-file");
+                            var file = fileInput.files[0];
+                            if (!file) {
+                                reject("Anda harus memilih file gambar.");
+                            } else {
+                                resolve(file);
+                            }
+                        });
+                    },
+                    allowOutsideClick: () => !Swal.isLoading(),
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var file = result.value;
+                        var formData = new FormData();
+                        formData.append("id_cart", id_cart);
+                        formData.append("img", file);
+
+                        $.ajax({
+                            url: appUrl + "/api/upload-payment",
+                            type: "POST",
+                            data: formData,
+                            contentType: false,
+                            processData: false,
+                            success: function(response) {
+                                Swal.fire({
+                                    title: "Upload Berhasil",
+                                    text: "Pembayaran telah diunggah.",
+                                    icon: "success",
+                                }).then(function() {
+                                    kembaliKemenuTransaksi();
+                                });
+                            },
+                            error: function(xhr, status, error) {
+                                Swal.fire({
+                                    title: "Upload Gagal",
+                                    text: "Terjadi kesalahan saat mengunggah pembayaran.",
+                                    icon: "error",
+                                });
+                            },
+                        });
+                    }
+                });
+            } else if (id_payment == 31) {
+                console.log("BNI VA");
+            }
+        });
+
+        $(document).on("click", "#upload-payment", function() {
+            var id_cart = $(this).data("id_cart");
+            var total = $(this).data("total");
+
+            var html = `
+        <p>
+            Nama Bank Tujuan    : PT. Elite Proxy Sistem <br>
+            Bank Tujuan         : Bank BNI <br>
+            No Rek Tujuan       : <b> 03975-60583 </b> <br>
+            Total Pembayaran    : <b> ${formatRupiah(total)} </b>
+        </p>
+        <img id="swal2-image-preview" src="${ bukti_transfer ? bukti_transfer : '#' }" alt="Bukti Transfer" style="max-width: 200px; max-height: 200px; display: ${ bukti_transfer ? '' : 'none' };">
+        <input type="file" id="swal2-file" name="img" accept="image/*" style="display: block; margin-top: 10px;">
+    `;
+
+            Swal.fire({
+                title: "Upload Pembayaran",
+                html: html,
+                showCancelButton: true,
+                confirmButtonText: "Unggah",
+                cancelButtonText: "Batal",
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                    return new Promise((resolve, reject) => {
+                        var fileInput = document.getElementById("swal2-file");
+                        var file = fileInput.files[0];
+                        if (!file) {
+                            reject("Anda harus memilih file gambar.");
+                        } else {
+                            resolve(file);
+                        }
+                    });
+                },
+                allowOutsideClick: () => !Swal.isLoading(),
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var file = result.value;
+                    var formData = new FormData();
+                    formData.append("id_cart", id_cart);
+                    formData.append("img", file);
+
+                    $.ajax({
+                        url: appUrl + "/api/upload-payment",
+                        type: "POST",
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function(response) {
+                            Swal.fire({
+                                title: "Upload Berhasil",
+                                text: "Pembayaran telah diunggah.",
+                                icon: "success",
+                            }).then(function() {
+                                kembaliKemenuTransaksi();
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                title: "Upload Gagal",
+                                text: "Terjadi kesalahan saat mengunggah pembayaran.",
+                                icon: "error",
+                            });
+                        },
+                    });
+                }
+            });
+        });
+
+        $(document).on("change", "#swal2-file", function() {
+            previewImage(this);
+        });
+
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function(e) {
+                    $("#swal2-image-preview").attr("src", e.target.result).show();
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function kembaliKemenuTransaksi() {
+            const contentArea = document.getElementById('contentArea');
+            const url = appUrl + '/profile/transaksi';
+
+            // Menampilkan pesan loading
+            contentArea.innerHTML = `<h5>Memuat konten untuk Transaksi...</h5>`;
+
+            // Melakukan request AJAX
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    contentArea.innerHTML = data;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    contentArea.innerHTML = `<h5>Terjadi kesalahan saat memuat konten untuk Transaksi. Silakan coba lagi.</h5>`;
+                });
+        }
     </script>
 </body>
 

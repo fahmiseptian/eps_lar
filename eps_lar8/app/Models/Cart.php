@@ -63,7 +63,8 @@ class Cart extends Model
         'id_nego',
     ];
 
-    public function getIdCartbyidmember($id_user) {
+    public function getIdCartbyidmember($id_user)
+    {
         $data = self::select('id')
             ->where('complete_checkout', 'N')
             ->where('id_user', $id_user)
@@ -84,68 +85,70 @@ class Cart extends Model
                 'id_voucher' => 0,
                 'sum_price' => 0,
                 'sum_price_non_ppn' => 0,
-                'sum_shipping_non_ppn'=>0,
-                'sum_shipping'=>0,
-                'sum_discount'=>0,
-                'coin_usage'=>0,
-                'qty'=>0,
-                'coin_reward'=>0,
-                'discount'=>0,
-                'handling_cost'=>0,
-                'total'=>0,
-                'total_non_ppn'=>0,
-                'total_ppn'=>0,
-                'total_pph'=>0,
-                'val_ppn'=>0,
-                'val_pph'=>0,
+                'sum_shipping_non_ppn' => 0,
+                'sum_shipping' => 0,
+                'sum_discount' => 0,
+                'coin_usage' => 0,
+                'qty' => 0,
+                'coin_reward' => 0,
+                'discount' => 0,
+                'handling_cost' => 0,
+                'total' => 0,
+                'total_non_ppn' => 0,
+                'total_ppn' => 0,
+                'total_pph' => 0,
+                'val_ppn' => 0,
+                'val_pph' => 0,
             ]);
 
             return $cart->id;
         }
     }
 
-    function getCart($id_user){
+    function getCart($id_user)
+    {
         $query = self::select('*')
-        ->where('complete_checkout', 'N')
-        ->where('id_user', $id_user)
-        ->first();
+            ->where('complete_checkout', 'N')
+            ->where('id_user', $id_user)
+            ->first();
 
-        if ($query->id_address_user == 0 ) {
+        if ($query->id_address_user == 0) {
             $id_address = DB::table('member_address')
-            ->where('member_id', $id_user)
-            ->where('is_default_shipping', 'yes')
-            ->value('member_address_id');
+                ->where('member_id', $id_user)
+                ->where('is_default_shipping', 'yes')
+                ->value('member_address_id');
 
             $update = Cart::where('id', $query->id)->update(['id_address_user' => $id_address]);
         }
         return $query;
-
     }
 
-    function getaddressCart($id_address_user){
+    function getaddressCart($id_address_user)
+    {
         $data = DB::table('member_address as ma')
-        ->select(
-            'ma.member_address_id',
-            'ma.phone',
-            'ma.address_name',
-            'ma.address',
-            'ma.postal_code',
-            'ma.province_id',
-            'ma.city_id',
-            'ma.subdistrict_id',
-            'p.province_name',
-            's.subdistrict_name',
-            'c.city_name as city',
-        )
-        ->where('ma.member_address_id',$id_address_user)
-        ->join('province as p', 'p.province_id','ma.province_id')
-        ->join('city as c', 'ma.city_id','c.city_id')
-        ->join('subdistrict as s', 's.subdistrict_id','ma.subdistrict_id')
-        ->first();
+            ->select(
+                'ma.member_address_id',
+                'ma.phone',
+                'ma.address_name',
+                'ma.address',
+                'ma.postal_code',
+                'ma.province_id',
+                'ma.city_id',
+                'ma.subdistrict_id',
+                'p.province_name',
+                's.subdistrict_name',
+                'c.city_name as city',
+            )
+            ->where('ma.member_address_id', $id_address_user)
+            ->join('province as p', 'p.province_id', 'ma.province_id')
+            ->join('city as c', 'ma.city_id', 'c.city_id')
+            ->join('subdistrict as s', 's.subdistrict_id', 'ma.subdistrict_id')
+            ->first();
         return $data;
     }
 
-    function getCartDetails($id_cart, $id_shop) {
+    function getCartDetails($id_cart, $id_shop)
+    {
         $query = DB::table('cart as c')
             ->select(
                 'cs.id_shop',
@@ -171,7 +174,8 @@ class Cart extends Model
         return $query;
     }
 
-    function getRates($id_cart, $id_shop) {
+    function getRates($id_cart, $id_shop)
+    {
         $data = DB::table('shop_courier as sc')
             ->select([
                 'c.id as courier_id',
@@ -235,7 +239,8 @@ class Cart extends Model
         return $ship_result;
     }
 
-    function insertHandlingCost($id_user, $ppn = null) {
+    function insertHandlingCost($id_user, $ppn = null)
+    {
         $calculation = new Calculation();
         $cart = Cart::where('id_user', $id_user)->first();
         $id_cart = $cart->id;
@@ -328,23 +333,24 @@ class Cart extends Model
                     ->update($data);
             }
         }
-        $data_cart 	 = array(
-			'id_payment' => $id_payment,
-			'total_ppn' => $ppn_total_final,
-			'total' => $total_pembayaran_final,
-			'handling_cost_fee_nominal' => $fee_nominal,
-			'handling_cost_fee_percent' => $fee_percent,
+        $data_cart      = array(
+            'id_payment' => $id_payment,
+            'total_ppn' => $ppn_total_final,
+            'total' => $total_pembayaran_final,
+            'handling_cost_fee_nominal' => $fee_nominal,
+            'handling_cost_fee_percent' => $fee_percent,
 
-			'handling_cost' => $total_handling_cost,
-			'handling_cost_non_ppn' => $total_handling_cost_non_ppn,
-			'handling_cost_fee_nominal_cut' => $total_price_gateway_fee_cut,
-		);
+            'handling_cost' => $total_handling_cost,
+            'handling_cost_non_ppn' => $total_handling_cost_non_ppn,
+            'handling_cost_fee_nominal_cut' => $total_price_gateway_fee_cut,
+        );
         $updatecart = CartShopTemporary::_updateCart($id_cart, $data_cart);
         $this->update_cart_temp($id_cart);
         return $data_cart;
     }
 
-    public function cekShipping($id_courier, $id_city_origin, $id_subdistrict_dest, $limit = null, $id_shop = null) {
+    public function cekShipping($id_courier, $id_city_origin, $id_subdistrict_dest, $limit = null, $id_shop = null)
+    {
         $query = DB::table('shipping')
             ->select('*')
             ->where('id_courier', $id_courier)
@@ -361,7 +367,8 @@ class Cart extends Model
         return $ship;
     }
 
-    public function getShipping($id_courier, $zip_origin, $zip_destination, $id_shop) {
+    public function getShipping($id_courier, $zip_origin, $zip_destination, $id_shop)
+    {
         $ship = DB::table('shipping')
             ->select('shipping.*', 'courier.code')
             ->leftJoin('courier', 'courier.id', '=', 'shipping.id_courier')
@@ -373,13 +380,15 @@ class Cart extends Model
         return $ship;
     }
 
-    public function insertRates($data_rates) {
+    public function insertRates($data_rates)
+    {
         DB::table('shipping')->insert($data_rates);
     }
 
 
     // RPX
-    public function rpx_get_rates($zip_origin, $zip_destination, $weight, $courier, $courier_id, $id_city_origin, $id_subdistrict_dest, $service) {
+    public function rpx_get_rates($zip_origin, $zip_destination, $weight, $courier, $courier_id, $id_city_origin, $id_subdistrict_dest, $service)
+    {
         $service_array = explode(",", $service);
         $response = $this->_rpx_get_rates($zip_origin, $zip_destination, $weight);
 
@@ -405,7 +414,8 @@ class Cart extends Model
         }
     }
 
-    public function _rpx_get_rates($zip_origin, $zip_destination, $weight) {
+    public function _rpx_get_rates($zip_origin, $zip_destination, $weight)
+    {
         $wsdl = "http://api.rpxholding.com/wsdl/rpxwsdl.php?wsdl";
         $client = new nusoap_client($wsdl, true);
 
@@ -439,7 +449,8 @@ class Cart extends Model
     }
 
 
-    public function insert_rpx_log_req($post_array, $result) {
+    public function insert_rpx_log_req($post_array, $result)
+    {
         DB::table('rpx_log')->insert([
             'payload' => json_encode($post_array),
             'response' => $result,
@@ -450,35 +461,38 @@ class Cart extends Model
 
 
     // JNE
-    public function jne_get_rates($zip_origin, $zip_destination, $weight, $courier, $courier_id, $id_city_origin, $id_subdistrict_dest, $sap_origin, $sap_destination, $service, $jne_destination, $jne_origin) {
+    public function jne_get_rates($zip_origin, $zip_destination, $weight, $courier, $courier_id, $id_city_origin, $id_subdistrict_dest, $sap_origin, $sap_destination, $service, $jne_destination, $jne_origin)
+    {
         $service_array = explode(",", $service);
         $response = $this->_jne_get_rates($jne_origin, $jne_destination, $weight);
-        Log::info('Raw API Response:', $response);
-        if (array_key_exists('price', $response)) {
-            foreach ($response['price'] as $price) {
-                if (!empty($price['price']) && in_array($price['service_display'], $service_array)) {
-                    // Konversi harga menjadi dalam satuan yang benar
-                    $convertedPrice = $price['price'];
-
-                    $data_rates = [
-                        'id_courier'            => $courier_id,
-                        'id_city_origin'        => $id_city_origin,
-                        'id_subdistrict_dest'   => $id_subdistrict_dest,
-                        'price'                 => $convertedPrice,  // Menggunakan harga yang sudah dikonversi
-                        'etd'                   => $price['etd_from'] . "-" . $price['etd_thru'],
-                        'deskripsi'             => 'JNE ' . ucwords(strtolower($price['service_display'])),
-                        'service'               => $price['service_code'],
-                        'zip_destination'       => $zip_destination,
-                        'zip_origin'            => $zip_origin,
-                    ];
-                    $insert = $this->insertRates($data_rates);
+        // Log::info('Raw API Response:', $response);
+        if ($response != null) {
+            if (array_key_exists('price', $response)) {
+                foreach ($response['price'] as $price) {
+                    if (!empty($price['price']) && in_array($price['service_display'], $service_array)) {
+                        // Konversi harga menjadi dalam satuan yang benar
+                        $convertedPrice = $price['price'];
+    
+                        $data_rates = [
+                            'id_courier'            => $courier_id,
+                            'id_city_origin'        => $id_city_origin,
+                            'id_subdistrict_dest'   => $id_subdistrict_dest,
+                            'price'                 => $convertedPrice,  // Menggunakan harga yang sudah dikonversi
+                            'etd'                   => $price['etd_from'] . "-" . $price['etd_thru'],
+                            'deskripsi'             => 'JNE ' . ucwords(strtolower($price['service_display'])),
+                            'service'               => $price['service_code'],
+                            'zip_destination'       => $zip_destination,
+                            'zip_origin'            => $zip_origin,
+                        ];
+                        $insert = $this->insertRates($data_rates);
+                    }
                 }
             }
         }
-
     }
 
-    public function _jne_get_rates($jne_origin, $jne_destination, $weight) {
+    public function _jne_get_rates($jne_origin, $jne_destination, $weight)
+    {
         $post_array = [
             'username' => 'TESTAPI',
             'api_key' => '25c898a9faea1a100859ecd9ef674548',
@@ -504,7 +518,8 @@ class Cart extends Model
         return $result;
     }
 
-    public function insert_jne_log_req($post_array, $result) {
+    public function insert_jne_log_req($post_array, $result)
+    {
         JneLog::create([
             'payload' => json_encode($post_array),
             'response' => json_encode($result),
@@ -514,23 +529,24 @@ class Cart extends Model
 
 
     // SAP
-    public function sap_get_rates($zip_origin, $zip_destination, $weight, $courier, $courier_id, $id_city_origin, $id_subdistrict_dest, $sap_origin, $sap_destination, $service) {
+    public function sap_get_rates($zip_origin, $zip_destination, $weight, $courier, $courier_id, $id_city_origin, $id_subdistrict_dest, $sap_origin, $sap_destination, $service)
+    {
         $service_array = explode(",", $service);
-        $response = $this->_sap_get_rates($sap_origin, $sap_destination,$weight);
+        $response = $this->_sap_get_rates($sap_origin, $sap_destination, $weight);
         if ($response) {
             foreach ($response['price_detail'] as $costs) {
                 if ($costs['minimum_kilo'] == '1') {
                     if (in_array($costs['service_type_code'], $service_array)) {
                         $data_rates = array(
-                            'id_courier' 			=> $courier_id,
-                            'id_city_origin' 		=> $id_city_origin,
-                            'id_subdistrict_dest' 	=> $id_subdistrict_dest,
-                            'price' 				=> $costs['price'],
-                            'etd' 					=> round($costs['sla']),
-                            'deskripsi' 			=> 'SAP ' . ucwords(strtolower($costs['service_type_name'])),
-                            'service' 				=> $costs['service_type_code'],
-                            'zip_destination'		=> $zip_destination,
-                            'zip_origin'			=> $zip_origin,
+                            'id_courier'             => $courier_id,
+                            'id_city_origin'         => $id_city_origin,
+                            'id_subdistrict_dest'     => $id_subdistrict_dest,
+                            'price'                 => $costs['price'],
+                            'etd'                     => round($costs['sla']),
+                            'deskripsi'             => 'SAP ' . ucwords(strtolower($costs['service_type_name'])),
+                            'service'                 => $costs['service_type_code'],
+                            'zip_destination'        => $zip_destination,
+                            'zip_origin'            => $zip_origin,
                         );
                         $insert = $this->insertRates($data_rates);
                     }
@@ -620,7 +636,8 @@ class Cart extends Model
         return $free_shipping;
     }
 
-    public function _getFreeShippingProvince($id_shop) {
+    public function _getFreeShippingProvince($id_shop)
+    {
         $query = DB::table('shipping')
             ->select('shipping.*', 'courier.code')
             ->leftJoin('courier', 'courier.id', '=', 'shipping.id_courier');
@@ -636,44 +653,46 @@ class Cart extends Model
         return $ship;
     }
 
-    public function getDataDistrictById($id_subdistrict) {
+    public function getDataDistrictById($id_subdistrict)
+    {
         $query = DB::table('subdistrict')
-        ->select('*')
-        ->where('subdistrict_id', $id_subdistrict);
+            ->select('*')
+            ->where('subdistrict_id', $id_subdistrict);
 
         return $query->first();
-	}
+    }
 
-    function update_cart_temp($id_cart) {
-		// NOTE do update cart shop by id_cart
-		$datasave_cart_shop = [];
+    function update_cart_temp($id_cart)
+    {
+        // NOTE do update cart shop by id_cart
+        $datasave_cart_shop = [];
 
-		$cf 	= Lpse_config::first();
-		$ppn 	= $cf->ppn / 100;
-		$pph 	= $cf->pph / 100;
+        $cf     = Lpse_config::first();
+        $ppn     = $cf->ppn / 100;
+        $pph     = $cf->pph / 100;
 
         $get = DB::table('cart_shop_temporary')
-        ->select(
-            'id_shop',
-            DB::raw('SUM(total) as sum_price'),
-            DB::raw('SUM(IF(nominal_ppn=0, 0, total_non_ppn)) as sum_price_ppn'),
-            DB::raw('SUM(total_non_ppn) as sum_price_non_ppn'),
-            DB::raw('SUM(nominal_ppn) as sum_ppn'),
-            DB::raw('SUM(nominal_pph) as sum_pph'),
-            DB::raw('SUM(qty) as sum_qty'),
-            DB::raw('SUM(total_weight) as total_weight')
-        )
-        ->where('id_cart', $id_cart)
-        ->where('is_selected', 'Y')
-        ->groupBy('id_shop')
-        ->get();
+            ->select(
+                'id_shop',
+                DB::raw('SUM(total) as sum_price'),
+                DB::raw('SUM(IF(nominal_ppn=0, 0, total_non_ppn)) as sum_price_ppn'),
+                DB::raw('SUM(total_non_ppn) as sum_price_non_ppn'),
+                DB::raw('SUM(nominal_ppn) as sum_ppn'),
+                DB::raw('SUM(nominal_pph) as sum_pph'),
+                DB::raw('SUM(qty) as sum_qty'),
+                DB::raw('SUM(total_weight) as total_weight')
+            )
+            ->where('id_cart', $id_cart)
+            ->where('is_selected', 'Y')
+            ->groupBy('id_shop')
+            ->get();
 
         if ($get) {
-			$data = $get->toArray();
+            $data = $get->toArray();
 
-			if (!empty($data)) {
-				foreach ($data as $key => $val) {
-					$id_shop = $val->id_shop;
+            if (!empty($data)) {
+                foreach ($data as $key => $val) {
+                    $id_shop = $val->id_shop;
 
                     // Data Shop
                     $query = DB::table('cart_shop')
@@ -686,65 +705,65 @@ class Cart extends Model
                     $shop  = $query;
 
 
-					$total_weight = $val->total_weight;
+                    $total_weight = $val->total_weight;
 
-					$sum_price = $val->sum_price ?? 0;
-					$sum_price_ppn = $val->sum_price_ppn ?? 0;
-					$sum_price_non_ppn = $val->sum_price_non_ppn ?? 0;
+                    $sum_price = $val->sum_price ?? 0;
+                    $sum_price_ppn = $val->sum_price_ppn ?? 0;
+                    $sum_price_non_ppn = $val->sum_price_non_ppn ?? 0;
 
 
-					$sum_ppn = round($val->sum_ppn);
-					$sum_pph = round($val->sum_pph);
+                    $sum_ppn = round($val->sum_ppn);
+                    $sum_pph = round($val->sum_pph);
 
-					$handling_cost_exlude_ppn = $shop->handling_cost_non_ppn ?? 0;
+                    $handling_cost_exlude_ppn = $shop->handling_cost_non_ppn ?? 0;
 
-					if ($handling_cost_exlude_ppn > 0) {
-						$sum_ppn = round(($sum_price_ppn + $handling_cost_exlude_ppn) * $ppn);
-						$sum_pph = round(($sum_price_non_ppn + $handling_cost_exlude_ppn) * $pph);
-					} else {
-						$sum_ppn = round(($sum_price_ppn) * $ppn);
-						$sum_pph = round(($sum_price_non_ppn) * $pph);
-					}
+                    if ($handling_cost_exlude_ppn > 0) {
+                        $sum_ppn = round(($sum_price_ppn + $handling_cost_exlude_ppn) * $ppn);
+                        $sum_pph = round(($sum_price_non_ppn + $handling_cost_exlude_ppn) * $pph);
+                    } else {
+                        $sum_ppn = round(($sum_price_ppn) * $ppn);
+                        $sum_pph = round(($sum_price_non_ppn) * $pph);
+                    }
 
-					// $sum_pph = round(($sum_price_non_ppn + $shop->sum_shipping + $shop->insurance_nominal + $handling_cost_exlude_ppn) * $pph);
+                    // $sum_pph = round(($sum_price_non_ppn + $shop->sum_shipping + $shop->insurance_nominal + $handling_cost_exlude_ppn) * $pph);
 
-					$sum_qty = $val->sum_qty;
+                    $sum_qty = $val->sum_qty;
 
-					if ($val->total_weight == 0) {
-						$val['total_weight'] = ($sum_qty * $this->config_default_weight);
-					}
+                    if ($val->total_weight == 0) {
+                        $val['total_weight'] = ($sum_qty * $this->config_default_weight);
+                    }
 
-					$id_coupon = $shop->id_coupon ?? 0;
-					$sum_shipping = $shop->sum_shipping ?? 0;
-					$insurance_nominal = $shop->insurance_nominal ?? 0;
+                    $id_coupon = $shop->id_coupon ?? 0;
+                    $sum_shipping = $shop->sum_shipping ?? 0;
+                    $insurance_nominal = $shop->insurance_nominal ?? 0;
 
-					$ppn_shipping = round(($sum_shipping + $insurance_nominal) * $ppn);
-					$pph_shipping = round(($sum_shipping + $insurance_nominal) * $pph);
+                    $ppn_shipping = round(($sum_shipping + $insurance_nominal) * $ppn);
+                    $pph_shipping = round(($sum_shipping + $insurance_nominal) * $pph);
 
-					$datasave_cart_shop[$id_shop] = [
-						'id_cart'   => $id_cart,
-						'id_shop'   => $id_shop,
-						'id_coupon' => $id_coupon,
-						'sum_price' => $sum_price,
-						'sum_shipping' => $sum_shipping,
-						'insurance_nominal' => $insurance_nominal,
+                    $datasave_cart_shop[$id_shop] = [
+                        'id_cart'   => $id_cart,
+                        'id_shop'   => $id_shop,
+                        'id_coupon' => $id_coupon,
+                        'sum_price' => $sum_price,
+                        'sum_shipping' => $sum_shipping,
+                        'insurance_nominal' => $insurance_nominal,
 
-						// sum price product ppn only, exclude ppn
-						'sum_price_ppn' => $sum_price_ppn,
-						// sum price product ppn & non ppn, exclude ppn
-						'sum_price_non_ppn' => $sum_price_non_ppn,
+                        // sum price product ppn only, exclude ppn
+                        'sum_price_ppn' => $sum_price_ppn,
+                        // sum price product ppn & non ppn, exclude ppn
+                        'sum_price_non_ppn' => $sum_price_non_ppn,
 
-						'ppn_shipping' => $ppn_shipping,
-						'pph_shipping' => $pph_shipping,
+                        'ppn_shipping' => $ppn_shipping,
+                        'pph_shipping' => $pph_shipping,
 
-						'ppn_price'    => $sum_ppn,
-						'pph_price'    => $sum_pph,
-						'qty'          => $sum_qty,
-						'total_weight' => $total_weight,
-					];
-				}
-			}
-		}
+                        'ppn_price'    => $sum_ppn,
+                        'pph_price'    => $sum_pph,
+                        'qty'          => $sum_qty,
+                        'total_weight' => $total_weight,
+                    ];
+                }
+            }
+        }
         if (!empty($datasave_cart_shop)) {
             foreach ($datasave_cart_shop as $key => $val) {
                 $id_shop = $val['id_shop'];
@@ -760,17 +779,18 @@ class Cart extends Model
         return $datasave_cart_shop;
     }
 
-    private function _updateShop2($id_cart, $id_shop, $data_shop) {
+    private function _updateShop2($id_cart, $id_shop, $data_shop)
+    {
         // $id_cart		= $data_shop['id_cart'];
-        $sum_price		= $data_shop['sum_price'];
-        $voucher 		= CartShopTemporary::getCartVoucherById($data_shop['id_coupon'], $sum_price);
-        $cf 			= Lpse_config::first();
-        $ppn 			= $cf->ppn / 100;
-        $pph 			= $cf->pph / 100;
+        $sum_price        = $data_shop['sum_price'];
+        $voucher         = CartShopTemporary::getCartVoucherById($data_shop['id_coupon'], $sum_price);
+        $cf             = Lpse_config::first();
+        $ppn             = $cf->ppn / 100;
+        $pph             = $cf->pph / 100;
 
         if ($voucher) {
             foreach ($voucher as $v) {
-                $type 		= $v->discount_type;
+                $type         = $v->discount_type;
                 if ($type == 'percent') {
                     $discount = ($v->discount_value / 100 * $sum_price);
                     if ($v->max_discount > 0 && $v->max_discount < $discount) {
@@ -839,7 +859,8 @@ class Cart extends Model
         }
     }
 
-    public function migrate_checkout($data) {
+    public function migrate_checkout($data)
+    {
         // Dapatkan tanggal dan waktu sekarang
         $date_now = Carbon::now()->toDateTimeString();
 
@@ -859,28 +880,30 @@ class Cart extends Model
             $migrate_cart_shop_detail = $this->migrate_cart_shop_detail($id_cart);
 
             if ($migrate_cart && $migrate_cart_shop && $migrate_cart_shop_detail) {
-				$delete = $this->delete_all_temporary($id_cart);
-				// $this->load->library('external/Lkpp', null, 'lkpp_lib');
-				// $this->lkpp_lib->trans_report($id_cart);
-				if ($delete) {
-					return true;
-				} else {
-					return false;
-				}
-			} else {
-				return false;
-			}
+                $delete = $this->delete_all_temporary($id_cart);
+                // $this->load->library('external/Lkpp', null, 'lkpp_lib');
+                // $this->lkpp_lib->trans_report($id_cart);
+                if ($delete) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
         }
     }
 
-    private function delete_all_temporary($id_cart) {
+    private function delete_all_temporary($id_cart)
+    {
         DB::table('cart')->where('id', $id_cart)->delete();
         DB::table('cart_shop')->where('id_cart', $id_cart)->delete();
         DB::table('cart_shop_temporary')->where('id_cart', $id_cart)->delete();
         return true;
     }
 
-    public function migrate_cart($id_cart, $date_now) {
+    public function migrate_cart($id_cart, $date_now)
+    {
         // Jalankan query
         $q = DB::table('cart')
             ->where('id', $id_cart)
@@ -932,16 +955,17 @@ class Cart extends Model
         $is_migrated = $this->_migrate_cart($data);
 
         if ($is_migrated) {
-			$complete_address = $this->migrate_address($q->id_address_user, $id_cart);
-			return $is_migrated;
-		} else {
-			return false;
-		}
+            $complete_address = $this->migrate_address($q->id_address_user, $id_cart);
+            return $is_migrated;
+        } else {
+            return false;
+        }
 
         return $data;
     }
 
-    private function _migrate_cart($data) {
+    private function _migrate_cart($data)
+    {
         if (in_array($data['id_payment'], [30])) {
             $no_invoice = $data['invoice'];
             $no_invoice = explode("-", $no_invoice);
@@ -955,24 +979,26 @@ class Cart extends Model
         return $insert ? true : false;
     }
 
-    public function generateVaNumber($no_invoice) {
+    public function generateVaNumber($no_invoice)
+    {
         $d_bca = DB::table('api_user')->where('user', 'BCA')->first();
         $company_code = $d_bca->company_code;
         $no_va = $company_code . $no_invoice;
         return $no_va;
     }
 
-    public function migrate_address($id_address, $id_cart) {
+    public function migrate_address($id_address, $id_cart)
+    {
         $ad = DB::table('member_address')
-                ->select('member_address_id', 'member_id', 'address_name', 'phone', 'province_id', 'city_id', 'subdistrict_id', 'address', 'postal_code')
-                ->where('member_address_id', $id_address)
-                ->first();
+            ->select('member_address_id', 'member_id', 'address_name', 'phone', 'province_id', 'city_id', 'subdistrict_id', 'address', 'postal_code')
+            ->where('member_address_id', $id_address)
+            ->first();
 
         $mad = DB::table('member_address')
-                ->select('member_address_id')
-                ->where('member_id', $ad->member_id)
-                ->where('is_default_billing', 'yes')
-                ->first();
+            ->select('member_address_id')
+            ->where('member_id', $ad->member_id)
+            ->where('is_default_billing', 'yes')
+            ->first();
 
         $id_billing_address = $mad ? $mad->member_address_id : $id_address;
 
@@ -994,77 +1020,81 @@ class Cart extends Model
         // return $data_address;
     }
 
-    private function _migrate_address($data) {
+    private function _migrate_address($data)
+    {
         DB::table('complete_cart_address')->insert($data);
         return true;
     }
 
 
-    public function migrate_cart_shop($id_cart, $date_now) {
-    $insert_cart_shop = false;
+    public function migrate_cart_shop($id_cart, $date_now)
+    {
+        $insert_cart_shop = false;
 
-    $query = DB::table('cart_shop')
-                ->select('*')
-                ->where('id_cart', $id_cart)
-                ->where('total', '>', 0)
-                ->get();
+        $query = DB::table('cart_shop')
+            ->select('*')
+            ->where('id_cart', $id_cart)
+            ->where('total', '>', 0)
+            ->get();
 
         foreach ($query as $q) {
-                $data = [
-                    'id_cart' => $id_cart,
-                    'id_shop' => $q->id_shop,
-                    'id_coupon' => $q->id_coupon,
-                    'id_address_shop' => $q->id_address_shop,
-                    'id_shipping' => $q->id_shipping,
-                    'is_insurance' => $q->is_insurance,
-                    'insurance_nominal' => $q->insurance_nominal,
-                    'base_rate' => $q->base_rate,
-                    'sum_price' => $q->sum_price,
-                    'sum_price_ppn' => $q->sum_price_ppn,
-                    'sum_price_non_ppn' => $q->sum_price_non_ppn,
-                    'ppn_price' => $q->ppn_price,
-                    'pph_price' => $q->pph_price,
-                    'sum_shipping' => $q->sum_shipping,
-                    'ppn_shipping' => $q->ppn_shipping,
-                    'pph_shipping' => $q->pph_shipping,
-                    'total_weight' => $q->total_weight,
-                    'qty' => $q->qty,
-                    'discount' => $q->discount,
-                    'subtotal' => $q->subtotal,
-                    'total' => $q->total,
-                    'note' => $q->note,
-                    'note_seller'=>$q->note_seller,
-                    'file_do'=>0,
-                    'no_resi' => $q->no_resi,
-                    'last_update' => $date_now,
-                    'pesan_seller' => $q->pesan_seller,
-                    'keperluan' => $q->keperluan,
-                    'handling_cost_fee_nominal' => $q->handling_cost_fee_nominal,
-                    'handling_cost_fee_percent' => $q->handling_cost_fee_percent,
-                    'handling_cost' => $q->handling_cost,
-                    'handling_cost_non_ppn' => $q->handling_cost_non_ppn,
-                    'handling_cost_fee_nominal_cut' => $q->handling_cost_fee_nominal_cut,
-                    'ppn_total' => $q->ppn_total,
-                    'base_price_shipping' => $q->base_price_shipping,
-                    'base_price_asuransi' => $q->base_price_asuransi,
-                ];
-                $insert_cart_shop = $this->_migrate_cart_shop($data);
-			    $complete_address = $this->migrate_address_shop($id_cart, $q->id_address_shop);
-            }
-            if ($insert_cart_shop) {
-                return true;
-            } else {
-                return false;
-            }
+            $data = [
+                'id_cart' => $id_cart,
+                'id_shop' => $q->id_shop,
+                'id_coupon' => $q->id_coupon,
+                'id_address_shop' => $q->id_address_shop,
+                'id_shipping' => $q->id_shipping,
+                'is_insurance' => $q->is_insurance,
+                'insurance_nominal' => $q->insurance_nominal,
+                'base_rate' => $q->base_rate,
+                'sum_price' => $q->sum_price,
+                'sum_price_ppn' => $q->sum_price_ppn,
+                'sum_price_non_ppn' => $q->sum_price_non_ppn,
+                'ppn_price' => $q->ppn_price,
+                'pph_price' => $q->pph_price,
+                'sum_shipping' => $q->sum_shipping,
+                'ppn_shipping' => $q->ppn_shipping,
+                'pph_shipping' => $q->pph_shipping,
+                'total_weight' => $q->total_weight,
+                'qty' => $q->qty,
+                'discount' => $q->discount,
+                'subtotal' => $q->subtotal,
+                'total' => $q->total,
+                'note' => $q->note,
+                'note_seller' => $q->note_seller,
+                'file_do' => 0,
+                'no_resi' => $q->no_resi,
+                'last_update' => $date_now,
+                'pesan_seller' => $q->pesan_seller,
+                'keperluan' => $q->keperluan,
+                'handling_cost_fee_nominal' => $q->handling_cost_fee_nominal,
+                'handling_cost_fee_percent' => $q->handling_cost_fee_percent,
+                'handling_cost' => $q->handling_cost,
+                'handling_cost_non_ppn' => $q->handling_cost_non_ppn,
+                'handling_cost_fee_nominal_cut' => $q->handling_cost_fee_nominal_cut,
+                'ppn_total' => $q->ppn_total,
+                'base_price_shipping' => $q->base_price_shipping,
+                'base_price_asuransi' => $q->base_price_asuransi,
+            ];
+            $insert_cart_shop = $this->_migrate_cart_shop($data);
+            $complete_address = $this->migrate_address_shop($id_cart, $q->id_address_shop);
+        }
+        if ($insert_cart_shop) {
+            return true;
+        } else {
+            return false;
+        }
         return $data;
     }
 
-    private function _migrate_cart_shop($data) {
+    private function _migrate_cart_shop($data)
+    {
         DB::table('complete_cart_shop')->insert($data);
         return true;
     }
 
-    public function migrate_address_shop($id_cart, $id_address_shop) {
+    public function migrate_address_shop($id_cart, $id_address_shop)
+    {
         $ad_shop = DB::table('member_address')
             ->select('member_address_id', 'member_id', 'address_name', 'phone', 'province_id', 'city_id', 'subdistrict_id', 'address', 'postal_code')
             ->where('member_address_id', $id_address_shop)
@@ -1086,7 +1116,8 @@ class Cart extends Model
         $mig_addr = $this->_migrate_address($data_address);
     }
 
-    public function migrate_cart_shop_detail($id_cart) {
+    public function migrate_cart_shop_detail($id_cart)
+    {
         $insert_cart_shop_detail = false;
 
         $query = DB::table('cart_shop_temporary')
@@ -1143,13 +1174,14 @@ class Cart extends Model
             $insert_cart_shop_detail = $this->_migrate_cart_shop_detail($data);
         }
         if ($insert_cart_shop_detail) {
-			return true;
-		} else {
-			return false;
-		}
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    private function _migrate_cart_shop_detail($data) {
+    private function _migrate_cart_shop_detail($data)
+    {
         $getLpse = Lpse_config::first();
         $getProduct = Products::getProductDetail($data['id_product']);
         $ppn = $getLpse->ppn;
@@ -1170,7 +1202,8 @@ class Cart extends Model
     }
 
 
-    public function VA_BNI() {
+    public function VA_BNI()
+    {
         $client_id = '44867';
         $secret_key = '3c1a5a5cfd36cdce1dd1bcf9ec7cc735';
         $prefix = '988';
@@ -1216,12 +1249,13 @@ class Cart extends Model
         }
     }
 
-    function update_cart_after_nego($id_shop, $id_nego){
+    function update_cart_after_nego($id_shop, $id_nego)
+    {
         $nego           = new Nego();
         $shop           = new Shop();
         $ShopCategory   = new ShopCategory();
         $Products       = new Products();
-        $ProductCategory= new ProductCategory();
+        $ProductCategory = new ProductCategory();
 
         $is_cart_exist = false;
 
@@ -1231,10 +1265,10 @@ class Cart extends Model
         $config         = Lpse_config::first();
         $ppn            = $config->ppn;
         $pph            = $config->pph;
-		$fee_mp_percent = $config->fee_mp_percent;
-		$fee_mp_nominal = $config->fee_mp_nominal;
-		$fee_pg_percent = $config->fee_pg_percent;
-		$fee_pg_nominal = $config->fee_pg_nominal;
+        $fee_mp_percent = $config->fee_mp_percent;
+        $fee_mp_nominal = $config->fee_mp_nominal;
+        $fee_pg_percent = $config->fee_pg_percent;
+        $fee_pg_nominal = $config->fee_pg_nominal;
 
         if ($data_nego) {
             // Data Nego
@@ -1268,30 +1302,30 @@ class Cart extends Model
 
             // Data Product
             $id_shop        = $getProduct->id_shop;
-			$product_nama   = $getProduct->name;
-			$product_image  = $getProduct->image;
-			$product_weight = $getProduct->weight;
-			$input_price    = $getProduct->price;
+            $product_nama   = $getProduct->name;
+            $product_image  = $getProduct->image;
+            $product_weight = $getProduct->weight;
+            $input_price    = $getProduct->price;
 
             // Persiapan Perhitungan
             $tot_fee_perc = $fee_mp_percent + $fee_pg_percent;
-			$tot_fee_nom = $fee_mp_nominal + $fee_pg_nominal;
+            $tot_fee_nom = $fee_mp_nominal + $fee_pg_nominal;
             $harga_dasar_lpse = 0;
-			$harga_dasar_lpse_satuan = 0;
+            $harga_dasar_lpse_satuan = 0;
 
-			if ($qty >= 1) {
-				$harga_dasar_lpse_satuan =($data_nego->harga_nego / $data_nego->qty);
-				$harga_dasar_lpse_exc 	= ($harga_dasar_lpse_satuan / (1 + ($ppn / 100)));
-				$harga_dasar_lpse 	= $harga_dasar_lpse_exc * $qty;
-			} else {
-				$harga_dasar_lpse_satuan = $data_nego->harga_nego;
-				$harga_dasar_lpse 	= ($data_nego->harga_nego / (1 + ($ppn / 100)));
-			}
+            if ($qty >= 1) {
+                $harga_dasar_lpse_satuan = ($data_nego->harga_nego / $data_nego->qty);
+                $harga_dasar_lpse_exc     = ($harga_dasar_lpse_satuan / (1 + ($ppn / 100)));
+                $harga_dasar_lpse     = $harga_dasar_lpse_exc * $qty;
+            } else {
+                $harga_dasar_lpse_satuan = $data_nego->harga_nego;
+                $harga_dasar_lpse     = ($data_nego->harga_nego / (1 + ($ppn / 100)));
+            }
 
-			$input_price 		= $data_nego->nominal_didapat / $qty;
-			$harga_tayang 		= $data_nego->base_price;
-			$ppn_nom        	= round($harga_dasar_lpse * ($ppn / 100));
-			$pph_nom        	= round($harga_dasar_lpse * ($pph / 100));
+            $input_price         = $data_nego->nominal_didapat / $qty;
+            $harga_tayang         = $data_nego->base_price;
+            $ppn_nom            = round($harga_dasar_lpse * ($ppn / 100));
+            $pph_nom            = round($harga_dasar_lpse * ($pph / 100));
 
             // Data
             $dataSave = [
@@ -1328,43 +1362,43 @@ class Cart extends Model
                 ->where('a.id_product', $id_product)
                 ->first();
 
-                if ($data_cart_detail) {
-					$is_cart_exist = true;
-				} else {
-					// NOTE Data tidak ada di keranjang
-					$is_cart_exist = false;
-				}
+            if ($data_cart_detail) {
+                $is_cart_exist = true;
+            } else {
+                // NOTE Data tidak ada di keranjang
+                $is_cart_exist = false;
+            }
 
-                if ($is_cart_exist) {
-                    // NOTE Data ada di keranjang
-					$id_temporary = $data_cart_detail->id;
-					$id_cart = $data_cart_detail->id_cart;
+            if ($is_cart_exist) {
+                // NOTE Data ada di keranjang
+                $id_temporary = $data_cart_detail->id;
+                $id_cart = $data_cart_detail->id_cart;
 
-                    $update_temporary = DB::table('cart_shop_temporary')
-                        ->where('id', $id_temporary)
-                        ->update(array_merge($dataSave, [
-                            'total_weight' => DB::raw('weight * qty')
-                        ]));
+                $update_temporary = DB::table('cart_shop_temporary')
+                    ->where('id', $id_temporary)
+                    ->update(array_merge($dataSave, [
+                        'total_weight' => DB::raw('weight * qty')
+                    ]));
 
-                    if ($update_temporary) {
-                        // Memanggil fungsi update_cart_temp dengan parameter $id_cart
-                        $this->update_cart_temp($id_cart);
-                        return true;
-                    }
-                }else{
-                    $id_cart = $this->getIdCartbyidmember($id_member);
-                    if ($id_cart) {
-						$dataSave['id_cart'] = $id_cart;
-						$dataSave['total_weight'] = DB::raw('weight * qty');
-                        // Menyimpan data ke tabel cart_shop_temporary
-                        $save = DB::table('cart_shop_temporary')->insert($dataSave);
-						if ($save) {
-							$savetocart = $this->update_cart_temp($id_cart);
-							return $savetocart;
-						}
-					}
+                if ($update_temporary) {
+                    // Memanggil fungsi update_cart_temp dengan parameter $id_cart
+                    $this->update_cart_temp($id_cart);
+                    return true;
                 }
-        }else{
+            } else {
+                $id_cart = $this->getIdCartbyidmember($id_member);
+                if ($id_cart) {
+                    $dataSave['id_cart'] = $id_cart;
+                    $dataSave['total_weight'] = DB::raw('weight * qty');
+                    // Menyimpan data ke tabel cart_shop_temporary
+                    $save = DB::table('cart_shop_temporary')->insert($dataSave);
+                    if ($save) {
+                        $savetocart = $this->update_cart_temp($id_cart);
+                        return $savetocart;
+                    }
+                }
+            }
+        } else {
             return  $data_nego;
         }
     }
