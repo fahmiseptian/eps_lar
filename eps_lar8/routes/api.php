@@ -20,6 +20,7 @@ use App\Http\Controllers\Seller\PromotionController;
 use App\Http\Controllers\Seller\SettingController;
 use App\Http\Controllers\Seller\ShophealthController;
 use App\Http\Controllers\Seller\ShopSettingController;
+use App\Libraries\Lpse;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -39,8 +40,12 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-// login lpse
+// lpse
 Route::post('/lpse/login',[LoginmemberController::class,'login_lpse']);
+Route::post('/lpse/report_trans/{id_cart}',[Lpse::class,'report_trans']);
+Route::post('/lpse/confirm_trans/{id_cart}',[Lpse::class,'confirm_trans']);
+
+
 
 Route::post('/bni/hit', [BniController::class, 'apiHiting']);
 Route::post('/bni/create-billing', [BniController::class, 'createBilling']);

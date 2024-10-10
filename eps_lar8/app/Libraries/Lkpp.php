@@ -61,6 +61,37 @@ class Lkpp
         return $check;
     }
 
+    function get_token($id_member)
+    {
+        $data = $this->check_token($id_member);
+        if ($data) {
+            return $data->token_lpse;
+        }
+        return false;
+    }
+
+    public function get_UserById($id_user)
+    {
+        $data_u = DB::table('member')
+            ->where('id', $id_user)
+            ->first();
+
+        return (array) $data_u;
+    }
+
+    public function save_log_lpse_payload($data, $id = '')
+    {
+        $table = $this->table_log_payload;
+
+        if (empty($id)) {
+            $save = DB::table($table)->insert($data);
+        } else {
+            $save = DB::table($table)->where('id', $id)->update($data);
+        }
+
+        return $save;
+    }
+
     public function save_token_lpse($data, $id_member = '')
     {
         $table = $this->table_token;

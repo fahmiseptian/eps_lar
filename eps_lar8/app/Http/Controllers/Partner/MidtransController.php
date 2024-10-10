@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Partner;
 
 use App\Http\Controllers\Controller;
+use App\Libraries\Lpse;
 use App\Libraries\Midtrans;
 use App\Models\Cart;
 use App\Models\Invoice;
@@ -13,8 +14,15 @@ class MidtransController extends Controller
     protected $data;
     protected $libraries;
 
-    public function __construct()
+    public function __construct(Request $request)
     {
+        $token = $request->input('token');
+        $this->data['is_lpse'] = 0;
+        if ($token != null) {
+            $lpse = new Lpse();
+            $this->data['is_lpse'] = 1;
+            $cek_token = $lpse->check_token($token);
+        }
         // Load Midtrans Library
         $this->libraries['Midtrans'] = new Midtrans();
     }
@@ -216,6 +224,10 @@ class MidtransController extends Controller
 
         $update         = $this->libraries['Midtrans']->FinalchangePaymentStatus($id_cart, $data_status);
 
+        if ( $this->data['is_lpse'] == 1) {
+            $lpse = new Lpse();
+            $cek_token = $lpse->confirm_trans($id_cart);
+        }
         return response()->json($get_stat);
     }
 

@@ -25,10 +25,11 @@ class CartController extends Controller
     {
         $token = $request->input('token');
         $this->data['token'] = $token;
+        $this->data['is_lpse'] = 0;
         if ($token != null) {
             $lpse = new Lpse();
             $cek_token = $lpse->check_token($token);
-
+            $this->data['is_lpse'] = 1;
             $this->user_id = $cek_token->id_member;
         } else {
             // Ambil semua data sesi
@@ -363,9 +364,16 @@ class CartController extends Controller
             $migrate_checkout = $complete_cart->migrate_cart_checkout_cond($id_user, $id_cart);
         }
         if ($migrate_checkout) {
-            return response()->json(['status' => 'success', 'id_cart' => $id_cart]);
+            if ($this->data['is_lpse'] == 1) {
+                $lpse = new Lpse();
+                $report = $lpse->report_trans($id_cart);
+                if ($report) {
+                    return response()->json(['status' => 'success', 'code' => 200 , 'massage' => 'Berhasil Melaporkan Transaksi']);
+                }
+            }
+            return response()->json(['status' => 'success', 'code' => 200]);
         } else {
-            return response()->json(['status' => 'failed', 'id_cart' => $id_cart]);
+            return response()->json(['status' => 'failed', 'code' => 400]);
         }
     }
 
