@@ -482,8 +482,6 @@ class Cart extends Model
         $service_array = explode(",", $service);
         $response = $this->_jne_get_rates($jne_origin, $jne_destination, $weight);
         if ($response != null) {
-            print_r($response);
-            exit();
             foreach ($response['price'] as $price) {
                 if (!empty($price['price']) && in_array($price['service_display'], $service_array)) {
                     // Konversi harga menjadi dalam satuan yang benar

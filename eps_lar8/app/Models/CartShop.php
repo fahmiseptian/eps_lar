@@ -73,9 +73,11 @@ class CartShop extends Model
                 'cs.ppn_price',
                 'cs.total',
                 'cs.discount',
+                'cs.pmk',
                 'cs.pesan_seller',
                 'cs.keperluan',
                 's.nama_pt as nama_seller',
+                's.is_pkp',
                 'shipping.id_courier',
                 'shipping.deskripsi as deskripsi_pengiriman'
             )

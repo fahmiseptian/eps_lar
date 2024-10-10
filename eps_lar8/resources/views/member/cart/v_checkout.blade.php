@@ -383,7 +383,22 @@
 
             <div class="row">
                 <div class="col-md-6">
+                    @foreach ($cart->detail as $detail)
+                    @if ($detail->is_pkp == 1 && $cartAddress->province_id == 3)
+                    <h3 class="payment-method-title">Pilihan PMK</h3>
+                    <b> Opsi Untuk {{ $detail->nama_seller }} </b>
+                    <div class="form-group">
+                        <select id="TOP-opsi" class="form-control" @if($cart->id_payment == 22) disabled @endif>
+                            <option value="7"
+                                {{ 58 == $detail->pmk ? 'selected' : '' }}>PMK 58</option>
+                            <option value="14"
+                                {{ 59 == $detail->pmk ? 'selected' : '' }}>PMK 59</option>
+                        </select>
+                    </div>
+                    @endif
+                    @endforeach
                 </div>
+
                 <div class="col-md-6 mt-2">
                     <h3 class="payment-detail-title">Detail Pembayaran</h3>
                     <ul class="payment-detail-list">
