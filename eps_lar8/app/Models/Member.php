@@ -258,6 +258,7 @@ class Member extends Model
             ->join('subdistrict as s', 's.subdistrict_id', 'ma.subdistrict_id')
             ->where('m.id', $id_member)
             ->where('ma.active_status', 'active')
+            ->orderBy('ma.member_address_id', 'desc')
             ->get();
         return $data;
     }

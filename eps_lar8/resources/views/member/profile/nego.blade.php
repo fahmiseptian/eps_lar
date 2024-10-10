@@ -39,22 +39,22 @@
 
     <ul class="nav nav-tabs" id="opsinego" role="tablist">
         <li class="nav-item" role="presentation">
-            <a class="nav-link negos-opsi {{ $selected_status == 'all' ? 'active' : '' }}" href="{{ route('profile.nego') }}?status=all">Semua</a>
+            <a class="nav-link negos-opsi {{ $selected_status == 'all' ? 'active' : '' }}" href="{{ route('profile.nego', ['status' => 'all' , 'token' => $token]) }}">Semua</a>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link negos-opsi {{ $selected_status == 'diajukan' ? 'active' : '' }}" href="{{ route('profile.nego') }}?status=diajukan">Belum Direspon</a>
+            <a class="nav-link negos-opsi {{ $selected_status == 'diajukan' ? 'active' : '' }}" href="{{ route('profile.nego', ['status' => 'diajukan' , 'token' => $token]) }}">Belum Direspon</a>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link negos-opsi {{ $selected_status == 'nego_ulang' ? 'active' : '' }}" href="{{ route('profile.nego') }}?status=nego_ulang">Nego Ulang</a>
+            <a class="nav-link negos-opsi {{ $selected_status == 'nego_ulang' ? 'active' : '' }}" href="{{ route('profile.nego', ['status' => 'nego_ulang' , 'token' => $token]) }}">Nego Ulang</a>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link negos-opsi {{ $selected_status == 'nego_diterima' ? 'active' : '' }}" href="{{ route('profile.nego') }}?status=nego_diterima">Sudah Disetujui</a>
+            <a class="nav-link negos-opsi {{ $selected_status == 'nego_diterima' ? 'active' : '' }}" href="{{ route('profile.nego', ['status' => 'nego_diterima' , 'token' => $token]) }}">Sudah Disetujui</a>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link negos-opsi {{ $selected_status == 'nego_ditolak' ? 'active' : '' }}" href="{{ route('profile.nego') }}?status=nego_ditolak">Dibatalkan</a>
+            <a class="nav-link negos-opsi {{ $selected_status == 'nego_ditolak' ? 'active' : '' }}" href="{{ route('profile.nego', ['status' => 'nego_ditolak' , 'token' => $token]) }}">Dibatalkan</a>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link negos-opsi {{ $selected_status == 'selesai' ? 'active' : '' }}" href="{{ route('profile.nego') }}?status=selesai">Selesai</a>
+            <a class="nav-link negos-opsi {{ $selected_status == 'selesai' ? 'active' : '' }}" href="{{ route('profile.nego', ['status' => 'selesai' , 'token' => $token]) }}">Selesai</a>
         </li>
     </ul>
 

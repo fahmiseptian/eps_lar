@@ -6,16 +6,6 @@ use Illuminate\Support\Facades\DB;
 
 use function PHPUnit\Framework\returnSelf;
 
-class Lkpp {
-    <?php
-
-/**
- *
- * Created by Mochammad Faisal
- * Created at 2023-07-25 16:23:32
- * Updated at
- *
- */
 
 class Lkpp
 {
@@ -35,38 +25,57 @@ class Lkpp
     private $max_merchant_score = 5;
     private $def_is_pkp = true;
 
+    protected $lkpp;
+
     function __construct()
     {
 
-        // $this->config_name = getenv('APP_CONFIG_NAME') ?? 'config_app';
-        // $this->environment = getenv('ENVIRONMENT') ?? 'development' ?: 'development';
-        $this->config_data = $this->get_config();
-    }
+        $this->config_name = getenv('APP_CONFIG_NAME') ?? 'config_app';
+        $this->environment =    env('ENVIRONMENT', 'development');
 
-    private function get_config()
-    {
-        // $get_data = $this->ci->salz->get_config($this->config_name, $this->environment);
-
-        if ($get_data) {
-            $config_data = $get_data['external']['lkpp'];
-
-            $endpoint = $config_data['endpoint'];
-            $client_id = $config_data['x_client_id'];
-            $client_secret = $config_data['x_client_secret'];
-
-            $r = [
-                'endpoint' => $endpoint,
-                'client_id' => $client_id,
-                'client_secret' => $client_secret,
+        if ($this->environment == 'development') {
+            $this->lkpp = [
+                'endpoint' => 'https://dev-tokodaring-api.lkpp.go.id/',
+                'x_client_id' => 'u_elitexlpse2022',
+                'x_client_secret' => 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9',
             ];
-
-            $this->config_HOST = $endpoint;
-            $this->config_client_id = $client_id;
-            $this->config_client_secret = $client_secret;
         } else {
-            $r = false;
+            $this->lkpp = [
+                'endpoint' => 'https://tokodaring-api.lkpp.go.id/',
+                'x_client_id' => 'u_elitexlpse2022',
+                'x_client_secret' => 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9',
+            ];
         }
 
-        return $r;
+        $this->config_HOST          = $this->lkpp['endpoint'];
+        $this->config_client_id     = $this->lkpp['x_client_id'];
+        $this->config_client_secret = $this->lkpp['x_client_secret'];
+    }
+
+    public function check_token($id_member)
+    {
+        $check = DB::table($this->table_token)
+            ->where('id_member', $id_member)
+            ->first();
+
+        return $check;
+    }
+
+    public function save_token_lpse($data, $id_member = '')
+    {
+        $table = $this->table_token;
+
+        if (empty($id_member)) {
+            $save = DB::table($table)->insert($data);
+        } else {
+            $check = $this->check_token($id_member);
+            if (empty($check)) {
+                $save = DB::table($table)->insert($data);
+            } else {
+                $save = DB::table($table)->where('id_member', $id_member)->update($data);
+            }
+        }
+
+        return $save;
     }
 }

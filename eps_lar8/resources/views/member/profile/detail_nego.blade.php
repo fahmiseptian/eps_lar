@@ -95,7 +95,7 @@
     <div class="d-flex justify-content-between align-items-start">
         <div>
             <strong>Nama Toko:</strong> {{ $nego->nama_toko }}<br>
-            <strong>Status:</strong> {{ $nego->status }}
+            <strong>Status:</strong>{{ ucfirst(str_replace('_', ' ', $nego->status)) }}
         </div>
         <div>
             <strong>Tanggal Nego:</strong> {{ \Carbon\Carbon::parse($nego->created_date)->format('d-m-Y') }}
@@ -223,7 +223,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: appUrl + '/api/member/nego/accNego',
+                    url: appUrl + '/api/member/nego/accNego?token=' + token,
                     type: 'POST',
                     data: {
                         id_nego: id
@@ -272,7 +272,7 @@
                 const reason = result.value;
 
                 $.ajax({
-                    url: appUrl + '/api/member/nego/tolak_nego',
+                    url: appUrl + '/api/member/nego/tolak_nego?token=' + token,
                     type: 'POST',
                     data: {
                         id_nego: id,
@@ -313,7 +313,7 @@
     }
 
     function backtomenu() {
-        const url = "{{ route('profile.nego') }}";
+        const url = "{{ route('profile.nego') }}?token=" + token;
         loadContent(url, $('#contentArea'));
     }
 

@@ -114,7 +114,7 @@
                         $requiresBaseUrl = strpos($product->image300, 'http') === false;
                         $image300 = $requiresBaseUrl ? "https://eliteproxy.co.id/" . $product->image300 : $product->image300;
                         @endphp
-                        <a href="{{ route('product.show', ['id' => $product->id]) }}" class="product-link">
+                        <a href="{{ route('product.show', ['id' => $product->id , 'token' => $token]) }}" class="product-link">
                             <img src="{{ $image300 }}" alt="{{ $product->name }}">
                             <p title="{{ $product->name }}">{{ Str::limit($product->name, 30) }}</p>
                             <p>Rp {{ number_format($product->hargaTayang, 0, ',', '.') }}</p>

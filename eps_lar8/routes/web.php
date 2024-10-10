@@ -69,7 +69,6 @@ Route::post('/login', [LoginmemberController::class, 'authmember'])->name('login
 Route::post('/login/submitStep2', [LoginmemberController::class, 'submitStep2']);
 Route::get('/logout', [LoginmemberController::class, 'logout'])->name('logout');
 
-
 // Routes Milik Member
 Route::get('/', [HomememberController::class, 'index'])->name('home');
 Route::get('/product/{id}', [HomememberController::class, 'getDetailproduct'])->name('product.show');
@@ -224,35 +223,36 @@ Route::group(['middleware' => 'seller'], function () {
     Route::get('/seller/product/get/product/{id}', [ProductController::class, 'addOldProduct']); //ngambil Data Product di table yang lama
 });
 
+Route::get('/cart', [CartController::class, 'index'])->name('cart');
+Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
+Route::get('/profile', [ProfilememberController::class, 'index'])->name('profile');
+Route::get('/dashboard', [ProfilememberController::class, 'dashboard'])->name('dashboard');
+Route::get('/inv/{id_seller}/{id_cart_shop}', [CheckoutController::class, 'cetak_Invoice']);
+Route::get('/kwitansi/{id_seller}/{id_cart_shop}', [CheckoutController::class, 'cetak_Kwitansi']);
+Route::get('/profile/transaksi', [ProfilememberController::class, 'transaksi'])->name('profile.transaksi');
+Route::get('/profile/transaksi/pemohon', [ProfilememberController::class, 'transaksi_pemohon'])->name('profile.transaksi.pemohon');
+Route::get('/profile/nego', [ProfilememberController::class, 'getNegos'])->name('profile.nego');
+Route::get('/profile/wish', [ProfilememberController::class, 'getwish'])->name('profile.wish');
+Route::get('/profile/detail-nego', [ProfilememberController::class, 'getNegoDetail'])->name('profile.nego.detail');
+Route::get('/profile/detail-transaksi', [ProfilememberController::class, 'GetDetailTransaction'])->name('profile.transaksi.detail');
+Route::get('/cetak-invoice', [ProfilememberController::class, 'cetakInvoice'])->name('cetak.invoice');
+Route::get('/cetak-kwitansi', [ProfilememberController::class, 'cetakKwitansi'])->name('cetak.kwitansi');
+Route::get('/profile/kontrak', [ProfilememberController::class, 'getKontrak'])->name('profile.kontrak');
+Route::get('/profile/view', [ProfilememberController::class, 'getprofile'])->name('profile.view');
+Route::get('/profile/user', [ProfilememberController::class, 'getuser'])->name('profile.user');
+Route::get('/profile/get-user/{id}', [ProfilememberController::class, 'getDetailUser'])->name('profile.get-user');
+Route::get('/profile/update-password', [ProfilememberController::class, 'v_update_password'])->name('profile.update_password');
+Route::get('/profile/suratpesanan', [ProfilememberController::class, 'getSuratPesanan'])->name('profile.suratpesanan');
+Route::get('/profile/create-kontrak', [ProfilememberController::class, 'createKontrak'])->name('profile.create-kontrak');
+Route::get('/profile/create-suratpesanan', [ProfilememberController::class, 'createSuratPesanan'])->name('profile.create-suratpesanan');
+Route::get('/profile/edit-kontrak', [ProfilememberController::class, 'editKontrak'])->name('profile.edit-kontrak');
+Route::get('/profile/edit-suratpesanan', [ProfilememberController::class, 'editSuratPesanan'])->name('profile.edit-suratpesanan');
+Route::get('/profile/address', [ProfilememberController::class, 'address'])->name('profile.address');
+Route::get('/profile/edit-address', [ProfilememberController::class, 'editAddress'])->name('profile.edit-address');
 
-Route::group(['middleware' => 'member'], function () {
-    Route::get('/cart', [CartController::class, 'index'])->name('cart');
-    Route::get('/profile', [ProfilememberController::class, 'index'])->name('profile');
-    Route::get('/dashboard', [ProfilememberController::class, 'dashboard'])->name('dashboard');
-    Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
-    Route::get('/inv/{id_seller}/{id_cart_shop}',[CheckoutController::class,'cetak_Invoice']);
-    Route::get('/kwitansi/{id_seller}/{id_cart_shop}',[CheckoutController::class,'cetak_Kwitansi']);
-    Route::get('/profile/transaksi', [ProfilememberController::class, 'transaksi'])->name('profile.transaksi');
-    Route::get('/profile/transaksi/pemohon', [ProfilememberController::class, 'transaksi_pemohon'])->name('profile.transaksi.pemohon');
-    Route::get('/profile/nego', [ProfilememberController::class, 'getNegos'])->name('profile.nego');
-    Route::get('/profile/wish', [ProfilememberController::class, 'getwish'])->name('profile.wish');
-    Route::get('/profile/detail-nego', [ProfilememberController::class, 'getNegoDetail'])->name('profile.nego.detail');
-    Route::get('/profile/detail-transaksi', [ProfilememberController::class, 'GetDetailTransaction'])->name('profile.transaksi.detail');
-    Route::get('/cetak-invoice', [ProfilememberController::class, 'cetakInvoice'])->name('cetak.invoice');
-    Route::get('/cetak-kwitansi', [ProfilememberController::class, 'cetakKwitansi'])->name('cetak.kwitansi');
-    Route::get('/profile/kontrak', [ProfilememberController::class, 'getKontrak'])->name('profile.kontrak');
-    Route::get('/profile/view', [ProfilememberController::class, 'getprofile'])->name('profile.view');
-    Route::get('/profile/user', [ProfilememberController::class, 'getuser'])->name('profile.user');
-    Route::get('/profile/get-user/{id}', [ProfilememberController::class, 'getDetailUser'])->name('profile.get-user');
-    Route::get('/profile/update-password', [ProfilememberController::class, 'v_update_password'])->name('profile.update_password');
-    Route::get('/profile/suratpesanan', [ProfilememberController::class, 'getSuratPesanan'])->name('profile.suratpesanan');
-    Route::get('/profile/create-kontrak', [ProfilememberController::class, 'createKontrak'])->name('profile.create-kontrak');
-    Route::get('/profile/create-suratpesanan', [ProfilememberController::class, 'createSuratPesanan'])->name('profile.create-suratpesanan');
-    Route::get('/profile/edit-kontrak', [ProfilememberController::class, 'editKontrak'])->name('profile.edit-kontrak');
-    Route::get('/profile/edit-suratpesanan', [ProfilememberController::class, 'editSuratPesanan'])->name('profile.edit-suratpesanan');
-    Route::get('/profile/address', [ProfilememberController::class, 'address'])->name('profile.address');
-    Route::get('/profile/edit-address', [ProfilememberController::class, 'editAddress'])->name('profile.edit-address');
-});
+// Route::group(['middleware' => 'member'], function () {
+
+// });
 
 Route::get('/find/{query}', [SearchController::class, 'fullSearch']);
 Route::get('/find/category/{category}', [SearchController::class, 'SerachwithCategory']);

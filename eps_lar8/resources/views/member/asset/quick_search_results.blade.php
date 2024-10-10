@@ -15,7 +15,7 @@
     $requiresBaseUrl = strpos($product->image50, 'http') === false;
     $image50 = $requiresBaseUrl ? "https://eliteproxy.co.id/" .$product->image50 : $product->image50;
     @endphp
-    <li> <a href=" {{ route('product.show', ['id' => $product->id]) }} " style="color: inherit; text-decoration: none;"> <img src="{{ $image50 }}"> {{ $product->name }} </a> </li>
+    <li> <a href=" {{ route('product.show', ['id' => $product->id, 'token' => $token ]) }} " style="color: inherit; text-decoration: none;"> <img src="{{ $image50 }}"> {{ $product->name }} </a> </li>
     @endforeach
 </ul>
 @endif

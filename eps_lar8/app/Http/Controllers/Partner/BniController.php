@@ -92,8 +92,16 @@ class BniController extends Controller {
 
 
     public function createBilling(Request $request) {
-        $id_cart = $request->id_cart;
-        $dataInvoice = Invoice::getDataInvoice($id_cart);
+        $id_cart = $request->input('id_cart');
+
+        $MInvoice = new Invoice();
+        $dataInvoice = $MInvoice->getDataInvoice($id_cart);
+        $invoice = DB::table('complete_cart')
+        ->select('complete_cart.id', 'invoice', 'total', 'm.nama', 'm.email', 'm.no_hp', 'm.instansi', 'm.satker', 'status_pembayaran_top')
+        ->leftJoin('member as m', 'm.id', '=', 'complete_cart.id_user')
+        ->where('complete_cart.id', $id_cart)
+        ->first();
+        return $invoice; 
 
         // Create VA Number
         $trx_date = substr($dataInvoice->invoice, 4, 8);

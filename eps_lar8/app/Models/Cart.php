@@ -391,7 +391,7 @@ class Cart extends Model
     {
         $service_array = explode(",", $service);
         $response = $this->_rpx_get_rates($zip_origin, $zip_destination, $weight);
-
+        Log::info("response RPX", [$response]);
         if ($response) {
             foreach ($response['RPX']['DATA'] as $costs) {
                 if (!empty($costs['TOT_CHARGE']) || $costs['TOT_CHARGE'] > 0) {
@@ -418,15 +418,31 @@ class Cart extends Model
     {
         $wsdl = "http://api.rpxholding.com/wsdl/rpxwsdl.php?wsdl";
         $client = new nusoap_client($wsdl, true);
+        $env = env('ENVIRONMENT') ? env('ENVIRONMENT') : 'development';
+        $rpx  = [
+            'endpoint'      => 'http://api.rpxholding.com/wsdl/rpxwsdl.php?wsdl',
+            'username'      => 'demo',
+            'password'      => 'demo',
+            'account_no'    => '234098705',
+        ];
+
+        if ($env == 'production') {
+            $rpx  = [
+                'endpoint'      => 'http://api.rpxholding.com/wsdl/rpxwsdl.php?wsdl',
+                'username'      => 'eliteproxy',
+                'password'      => '3liTePr0XyS15TEm',
+                'account_no'    => '758078721',
+            ];
+        }
 
         if ($client->getError()) {
             return false; // Gagal membuat objek client, kembalikan false
         }
 
         $post_array = [
-            'user'                      => 'demo',
-            'password'                  => 'demo',
-            'account_number'            => '234098705',
+            'user'                      => $rpx['username'],
+            'password'                  => $rpx['password'],
+            'account_number'            => $rpx['account_no'],
             'origin_postal_code'        => $zip_origin,
             'destination_postal_code'   => $zip_destination,
             'weight'                    =>  $weight,
@@ -465,27 +481,26 @@ class Cart extends Model
     {
         $service_array = explode(",", $service);
         $response = $this->_jne_get_rates($jne_origin, $jne_destination, $weight);
-        // Log::info('Raw API Response:', $response);
         if ($response != null) {
-            if (array_key_exists('price', $response)) {
-                foreach ($response['price'] as $price) {
-                    if (!empty($price['price']) && in_array($price['service_display'], $service_array)) {
-                        // Konversi harga menjadi dalam satuan yang benar
-                        $convertedPrice = $price['price'];
-    
-                        $data_rates = [
-                            'id_courier'            => $courier_id,
-                            'id_city_origin'        => $id_city_origin,
-                            'id_subdistrict_dest'   => $id_subdistrict_dest,
-                            'price'                 => $convertedPrice,  // Menggunakan harga yang sudah dikonversi
-                            'etd'                   => $price['etd_from'] . "-" . $price['etd_thru'],
-                            'deskripsi'             => 'JNE ' . ucwords(strtolower($price['service_display'])),
-                            'service'               => $price['service_code'],
-                            'zip_destination'       => $zip_destination,
-                            'zip_origin'            => $zip_origin,
-                        ];
-                        $insert = $this->insertRates($data_rates);
-                    }
+            print_r($response);
+            exit();
+            foreach ($response['price'] as $price) {
+                if (!empty($price['price']) && in_array($price['service_display'], $service_array)) {
+                    // Konversi harga menjadi dalam satuan yang benar
+                    $convertedPrice = $price['price'];
+
+                    $data_rates = [
+                        'id_courier'            => $courier_id,
+                        'id_city_origin'        => $id_city_origin,
+                        'id_subdistrict_dest'   => $id_subdistrict_dest,
+                        'price'                 => $convertedPrice,  // Menggunakan harga yang sudah dikonversi
+                        'etd'                   => $price['etd_from'] . "-" . $price['etd_thru'],
+                        'deskripsi'             => 'JNE ' . ucwords(strtolower($price['service_display'])),
+                        'service'               => $price['service_code'],
+                        'zip_destination'       => $zip_destination,
+                        'zip_origin'            => $zip_origin,
+                    ];
+                    $insert = $this->insertRates($data_rates);
                 }
             }
         }
@@ -493,29 +508,52 @@ class Cart extends Model
 
     public function _jne_get_rates($jne_origin, $jne_destination, $weight)
     {
-        $post_array = [
-            'username' => 'TESTAPI',
-            'api_key' => '25c898a9faea1a100859ecd9ef674548',
-            'from' => $jne_origin,
-            'thru' => $jne_destination,
-            'weight' =>  1,
+        $env = env('ENVIRONMENT') ? env('ENVIRONMENT') : 'development';
+
+        $jne = [
+            'endpoint'  => 'http://apiv2.jne.co.id:10102/',
+            'username'  => 'TESTAPI',
+            'apikey'    => '25c898a9faea1a100859ecd9ef674548',
+            'cust_no'   => 'TESTAKUN',
+            'branch'    => 'CGK000',
         ];
 
-        // Log::info('Sending payload to JNE API', $post_array);
+        if ($env != 'development') {
+            $jne = [
+                'endpoint' => 'https://apiv2.jne.co.id:10205/',
+                'username' => 'ELITEPROXY',
+                'apikey'   => 'a2166df97bc330831f0c4e2cf4fb60b4',
+                'cust_no'  => '11953800',
+                'branch'   => 'CGK000',
+            ];
+        }
 
-        $response = Http::asForm()
-            ->withHeaders([
-                'Content-Type' => 'application/x-www-form-urlencoded',
-            ])
-            ->post('http://apiv2.jne.co.id:10102/tracing/api/pricedev', $post_array);
+        $post_array = [
+            'username'  => 'TESTAPI',
+            'api_key'   => '25c898a9faea1a100859ecd9ef674548',
+            'from'      => 'CGK10000',
+            'thru'      => 'CGK10104',
+            'weight'    =>  1,
+        ];
 
-        $result = $response->json();
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $jne['endpoint'] . 'tracing/api/pricedev');
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/x-www-form-urlencoded'));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_array));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $result = curl_exec($ch);
+        curl_close($ch);
+        $data = json_decode($result, true);
+        // print_r($result);
+        // exit();
 
-        // Log::info('Response from JNE API', ['response' => $response->body()]);
+        Log::info('Response from JNE API', ['response' => $result]);
+        Log::info('Payload to JNE API', ['response' => $post_array]);
         // Log::info('Parsed response from JNE API', $result);
 
         $this->insert_jne_log_req($post_array, $result);
-        return $result;
+        return $data;
     }
 
     public function insert_jne_log_req($post_array, $result)
@@ -533,6 +571,7 @@ class Cart extends Model
     {
         $service_array = explode(",", $service);
         $response = $this->_sap_get_rates($sap_origin, $sap_destination, $weight);
+        Log::info("response SAP", [$response]);
         if ($response) {
             foreach ($response['price_detail'] as $costs) {
                 if ($costs['minimum_kilo'] == '1') {
@@ -548,7 +587,7 @@ class Cart extends Model
                             'zip_destination'        => $zip_destination,
                             'zip_origin'            => $zip_origin,
                         );
-                        $insert = $this->insertRates($data_rates);
+                        $this->insertRates($data_rates);
                     }
                 }
             }
@@ -1178,6 +1217,15 @@ class Cart extends Model
         } else {
             return false;
         }
+    }
+
+    public function negoComplete($id_nego)
+    {
+        DB::table('nego')
+            ->where('id', $id_nego)
+            ->update(['complete_checkout' => '1']);
+
+        return true;
     }
 
     private function _migrate_cart_shop_detail($data)

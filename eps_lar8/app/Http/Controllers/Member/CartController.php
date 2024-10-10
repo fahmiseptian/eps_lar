@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
 use App\Libraries\Calculation;
+use App\Libraries\Lpse;
 use App\Models\Cart;
 use App\Models\CartShop;
 use App\Models\CartShopTemporary;
@@ -18,20 +19,34 @@ use Illuminate\Support\Facades\DB;
 class CartController extends Controller
 {
     protected $data;
+    protected $user_id;
     protected $model;
     public function __construct(Request $request)
     {
+        $token = $request->input('token');
+        $this->data['token'] = $token;
+        if ($token != null) {
+            $lpse = new Lpse();
+            $cek_token = $lpse->check_token($token);
+
+            $this->user_id = $cek_token->id_member;
+        } else {
+            // Ambil semua data sesi
+            $sessionData = $request->session()->all();
+            $this->user_id = $sessionData['id'] ?? null;
+        }
+
         $this->model['CartShopTemporary'] = new CartShopTemporary();
         $this->model['CartShop'] = new CartShop();
         $this->model['member'] = new Member();
         $this->model['Cart'] = new Cart();
 
-        // Ambil semua data sesi
-        $sessionData = $request->session()->all();
-        $this->data['id_user'] = $sessionData['id'] ?? null;
+        $this->data['id_user'] = $this->user_id ?? null;
+
+
 
         $this->data['nama_user'] = '';
-        $this->data['member'] = null ;
+        $this->data['member'] = null;
 
         if ($this->data['id_user'] != null) {
             $this->data['member'] = $this->model['member']->find($this->data['id_user']);
@@ -41,6 +56,9 @@ class CartController extends Controller
     // Metode lain dalam controller
     public function index()
     {
+        if ($this->user_id == null) {
+            return redirect()->route('login');
+        }
         $id_member = $this->data['id_user'];
         // $id_cart = $this->data['Cart']->getIdCartbyidmember($id_member);
         $cart = Cart::where('id_user', $id_member)->select('id', 'total', 'qty')->first();
@@ -133,6 +151,10 @@ class CartController extends Controller
 
     function addCart(Request $request)
     {
+        if ($this->user_id == null) {
+            return redirect()->route('login');
+        }
+        $id_member = $this->data['id_user'];
 
         $id_member = $this->data['id_user'];
         $id_product = $request->id_product;

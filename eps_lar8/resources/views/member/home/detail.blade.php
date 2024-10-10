@@ -123,7 +123,7 @@
                             <i class="material-icons">chat</i>
                             Chat
                         </button>
-                        <a href="{{ route('seller.detail', ['id' => $idToko]) }}" class="btn-kunjungi">
+                        <a href="{{ route('seller.detail', ['id' => $idToko , 'token' => $token]) }}" class="btn-kunjungi">
                             <i class="material-icons">store</i>
                             Kunjungi Toko
                         </a>
@@ -131,7 +131,7 @@
                 </div>
                 <div class="produk-lainnya">
                     <p>Produk lainnya</p>
-                    <a href="{{ route('seller.detail', ['id' => $idToko]) }}">
+                    <a href="{{ route('seller.detail', ['id' => $idToko , 'token' => $token]) }}">
                         <p>lihat lainnya...</p>
                     </a>
                 </div>
@@ -142,7 +142,7 @@
                     $image300 = $requiresBaseUrl ? "https://eliteproxy.co.id/" .$product->image300 : $product->image300;
                     @endphp
 
-                    <a href="{{ route('product.show', ['id' => $product->id]) }}">
+                    <a href="{{ route('product.show', ['id' => $product->id , 'token' => $token]) }}">
                         <img src="{{ $image300 }}" alt="Gambar produk">
                     </a>
                     @endforeach
@@ -330,7 +330,7 @@
             var price = unformatRupiah($('#nego-price').val());
             $.ajax({
                 type: 'POST',
-                url: '/api/calc_nego',
+                url: '/api/calc_nego?token=' + token,
                 data: {
                     id_produk: id_produk,
                     quantity: quantity,
@@ -339,13 +339,23 @@
                 },
                 success: function(response) {
                     if (response.error === 0) {
-                        alert('Berhasil menghitung nego harga. Silakan lanjutkan dengan proses berikutnya.');
+                        Swal.fire({
+                            title: "Berhasil!",
+                            text: "Berhasil melakukan permintaan nego produk.",
+                            icon: "success",
+                            confirmButtonText: "OK",
+                        });
                     } else {
-                        alert('Gagal menghitung nego harga. Silakan coba lagi.');
+                        Swal.fire({
+                            title: "Gagal!",
+                            text: "Gagal melakukan permintaan nego. Silakan coba lagi.",
+                            icon: "error",
+                            confirmButtonText: "OK",
+                        });
                     }
                 },
                 error: function(xhr, status, error) {
-                    alert('Terjadi kesalahan saat menghitung nego harga. Silakan coba lagi.');
+                    alert('melakukan permintaan nego. Silakan coba lagi.');
                 }
             });
             closeNegoModal();

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Member;
 use App\Http\Controllers\Controller;
 use App\Libraries\Calculation;
 use App\Libraries\Checkout;
+use App\Libraries\Lpse;
 use App\Models\Cart;
 use App\Models\CartShop;
 use App\Models\CartShopTemporary;
@@ -33,9 +34,21 @@ class HomememberController extends Controller
 
     public function __construct(Request $request)
     {
-        // Ambil semua data sesi
-        $sessionData = $request->session()->all();
-        $this->user_id = $sessionData['id'] ?? null;
+        $token = $request->input('token');
+        $this->data['token'] = $token;
+        $this->data['user_category'] = null;
+        $this->data['is_lpse'] = 0;
+        if ($token != null) {
+            $lpse = new Lpse();
+            $cek_token = $lpse->check_token($token);
+            $this->data['user_category'] = $cek_token->category;
+            $this->data['is_lpse'] = 1;
+            $this->user_id = $cek_token->id_member;
+        } else {
+            // Ambil semua data sesi
+            $sessionData = $request->session()->all();
+            $this->user_id = $sessionData['id'] ?? null;
+        }
 
         $this->Libraries['Calculation'] = new Calculation();
 
@@ -46,8 +59,8 @@ class HomememberController extends Controller
         $this->model['ProductCategory'] = new ProductCategory();
         $this->model['ShopCategory'] = new ShopCategory();
         $this->data['nama_user'] = '';
-        $this->data['id_user'] =  $sessionData['id'] ?? null;
-        $this->data['member'] = null ;
+        $this->data['id_user'] =   $this->user_id ?? null;
+        $this->data['member'] = null;
 
         if ($this->user_id != null) {
             $this->data['member'] = $this->model['member']->find($this->user_id);
@@ -64,18 +77,24 @@ class HomememberController extends Controller
 
     public function index()
     {
-        $products =  $this->model['products']->getShowproduct(35);
+        $products =  $this->model['products']->getShowproduct(35,  $this->data['is_lpse'], $this->data['user_category'] );
         $banners = $this->model['shop_banner']->getBannerbyTipe(1);
         $chill_banner =  $this->model['shop_banner']->getBannerbyTipe(2, 3);
         $this->data['id_user'] = $this->user_id;
 
-        $banner_product_category = DB::table('product_category')->where('active', 'Y')->where('icon', '!=', '')->get();
+        if ($this->data['user_category'] != null) {
+            $banner_product_category = DB::table('product_category')->where('lpse_code', $this->data['user_category'])->get();
+        } else {
+            $banner_product_category = DB::table('product_category')->where('active', 'Y')->where('icon', '!=', '')->get();
+        }
         $promos = DB::table('promo_category')->where('active', 'Y')->where('display_status', 'show')->get();
         $product_search = $this->model['products']->getPencarianProdukwithlimit(4);
         $random_search = $this->model['products']->getRandomSerach();
         $categories = collect();
         $productsearch = collect();
         $stores = collect();
+
+        // return response()->json($products);
 
         return view('member.home.index', $this->data, [
             "products" => $products,
@@ -102,7 +121,7 @@ class HomememberController extends Controller
 
     public function getPaginatedProducts(Request $request)
     {
-        $products =  $this->model['products']->getShowproduct(35);
+        $products =  $this->model['products']->getShowproduct(35, $this->data['user_category']);
 
         if ($request->ajax()) {
             return view('member.home.product-list', compact('products'))->render();
@@ -113,6 +132,8 @@ class HomememberController extends Controller
 
     public function getDetailproduct($id)
     {
+        $token = $this->data['token'];
+
         $this->data = $this->model['products']->getproductById($id);
         $this->data['id_user'] = $this->user_id;
         $produkToko = $this->model['products']->get5ProductByIdShop($this->data->idToko);
@@ -127,6 +148,7 @@ class HomememberController extends Controller
         // Store the array in the data property
         $this->data->produkToko = $produkToko;
         $this->data->gambarProduct = $gambarProduct;
+        $this->data['token'] = $token;
 
         // return response()->json($this->data);
         return view('member.home.detail', $this->data);
@@ -138,6 +160,7 @@ class HomememberController extends Controller
         $shopData = $this->model['shop']->getShopById($id_shop);
         $jmlhproduct = $this->model['products']->countProductByIdShop($id_shop, $where);
         $jmlhTerjualproduct = $this->model['products']->countproductTerjualbyId($id_shop);
+        $rate = $this->model['products']->getCountRatingShop($id_shop);
         $etalsetoko = Etalase::getEtalasetoko($id_shop);
 
         $products = $this->model['products']->getProductByIdShop($id_shop);
@@ -158,7 +181,8 @@ class HomememberController extends Controller
             'jmlhTerjualproduct' => $jmlhTerjualproduct,
             'etalsetoko' => $etalsetoko,
             'products' => $products,
-            'NewProduct' => $productTerbaru
+            'NewProduct' => $productTerbaru,
+            'rate_toko' => $rate
         ]);
     }
 

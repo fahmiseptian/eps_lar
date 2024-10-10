@@ -21,8 +21,8 @@
             }
 
             if ($shopData->id == '161') {
-                $requiresBaseUrl = strpos($shopData->avatar ?? '', 'http') === false;
-                $avatar = $requiresBaseUrl ? "https://eliteproxy.co.id/seller_center/" . ($shopData->avatar ?? '') : ($shopData->avatar ?? '');
+            $requiresBaseUrl = strpos($shopData->avatar ?? '', 'http') === false;
+            $avatar = $requiresBaseUrl ? "https://eliteproxy.co.id/seller_center/" . ($shopData->avatar ?? '') : ($shopData->avatar ?? '');
             }
             @endphp
             <div class="toko-profile-banner" style="background-image: url('{{ $image_banner }}');">
@@ -50,7 +50,11 @@
                         <span class="stat-label">Terjual</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-value">4.8 <span class="rating-stars">★★★★★</span></span>
+                        <span class="stat-value">
+                            @for ($i = 1; $i <= 5; $i++)
+                                <span class="rating-stars" style="color: {{ $i <= $rate_toko ? 'yellow' : 'lightgray' }};">★</span>
+                        @endfor
+                        </span>
                         <span class="stat-label">Rating</span>
                     </div>
                 </div>
@@ -72,7 +76,7 @@
                     @if (!empty($NewProduct))
                     @foreach ($NewProduct as $product)
                     <div class="product-item-terbaru">
-                        <a href="{{ route('product.show', ['id' => $product->id]) }}" class="product-link">
+                        <a href="{{ route('product.show', ['id' => $product->id , 'token' => $token]) }}" class="product-link">
                             @php
                             $requiresBaseUrl = strpos($product->image ?? '', 'http') === false;
                             $image = $requiresBaseUrl ? "https://eliteproxy.co.id/" . ($product->image ?? '') : ($product->image ?? '');
@@ -122,8 +126,8 @@
                             <label for="sortOrder">Urutkan:</label>
                             <select id="sortOrder">
                                 <option value="terbaru">Terbaru</option>
-                                <option value="h_tertinggi">Rendah ke Tinggi</option>
-                                <option value="h_terendah">Tinggi ke Rendah</option>
+                                <option value="h_terendah">Rendah ke Tinggi</option>
+                                <option value="h_tertinggi">Tinggi ke Rendah</option>
                                 <option value="terjual">Terpopuler</option>
                             </select>
                         </div>
@@ -134,7 +138,7 @@
                     <div class="product-grid-kategori" id="productGrid-kategori">
                         @foreach ($products ?? [] as $product)
                         <div class="product-item-category">
-                            <a href="{{ route('product.show', ['id' => $product->id ?? '']) }}" class="product-link">
+                            <a href="{{ route('product.show', ['id' => $product->id ?? ''  , 'token' => $token]) }}" class="product-link">
                                 @php
                                 $requiresBaseUrl = strpos($product->image ?? '', 'http') === false;
                                 $image = $requiresBaseUrl ? "https://eliteproxy.co.id/" . ($product->image ?? '') : ($product->image ?? '');
@@ -163,7 +167,7 @@
                 <div class="product-grid-kategori" id="productGrid-kategori">
                     @foreach ($products ?? [] as $product)
                     <div class="product-item-category">
-                        <a href="{{ route('product.show', ['id' => $product->id ?? '']) }}" class="product-link">
+                        <a href="{{ route('product.show', ['id' => $product->id ?? ''  , 'token' => $token]) }}" class="product-link">
                             @php
                             $requiresBaseUrl = strpos($product->image ?? '', 'http') === false;
                             $image = $requiresBaseUrl ? "https://eliteproxy.co.id/" . ($product->image ?? '') : ($product->image ?? '');

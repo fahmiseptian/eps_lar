@@ -57,7 +57,7 @@
     initTinyMCE();
 
     function kembaliKeDetailTransaksi() {
-        var id_cart_shop = "{{ $id_cart_shop ?? $suratpesanan->id_cart_shop }}";
+        var id_cart_shop = "{{ $id_cart_shop ?? $suratpesanan->id_cart_shop }}?token=" + token; 
         var url = "{{ route('profile.suratpesanan') }}?id=" + id_cart_shop;
         loadContent(url, $('#contentArea'));
     }
@@ -72,7 +72,7 @@
         }
 
         $.ajax({
-            url: appUrl + "/api/storeSuratPesanan",
+            url: appUrl + "/api/storeSuratPesanan?token=" + token,
             data: formData,
             processData: false,
             method: 'POST',

@@ -160,7 +160,7 @@
 
             // AJAX untuk mengirim data
             $.ajax({
-                url: appUrl + '/api/member/storeAddress', // Ganti dengan URL API Anda
+                url: appUrl + '/api/member/storeAddress?token=' + token, // Ganti dengan URL API Anda
                 method: 'POST',
                 data: formData,
                 success: function(response) {
@@ -176,7 +176,7 @@
     });
 
     function kembaliKealamat() {
-        var url = "{{ route('profile.address') }}";
+        var url = "{{ route('profile.address') }}?token=" + token;
         loadContent(url, $('#contentArea'));
     }
 </script>

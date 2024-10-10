@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Member;
 use App\Http\Controllers\Controller;
 use App\Libraries\Calculation;
 use App\Libraries\Encryption;
+use App\Libraries\Lpse;
 use App\Libraries\Terbilang;
 use App\Models\Cart;
 use App\Models\CompleteCartShop;
@@ -26,13 +27,24 @@ class ProfilememberController extends Controller
 {
     protected $data;
     protected $model;
+    protected $user_id;
     protected $Liberies;
 
     public function __construct(Request $request)
     {
-        // Ambil semua data sesi
-        $sessionData = $request->session()->all();
-        $this->data['id_user'] = $sessionData['id'] ?? null;
+        $token = $request->input('token');
+        $this->data['token'] = $token;
+        if ($token != null) {
+            $lpse = new Lpse();
+            $cek_token = $lpse->check_token($token);
+            $this->user_id = $cek_token->id_member;
+        } else {
+            // Ambil semua data sesi
+            $sessionData = $request->session()->all();
+            $this->user_id = $sessionData['id'] ?? null;
+        }
+
+        $this->data['id_user'] = $this->user_id;
         $this->model['member'] = new Member();
         $this->model['nego'] = new Nego();
         $this->model['products'] = new Products();
@@ -419,13 +431,13 @@ class ProfilememberController extends Controller
 
         if ($nego->status_nego == 0 && $nego->status == 0) {
             $nego->status = 'diajukan';
-        } elseif ($nego->status_nego >= 2 && $nego->status == 0) {
+        } elseif ($nego->status == 0 && $nego->nego_status >= 1) {
             $nego->status = 'nego_ulang';
-        } elseif ($nego->status_nego >= 2 && $nego->status == 1) {
+        } elseif ($nego->status_nego == 1 && $nego->status == 1) {
             $nego->status = 'nego_diterima';
-        } elseif ($nego->status_nego >= 2 && $nego->status == 2) {
+        } elseif ($nego->status_nego == 2 && $nego->status == 2) {
             $nego->status = 'nego_ditolak';
-        } elseif ($nego->status_nego >= 1 && $nego->is_checkout == 1) {
+        } elseif ($nego->status_nego == 1 && $nego->complete_checkout == 1) {
             $nego->status = 'selesai';
         } else {
             $nego->status = 'Status_Tidak_Diketahui';
@@ -719,7 +731,7 @@ class ProfilememberController extends Controller
             'id_member_type' => $request->input('role'),
             'member_status' => $status,
             'activation_key' => ' ',
-            'is_email_subscribe' => $data_user->is_email_subscribe,
+            'is_email_subscribe' => $data_user->is_email_subscribe ? $data_user->is_email_subscribe : null,
             'registered_member' => 1,
             'last_update' => now(),
             'instansi' => $data_user->instansi,
@@ -788,6 +800,13 @@ class ProfilememberController extends Controller
 
     function storeAddress(Request $request)
     {
+        if ($this->data['id_user'] == null) {
+            return response()->json([
+                'code' => 404,
+                'error' => 'Anda harus login terlebih dahulu!',
+            ]);
+        }
+
         $member_address_id = $request->id;
         $address_name = $request->nama_penerima;
         $phone = $request->no_telepon;
@@ -812,6 +831,8 @@ class ProfilememberController extends Controller
             'is_default_shipping' => 'yes',
             'is_default_billing' => 'yes'
         ];
+
+        // return response()->json($data);
 
         if ($member_address_id != null) {
             DB::table('member_address')->where('member_address_id', $member_address_id)->update($data);

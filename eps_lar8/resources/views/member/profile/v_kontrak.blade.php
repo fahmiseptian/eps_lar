@@ -52,7 +52,6 @@
             type: "post",
             data: {
                 idcs: id,
-                _token: csrfToken,
             },
             xhrFields: {
                 responseType: "blob",
@@ -94,7 +93,7 @@
     function kembaliKeDetailTransaksi() {
         var id_cart = "{{ $id_cart }}";
 
-        var url = "{{ route('profile.transaksi.detail') }}?id=" + id_cart;
+        var url = "{{ route('profile.transaksi.detail') }}?id=" + id_cart + "&token=" + token;
         loadContent(url, $('#contentArea'));
     }
 </script>

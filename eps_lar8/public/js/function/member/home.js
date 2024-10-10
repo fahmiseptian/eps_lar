@@ -1304,7 +1304,7 @@ $(document).on("click", ".cart-btn", function () {
         return;
     }
     $.ajax({
-        url: appUrl + "/api/add-cart",
+        url: appUrl + "/api/add-cart?token=" + token,
         type: "POST",
         data: {
             _token: $('meta[name="csrf-token"]').attr("content"),
@@ -1371,7 +1371,7 @@ $(document).on("click", ".buy-btn", function () {
         return;
     }
     $.ajax({
-        url: appUrl + "/api/add-cart",
+        url: appUrl + "/api/add-cart?token=" + token,
         type: "POST",
         data: {
             _token: $('meta[name="csrf-token"]').attr("content"),
@@ -1386,7 +1386,7 @@ $(document).on("click", ".buy-btn", function () {
                 confirmButtonText: "OK",
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = appUrl + "/cart";
+                    window.location.href = appUrl + "/cart?token=" + token;
                 }
             });
         },
@@ -1410,7 +1410,14 @@ $(document).on("click", "#deleteCart", function () {
     var id_temporary = $(this).data("idtemp");
     var id_shop = $(this).data("idshop");
     $.ajax({
-        url: appUrl + "/api/cart/" + id_temporary + "/" + id_shop,
+        url:
+            appUrl +
+            "/api/cart/" +
+            id_temporary +
+            "/" +
+            id_shop +
+            "?token=" +
+            token,
         type: "delete",
         success: function (response) {
             Swal.fire({
@@ -1436,7 +1443,7 @@ $(document).on("click", "#deleteCart", function () {
 $(document).on("click", "#ubah-lokasi-pengiriman", function () {
     var member_address_id = $(this).data("id_address");
     $.ajax({
-        url: appUrl + "/api/member/getaddress",
+        url: appUrl + "/api/member/getaddress?token=" + token,
         type: "get",
         success: function (response) {
             let addressList = response.address;
@@ -1488,7 +1495,9 @@ $(document).on("click", "#ubah-lokasi-pengiriman", function () {
                         url:
                             appUrl +
                             "/api/updateAddressCart/" +
-                            selectedAddress,
+                            selectedAddress +
+                            "?token=" +
+                            token,
                         type: "get",
                         success: function (response) {
                             // Lakukan sesuatu setelah alamat keranjang berhasil diperbarui
@@ -1531,7 +1540,14 @@ $(document).ready(function () {
         var id_cs = $(this).data("id_cs");
         var selectedId = $(this).val();
         $.ajax({
-            url: appUrl + "/api/shipping/" + selectedId + "/" + id_cs,
+            url:
+                appUrl +
+                "/api/shipping/" +
+                selectedId +
+                "/" +
+                id_cs +
+                "?token=" +
+                token,
             type: "get",
             success: function (response) {
                 location.reload();
@@ -1559,7 +1575,9 @@ $(document).on("click", "#asuransi-pengiriman", function () {
             "/" +
             id_cs +
             "/" +
-            status,
+            status +
+            "?token=" +
+            token,
         type: "get",
         success: function (response) {
             location.reload();
@@ -1574,7 +1592,7 @@ $(document).on("click", "#asuransi-pengiriman", function () {
 $(document).on("click", "#paymend_method", function () {
     var id_payment = $(this).data("id_pay");
     $.ajax({
-        url: appUrl + "/api/update-payment",
+        url: appUrl + "/api/update-payment?token=" + token,
         type: "POST",
         data: {
             _token: $('meta[name="csrf-token"]').attr("content"),
@@ -1594,7 +1612,7 @@ $(document).on("click", "#updateTOP", function () {
     var top = $(this).data("top");
     console.log(top);
     $.ajax({
-        url: appUrl + "/api/update-top/" + top,
+        url: appUrl + "/api/update-top/" + top + "?token=" + token,
         type: "get",
         success: function (response) {
             location.reload();
@@ -1645,7 +1663,7 @@ $(document).on("click", "#request-checkout", function () {
                     formData.append("id_cart", id_cart);
 
                     $.ajax({
-                        url: appUrl + "/api/finishCheckout",
+                        url: appUrl + "/api/finishCheckout?token=" + token,
                         type: "POST",
                         data: formData,
                         contentType: false,
@@ -1660,7 +1678,8 @@ $(document).on("click", "#request-checkout", function () {
                                     text: "Silahkan lihat pesanan anda di transaksi.",
                                     icon: "success",
                                 }).then(function () {
-                                    window.location.href = appUrl + "/cart"; // redirect to cart page
+                                    window.location.href =
+                                        appUrl + "/cart?token=" + token; // redirect to cart page
                                 });
                             }
                         },
@@ -1697,7 +1716,7 @@ function generatebca(id_cart) {
                 text: "Silahkan lihat pesanan anda di transaksi.",
                 icon: "success",
             }).then(function () {
-                window.location.href = appUrl + "/cart"; // redirect to cart page
+                window.location.href = appUrl + "/cart?token=" + token;
             });
         },
         error: function (xhr, status, error) {
@@ -1716,7 +1735,7 @@ $(document).on("click", "#request-checkout-withPPK", function () {
     formData.append("id_cart", id_cart);
     formData.append("status", "request_ppk");
     $.ajax({
-        url: appUrl + "/api/finishCheckout",
+        url: appUrl + "/api/finishCheckout?token=" + token,
         type: "POST",
         data: formData,
         contentType: false,
@@ -1747,7 +1766,14 @@ $(document).on("click", "#lacak_pesanan", function () {
     console.log(id_order_shop);
 
     $.ajax({
-        url: appUrl + "/api/lacak_pengiriman/" + id_shop + `/` + id_order_shop,
+        url:
+            appUrl +
+            "/api/lacak_pengiriman/" +
+            id_shop +
+            `/` +
+            id_order_shop +
+            "?token=" +
+            token,
         method: "GET",
         success: function (response) {
             var status = response.ccs.status;
@@ -1843,7 +1869,7 @@ $(document).on("click", ".updateIsSelectProduct", function () {
     var id_cst = $(this).data("id_cst");
 
     $.ajax({
-        url: appUrl + "/api/updateIsSelectProduct",
+        url: appUrl + "/api/updateIsSelectProduct?token=" + token,
         method: "POST",
         data: {
             id_cart: id_cart,
@@ -2085,7 +2111,7 @@ function updateCartQuantity(action) {
         }
 
         $.ajax({
-            url: appUrl + "/api/cart/update-quantity",
+            url: appUrl + "/api/cart/update-quantity?token=" + token,
             method: "POST",
             data: {
                 qty: newQty,
@@ -2198,7 +2224,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function fetchProducts(data) {
         $("#moreproduct").hide();
         // Implement your AJAX call here
-        fetch(appUrl + "/api/filter-searching", {
+        fetch(appUrl + "/api/filter-searching?token="+ token, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -2228,7 +2254,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     : `https://eliteproxy.co.id/${product.image}`;
 
                 productItem.innerHTML = `
-                    <a href="/product/${product.id}" class="product-link">
+                    <a href="/product/${product.id}?token=${token}" class="product-link">
                         <img src="${image300}" alt="${product.name}">
                         <p title="${product.name}">${truncateString(
                     product.name,
@@ -2288,7 +2314,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function filterByCondition(data) {
-        fetch(appUrl + "/api/filter-searching", {
+        fetch(appUrl + "/api/filter-searching?token="+ token, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -2348,13 +2374,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     sortOrder.addEventListener("change", function () {
         const selectedValue = this.value;
-        console.log("Urutan yang dipilih:", selectedValue);
-
-        applySort(selectedValue);
+        applySortir(selectedValue);
     });
 });
 
-function applySort(sortType) {
+function applySortir(sortType) {
     const activeFilter = document.querySelector(
         ".category-list .filter-item.active"
     );
@@ -2383,7 +2407,7 @@ function applySort(sortType) {
 
 // Pastikan fungsi fetchProducts sudah ada dan dapat menerima parameter sort
 function fetchProducts(data) {
-    fetch(appUrl + "/api/filter-searching", {
+    fetch(appUrl + "/api/filter-searching?token="+ token, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -2442,12 +2466,13 @@ function updateListProduct(products) {
 
 $(".popular-search-item").on("click", function () {
     const keyword = $(this).data("keyword");
-    window.location.href = appUrl + "/find/" + keyword;
+    window.location.href = appUrl + "/find/" + keyword + "?token=" + token;
 });
 
 $(".category-item").on("click", function () {
     const category = $(this).data("category");
-    window.location.href = appUrl + "/find/category/" + category;
+    window.location.href =
+        appUrl + "/find/category/" + category + "?token=" + token;
 });
 
 let searchTimer;
@@ -2472,7 +2497,7 @@ function applySort(
     condition = null
 ) {
     $.ajax({
-        url: appUrl + "/api/shop/search-product",
+        url: appUrl + "/api/shop/search-product?token="+token,
         method: "GET",
         data: {
             keyword: keyword,
@@ -2489,7 +2514,7 @@ function applySort(
         },
     });
 }
-
+ 
 function updateProductList(products) {
     const productGrid = $("#productGrid-kategori");
     productGrid.empty();
@@ -2501,7 +2526,7 @@ function updateProductList(products) {
                 : `https://eliteproxy.co.id/${product.image}`;
             const productItem = `
                 <div class="product-item-category">
-                    <a href="/product/${product.id}" class="product-link">
+                    <a href="/product/${product.id}?token=${token}"  class="product-link">
                         <img src="${image300}" alt="${product.name}">
                         <div class="product-info">
                             <p class="product-name" title="${
@@ -2523,7 +2548,13 @@ function updateProductList(products) {
 
 $("#sortOrder").on("change", function () {
     const selectedValue = $(this).val();
-    applySort(null, null, null, selectedValue);
+
+    var idshop = $('#searchProduct').data("idshop");
+
+    const keyword = $("#searchProduct").val().trim();
+    const idCategory =  $(".category-item-shop.active").data("id");;
+   
+    applySort(keyword, idshop, idCategory, selectedValue);
 });
 
 $("#keperluan").on("input", function () {
@@ -2575,7 +2606,7 @@ $("#note_seller").on("input", function () {
 $("#payment-method").on("change", function () {
     var id_payment = $(this).val();
     $.ajax({
-        url: appUrl + "/api/update-payment",
+        url: appUrl + "/api/update-payment?token=" + token,
         type: "POST",
         data: {
             _token: $('meta[name="csrf-token"]').attr("content"),
@@ -2602,7 +2633,7 @@ $("#payment-method").on("change", function () {
 $("#TOP-opsi").on("change", function () {
     var top = $(this).val();
     $.ajax({
-        url: appUrl + "/api/update-top/" + top,
+        url: appUrl + "/api/update-top/" + top + "?token=" + token,
         type: "get",
         success: function (response) {
             // location.reload();

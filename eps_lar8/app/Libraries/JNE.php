@@ -13,24 +13,24 @@ class JNE
 
     public function __construct()
     {
-        $this->Config['ENVIRONMENT'] = 'development';
-        // $this->Config['ENVIRONMENT'] = 'production';
-
+        $this->Config['ENVIRONMENT'] = env('ENVIRONMENT') ? env('ENVIRONMENT') : 'development';
 
         if ($this->Config['ENVIRONMENT'] == 'production') {
             $this->Config['username'] = 'ELITEPROXY';
             $this->Config['api_key'] = 'a2166df97bc330831f0c4e2cf4fb60b4';
             $this->Config['OLSHOP_CUST'] = '11953800';
+            $this->Config['endpoint'] = 'https://apiv2.jne.co.id:10205/';
         } else {
             $this->Config['username'] = 'TESTAPI';
             $this->Config['api_key'] = '25c898a9faea1a100859ecd9ef674548';
             $this->Config['OLSHOP_CUST'] = 'TESTAKUN';
+            $this->Config['endpoint'] = 'http://apiv2.jne.co.id:10102/';
         }
     }
 
     public function generateCnote($data)
     {
-        $url      = 'http://apiv2.jne.co.id:10102/tracing/api/generatecnote';
+        $url      = $this->Config['endpoint'].'/tracing/api/generatecnote';
 
         $postData = array_merge([
             'username' => $this->Config['username'],
@@ -78,7 +78,7 @@ class JNE
 
     function tracking($awb)
     {
-        $url        = 'http://apiv2.jne.co.id:10102/tracing/api/list/v1/cnote';
+        $url        = $this->Config['endpoint'].'/tracing/api/list/v1/cnote';
 
         if ($this->Config['ENVIRONMENT'] == 'production') {
             $resi   = $awb;

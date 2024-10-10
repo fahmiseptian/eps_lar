@@ -625,7 +625,7 @@
 
             // AJAX untuk mengirim data
             $.ajax({
-                url: appUrl + '/api/member/storeAddress', // Ganti dengan URL API Anda
+                url: appUrl + '/api/member/storeAddress?token=' + token,
                 method: 'POST',
                 data: formData,
                 success: function(response) {

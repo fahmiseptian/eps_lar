@@ -22,7 +22,8 @@ class CartShopTemporary extends Model
                 'cst.image as gambar_product',
                 'cst.id as id_cst',
                 'cst.*',
-                'p.stock'
+                'p.stock',
+                'p.id as id_product'
             )
             ->join('shop as s', 'cst.id_shop', '=', 's.id')
             ->join('product as p', 'cst.id_product', '=', 'p.id')

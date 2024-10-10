@@ -66,7 +66,7 @@
 
     function kembaliKeDetailTransaksi() {
         var id_cart_shop = "{{ $id_cart_shop }}";
-        var url = "{{ route('profile.kontrak') }}?id=" + id_cart_shop;
+        var url = "{{ route('profile.kontrak') }}?id=" + id_cart_shop + "&token=" + token;
         loadContent(url, $('#contentArea'));
     }
 
@@ -96,7 +96,7 @@
         }
 
         $.ajax({
-            url: appUrl + "/api/storeKontrak", // Sesuaikan dengan route yang benar
+            url: appUrl + "/api/storeKontrak?token=" + token,
             type: 'POST',
             data: formData,
             processData: false,

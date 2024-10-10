@@ -15,7 +15,8 @@
         width: 35px;
         height: 35px;
         background-color: white;
-        box-shadow: 0 4px 4px #000000; /* Shadow biru lebih muda */
+        box-shadow: 0 4px 4px #000000;
+        /* Shadow biru lebih muda */
         border-radius: 50%;
         display: flex;
         justify-content: center;
@@ -46,7 +47,7 @@
             $pc_image = $requiresBaseUrl ? "https://eliteproxy.co.id/" .$wish->image : $wish->image;
             @endphp
             <div class="product-item">
-                <a href="{{ route('product.show', ['id' => $wish->id]) }}" class="product-link">
+                <a href="{{ route('product.show', ['id' => $wish->id , 'token'=>$token]) }}" class="product-link">
                     <img src="{{ $pc_image }}" alt="Produk">
                     <p title="{{ $wish->name }}">{{ $wish->name }}</p>
                     <p>Rp {{ number_format($wish->harga_tayang, 0, ',', '.') }}</p>

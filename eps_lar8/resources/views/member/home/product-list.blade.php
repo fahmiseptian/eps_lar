@@ -5,7 +5,7 @@ $pc_image = $requiresBaseUrl ? "https://eliteproxy.co.id/" .$product->image : $p
 @endphp
 
 <div class="product-item">
-    <a href="{{ route('product.show', ['id' => $product->id]) }}" class="product-link">
+    <a href="{{ route('product.show', ['id' => $product->id , 'token' => $token]) }}" class="product-link">
         <img src="{{ $pc_image }}" alt="Produk">
         <p title="{{ $product->name }}">{{ substr($product->name, 0, 20) }}...</p>
         <p>Rp {{ number_format($product->hargaTayang, 0, ',', '.') }}</p>

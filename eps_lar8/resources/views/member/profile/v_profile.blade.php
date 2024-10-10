@@ -19,27 +19,27 @@
                         <ul class="nav flex-column">
                             @if($member->id_member_type != 3)
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('profile.transaksi.pemohon') }}"><span class="material-icons">swap_horiz</span> Lihat Transaksi</a>
+                                <a class="nav-link" href="{{ route('profile.transaksi.pemohon', ['token' => $token] ) }}"><span class="material-icons">swap_horiz</span> Lihat Transaksi</a>
                             </li>
                             @endif
                             @if($member->id_member_type == 3)
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('profile.transaksi') }}"><span class="material-icons">swap_horiz</span> Lihat Transaksi</a>
+                                <a class="nav-link" href="{{ route('profile.transaksi', ['token' => $token] ) }}"><span class="material-icons">swap_horiz</span> Lihat Transaksi</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('profile.nego') }}"><span class="material-icons">handshake</span> Nego</a>
+                                <a class="nav-link" href="{{ route('profile.nego', ['token' => $token] ) }}"><span class="material-icons">handshake</span> Nego</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('profile.wish') }}"><span class="material-icons">favorite</span> Favorite</a>
+                                <a class="nav-link" href="{{ route('profile.wish', ['token' => $token] ) }}"><span class="material-icons">favorite</span> Favorite</a>
                             </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" id="manajemenDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <span class="material-icons">manage_accounts</span> Manajemen
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="manajemenDropdown">
-                                    <li><a class="dropdown-item" href="{{ route('profile.user', ['tipe' => 'pemohon']) }}"><span class="material-icons">person_add</span> User Pemohon</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('profile.user', ['tipe' => 'Penyetuju_Pemohonan']) }}"><span class="material-icons">how_to_reg</span> User Penyetuju</a></li>
-                                    <li><a class="dropdown-item" href="{{ route('profile.user', ['tipe' => 'finance']) }}"><span class="material-icons">account_balance</span> User Finance</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('profile.user', ['tipe' => 'pemohon' , 'token' => $token]) }}"><span class="material-icons">person_add</span> User Pemohon</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('profile.user', ['tipe' => 'Penyetuju_Pemohonan' , 'token' => $token]) }}"><span class="material-icons">how_to_reg</span> User Penyetuju</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('profile.user', ['tipe' => 'finance' , 'token' => $token]) }}"><span class="material-icons">account_balance</span> User Finance</a></li>
                                 </ul>
                             </li>
                             @endif
@@ -48,15 +48,15 @@
                                     <span class="material-icons">settings</span> Setting
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="settingDropdown">
-                                    <li><a class="dropdown-item" href="{{ route('profile.view') }}"><span class="material-icons">person</span> Profile</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('profile.view', ['token' => $token] ) }}"><span class="material-icons">person</span> Profile</a></li>
                                     @if($member->id_member_type == 3)
-                                    <li><a class="dropdown-item" href="{{ route('profile.address') }}"><span class="material-icons">location_on</span> Alamat</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('profile.address' , ['token' => $token]) }}"><span class="material-icons">location_on</span> Alamat</a></li>
                                     @endif
-                                    <li><a class="dropdown-item" href="{{ route('profile.update_password') }}"><span class="material-icons">vpn_key</span> Ganti Password</a></li>
+                                    <li><a class="dropdown-item" href="{{ route('profile.update_password', ['token' => $token]) }}"><span class="material-icons">vpn_key</span> Ganti Password</a></li>
                                 </ul>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link-logout" href="{{ route('logout') }}">
+                                <a class="nav-link-logout" href="{{ route('logout' , ['token' => $token] ) }}">
                                     <span class="material-icons">logout</span> Keluar
                                 </a>
                             </li>
@@ -81,27 +81,54 @@
                                         <span class="material-icons profile-icon">person</span>
                                         <div class="profile-detail">
                                             <label>Nama Lengkap</label>
-                                            <p>{{ $user->nama ?? 'Nama belum diatur' }}</p>
+                                            <p>
+                                                <input id="edit-nama" value="{{ $user->nama }}" placeholder="Nama belum diatur" readonly style="border: none; background: transparent; width: 100%;">
+                                            </p>
                                         </div>
                                     </div>
                                     <div class="profile-item">
                                         <span class="material-icons profile-icon">email</span>
                                         <div class="profile-detail">
                                             <label>Email</label>
-                                            <p>{{ $user->email ?? 'Email belum diatur' }}</p>
+                                            <p>
+                                                <input id="edit-email" value="{{ $user->email }}" placeholder="Email belum diatur" readonly style="border: none; background: transparent; width: 100%;">
+                                            </p>
                                         </div>
                                     </div>
                                     <div class="profile-item">
                                         <span class="material-icons profile-icon">phone</span>
                                         <div class="profile-detail">
                                             <label>Nomor Telepon</label>
-                                            <p>{{ $user->phone ?? 'Nomor telepon belum diatur' }}</p>
+                                            <p>
+                                                <input id="edit-phone" type="number" value="{{ $user->phone }}" placeholder="Nomor telepon belum diatur" readonly style="border: none; background: transparent; width: 100%;">
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="profile-item">
+                                        <span class="material-icons profile-icon">assignment</span>
+                                        <div class="profile-detail">
+                                            <label>NPWP</label>
+                                            <p>
+                                                <input id="edit-npwp" value="{{ $user->npwp }}" placeholder="NPWP belum diatur" readonly style="border: none; background: transparent; width: 100%;">
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="profile-item">
+                                        <span class="material-icons profile-icon">home</span>
+                                        <div class="profile-detail">
+                                            <label>Alamat NPWP</label>
+                                            <p>
+                                                <input id="edit-npwp_address" value="{{ $user->npwp_address }}" placeholder="Alamat NPWP belum diatur" readonly style="border: none; background: transparent; width: 100%;">
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="profile-actions">
-                                    <button class="btn btn-primary" onclick="editProfile()">
+                                    <button class="btn btn-primary" id="edit-button" onclick="toggleEdit()">
                                         <span class="material-icons">edit</span> Edit Profil
+                                    </button>
+                                    <button class="btn btn-primary" id="save-button" style="display: none;" onclick="saveProfile()">
+                                        <span class="material-icons">save</span> Simpan Perubahan
                                     </button>
                                 </div>
                             </div>
@@ -304,7 +331,7 @@
         $(document).on('click', '.detail-transaction', function(e) {
             e.preventDefault();
             var id_cart = $(this).data('id');
-            var url = "{{ route('profile.transaksi.detail') }}?id=" + id_cart;
+            var url = "{{ route('profile.transaksi.detail') }}?id=" + id_cart + "?token=" + token;
             loadContent(url, $('#contentArea'));
         });
 
@@ -325,18 +352,18 @@
         }
 
         $(document).on('click', '#tambah-alamat', function(e) {
-            var url = "{{ route('profile.edit-address') }}";
+            var url = "{{ route('profile.edit-address') }}?token=" + token;
             loadContent(url, $('#contentArea'));
         });
 
         function editAlamat(id) {
-            var url = "{{ route('profile.edit-address') }}?id_address=" + id;
+            var url = "{{ route('profile.edit-address') }}?id_address=" + id + "?token=" + token;
             loadContent(url, $('#contentArea'));
         }
 
         function hapusAlamat(id) {
             $.ajax({
-                url: appUrl + "/api/member/update-Address",
+                url: appUrl + "/api/member/update-Address?token=" + token,
                 method: 'POST',
                 data: {
                     id_address: id,
@@ -346,7 +373,7 @@
                     if (response.success) {
                         Swal.fire('Berhasil!', 'Alamat berhasil dihapus.', 'success').then((result) => {
                             if (result.isConfirmed) {
-                                var url = "{{ route('profile.address') }}";
+                                var url = "{{ route('profile.address') }}?token=" + token;
                                 loadContent(url, $('#contentArea'));
                             }
                         });
@@ -363,7 +390,7 @@
 
         function aturSebagaiPenagihan(id) {
             $.ajax({
-                url: appUrl + "/api/member/update-Address",
+                url: appUrl + "/api/member/update-Address?token=" + token,
                 method: 'POST',
                 data: {
                     id_address: id,
@@ -373,7 +400,7 @@
                     if (response.success) {
                         Swal.fire('Berhasil!', 'Alamat berhasil diset sebagai pengaihan.', 'success').then((result) => {
                             if (result.isConfirmed) {
-                                var url = "{{ route('profile.address') }}";
+                                var url = "{{ route('profile.address') }}?token=" + token;
                                 loadContent(url, $('#contentArea'));
                             }
                         });
@@ -390,7 +417,7 @@
 
         function aturAlamatUtama(id) {
             $.ajax({
-                url: appUrl + "/api/member/update-Address",
+                url: appUrl + "/api/member/update-Address?token=" + token,
                 method: 'POST',
                 data: {
                     id_address: id,
@@ -400,7 +427,7 @@
                     if (response.success) {
                         Swal.fire('Berhasil!', 'Alamat berhasil diset sebagai alamat utama.', 'success').then((result) => {
                             if (result.isConfirmed) {
-                                var url = "{{ route('profile.address') }}";
+                                var url = "{{ route('profile.address') }}?token=" + token;
                                 loadContent(url, $('#contentArea'));
                             }
                         });
@@ -424,7 +451,7 @@
         $(document).on('click', '.detail_nego', function(e) {
             e.preventDefault();
             var id_nego = $(this).data('id');
-            var url = "{{ route('profile.nego.detail') }}?id=" + id_nego;
+            var url = "{{ route('profile.nego.detail') }}?id=" + id_nego + "?token=" + token;
             loadContent(url, $('#contentArea'));
         });
 
@@ -437,7 +464,7 @@
 
             // Perform AJAX to submit the new negotiation
             $.ajax({
-                url: appUrl + '/api/member/nego/reqNego', // Replace with your actual endpoint
+                url: appUrl + '/api/member/nego/reqNego?token=' + token, // Replace with your actual endpoint
                 type: 'POST',
                 data: {
                     id_nego: id_nego,
@@ -744,7 +771,7 @@
         function getnewtoken(id_user, id_cart, cond) {
             console.log('masuk');
             $.ajax({
-                url: appUrl + "/api/midtrans/status",
+                url: appUrl + "/api/midtrans/status?token=" + token,
                 type: "get",
                 data: {
                     id_user: id_user,
@@ -877,7 +904,7 @@
                     formData.append("img", file);
 
                     $.ajax({
-                        url: appUrl + "/api/upload-payment",
+                        url: appUrl + "/api/upload-payment?token" + token,
                         type: "POST",
                         data: formData,
                         contentType: false,
@@ -921,7 +948,7 @@
 
         function kembaliKemenuTransaksi() {
             const contentArea = document.getElementById('contentArea');
-            const url = appUrl + '/profile/transaksi';
+            const url = appUrl + '/profile/transaksi?token=' + token;
 
             // Menampilkan pesan loading
             contentArea.innerHTML = `<h5>Memuat konten untuk Transaksi...</h5>`;
@@ -942,6 +969,60 @@
                     contentArea.innerHTML = `<h5>Terjadi kesalahan saat memuat konten untuk Transaksi. Silakan coba lagi.</h5>`;
                 });
         }
+
+        function toggleEdit() {
+            const isEditing = $('#edit-button').text().includes('Simpan');
+
+            // Toggle between edit and save
+            $('#edit-button').toggle();
+            $('#save-button').toggle();
+
+            // Enable or disable input fields
+            $('input').prop('readonly', isEditing);
+            $('input').css('background', isEditing ? 'transparent' : '#fff'); // Ubah latar belakang saat edit
+        }
+
+        function saveProfile() {
+            // Logic to save changes
+            const updatedData = {
+                nama: $('#edit-nama').val(),
+                email: $('#edit-email').val(),
+                phone: $('#edit-phone').val(),
+                npwp: $('#edit-npwp').val(),
+                npwp_address: $('#edit-npwp_address').val()
+            };
+
+            $.ajax({
+                url: '/update-profile', // Ganti dengan URL endpoint yang sesuai
+                type: 'POST',
+                data: updatedData,
+                success: function(response) {
+                    // Update the displayed values with the input values
+                    $('#edit-nama').val(updatedData.nama);
+                    $('#edit-email').val(updatedData.email);
+                    $('#edit-phone').val(updatedData.phone);
+                    $('#edit-npwp').val(updatedData.npwp);
+                    $('#edit-npwp_address').val(updatedData.npwp_address);
+                    alert('Perubahan berhasil disimpan!');
+                    toggleEdit(); // Kembali ke mode tampilan
+                },
+                error: function(xhr) {
+                    alert('Terjadi kesalahan saat menyimpan perubahan. Silakan coba lagi.');
+                }
+            });
+        }
+
+        $("#edit-npwp").on("input", function() {
+            let a = $(this).val().replace(/\D/g, ""),
+                t = "";
+            a.length > 0 && (t += a.substring(0, 2)),
+                a.length > 2 && (t += "." + a.substring(2, 5)),
+                a.length > 5 && (t += "." + a.substring(5, 8)),
+                a.length > 8 && (t += "." + a.substring(8, 9)),
+                a.length > 9 && (t += "-" + a.substring(9, 12)),
+                a.length > 12 && (t += "." + a.substring(12, 15)),
+                $(this).val(t);
+        });
     </script>
 </body>
 

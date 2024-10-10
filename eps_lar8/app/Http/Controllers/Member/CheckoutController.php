@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
 use App\Libraries\Bca;
+use App\Libraries\Lpse;
 use App\Libraries\Terbilang;
 use App\Models\Bast;
 use App\Models\Cart;
@@ -23,14 +24,26 @@ use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
 class CheckoutController extends Controller
 {
     protected $data;
+    protected $user_id;
     protected $model;
     public function __construct(Request $request)
     {
+        $token = $request->input('token');
+        if ($token != null) {
+            $lpse = new Lpse();
+            $cek_token = $lpse->check_token($token);
+
+            $this->user_id = $cek_token->id_member;
+        } else {
+            // Ambil semua data sesi
+            $sessionData = $request->session()->all();
+            $this->user_id = $sessionData['id'] ?? null;
+        }
+
         $this->data['complate_cart'] = new Invoice();
         $this->model['member'] = new Member();
         // Ambil semua data sesi
-        $sessionData = $request->session()->all();
-        $this->data['id_user'] = $sessionData['id'] ?? null;
+        $this->data['id_user'] = $this->user_id ?? null;
 
         $this->data['nama_user'] = '';
 

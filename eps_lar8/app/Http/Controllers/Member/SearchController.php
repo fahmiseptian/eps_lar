@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
+use App\Libraries\Lpse;
 use App\Libraries\Searchengine;
 use App\Models\Member;
 use App\Models\Product;
@@ -16,11 +17,25 @@ class SearchController extends Controller
 
     protected $data;
     protected $model;
+    protected $user_id;
     protected $libraries;
     public function __construct(Request $request)
     {
-        $sessionData = $request->session()->all();
-        $this->data['id_user'] = $sessionData['id'] ?? null;
+        $token = $request->input('token');
+        $this->data['token'] = $token;
+        $this->data['is_lpse'] = 0;
+        if ($token != null) {
+            $lpse = new Lpse();
+            $cek_token = $lpse->check_token($token);
+            $this->data['is_lpse'] = 1;
+            $this->user_id = $cek_token->id_member;
+        } else {
+            // Ambil semua data sesi
+            $sessionData = $request->session()->all();
+            $this->user_id = $sessionData['id'] ?? null;
+        }
+
+        $this->data['id_user'] = $this->user_id ?? null;
         $this->model['member'] = new Member();
 
         $this->libraries['Searchengine'] = new Searchengine();
@@ -36,12 +51,12 @@ class SearchController extends Controller
         $query = $request->input('query');
 
         $result = $this->libraries['Searchengine']->quickSearch($query);
-        return view('member.asset.quick_search_results', $result);
+        return view('member.asset.quick_search_results', $result, $this->data);
     }
 
     public function fullSearch($query)
     {
-        $result = $this->libraries['Searchengine']->fullSearch($query, null, null, 20, 1);
+        $result = $this->libraries['Searchengine']->fullSearch($query, null, null, $this->data['is_lpse'] , 20, 2);
 
         if ($result && isset($result['productsearch']) && $result['productsearch']->total() > 0) {
             $firstProduct = $result['productsearch']->first();
@@ -76,7 +91,7 @@ class SearchController extends Controller
             'perPage' => $request->input('perPage'),
             'page' => $request->input('page'),
         ];
-        $result = $this->libraries['Searchengine']->filterSearching($data);
+        $result = $this->libraries['Searchengine']->filterSearching($data , $this->data['is_lpse']);
         return response()->json($result);
     }
 
@@ -87,7 +102,7 @@ class SearchController extends Controller
 
         // return response()->json(["query" => $query, "page" => $page]);
 
-        $result = $this->libraries['Searchengine']->fullSearch($query, null, null, 20, $page);
+        $result = $this->libraries['Searchengine']->fullSearch($query, null, null, $this->data['is_lpse'], 20, $page);
 
         if ($request->ajax()) {
             return view('member.home.product_searching', $result)->render();
@@ -98,7 +113,7 @@ class SearchController extends Controller
 
     function SerachwithCategory($category)
     {
-        $result = $this->libraries['Searchengine']->fullSearch(null, null, $category, 20, 1);
+        $result = $this->libraries['Searchengine']->fullSearch(null, null, $category, $this->data['is_lpse'], 20, 1);
         // return response()->json($result);
         return view('member.home.search', $this->data, $result);
     }
@@ -119,7 +134,7 @@ class SearchController extends Controller
             'category' => $category,
             'sort' => $sort
         ];
-        $result = $this->libraries['Searchengine']->filterSearching($data);
+        $result = $this->libraries['Searchengine']->filterSearching($data, $this->data['is_lpse']);
         return response()->json($result);
     }
 }

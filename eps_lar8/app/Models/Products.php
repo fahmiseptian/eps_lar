@@ -160,26 +160,45 @@ class Products extends Model implements HasMedia
     }
 
 
-    public function getShowproduct($perPage = 10)
+    public function getShowproduct($perPage = 10, $is_lpse,  $category = null)
     {
-        return self::select(
-            'products.*',
-            'lp.price_lpse as hargaTayang',
-            's.name as namaToko',
-            's.id as idToko',
-            'p.province_name',
-            DB::raw('(SELECT image300 FROM product_image WHERE id_product = products.id AND is_default = "yes" LIMIT 1) AS image')
-        )
+        $query = DB::table('products') // Ganti DB::select dengan DB::table
+            ->select(
+                'products.*',
+                'lp.price_lpse as hargaTayang',
+                's.name as namaToko',
+                's.id as idToko',
+                'p.province_name',
+                DB::raw('(SELECT image300 FROM product_image WHERE id_product = products.id AND is_default = "yes" LIMIT 1) AS image')
+            )
             ->leftJoin('lpse_price as lp', 'products.id', '=', 'lp.id_product')
             ->leftJoin('shop as s', 'products.id_shop', '=', 's.id')
             ->leftJoin('member_address as ma', 's.id_address', '=', 'ma.member_address_id')
             ->leftJoin('province as p', 'ma.province_id', '=', 'p.province_id')
             ->where('products.status_display', 'Y')
             ->where('products.status_delete', 'N')
-            ->where('s.status', 'active')
-            ->orderBy('products.id', 'DESC')
-            ->distinct()
-            ->paginate($perPage);
+            ->where('s.status', 'active');
+
+        if ($is_lpse == 1) {
+            $query->where('s.is_lpse_verified', 1)
+            ->where('products.status_lpse', 1);
+        }
+
+        if ($category != null) {
+            $id_category = DB::table('product_category')->where('lpse_code', $category)->value('id');
+
+            $query->leftJoin('product_category as pc', 'products.id_category', '=', 'pc.id')
+                ->where(function ($q) use ($id_category) {
+                    $q->where('products.id_category', $id_category)
+                        ->orWhere('pc.parent_id', $id_category);
+                });
+        }
+
+        $query->orderBy('products.id', 'DESC')
+            ->distinct();
+
+        // Eksekusi query dan kembalikan hasilnya
+        return $query->paginate($perPage);
     }
 
     function getDataProduct($id_product)
@@ -645,6 +664,6 @@ class Products extends Model implements HasMedia
             ->join('shop as s', 's.id', '=', 'p.id_shop')
             ->join('lpse_price as l', 'l.id_product', '=', 'p.id')
             ->where('mw.id_member', $id_member)
-            ->get(); 
+            ->get();
     }
 }

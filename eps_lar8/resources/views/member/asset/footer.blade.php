@@ -167,7 +167,7 @@
             searchTimer = setTimeout(function() {
                 if (query.length >= 2) {
                     $.ajax({
-                        url: '{{ route("quick.search") }}',
+                        url: appUrl + '/api/quick-search?token=' + token,
                         method: 'GET',
                         data: {
                             query: query
@@ -192,7 +192,7 @@
         $('#search-button').on('click', function() {
             var query = $('#search-input').val();
             if (query.length >= 2) {
-                window.location.href = appUrl + '/find/' + query;
+                window.location.href = appUrl + '/find/' + query + '?token=' + token;
             }
         });
 

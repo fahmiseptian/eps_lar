@@ -12,6 +12,7 @@ class Searchengine
     {
         $categories = DB::table('product_category')
             ->where('name', 'like', "%$query%")
+            ->where('active', 'Y')
             ->take(5)
             ->get();
 
@@ -37,7 +38,7 @@ class Searchengine
         return compact('categories', 'productsearch', 'stores');
     }
 
-    function fullSearch($query = null, $where = null, $category = null, $perPage = 20, $page = 1)
+    function fullSearch($query = null, $where = null, $category = null, $is_lpse, $perPage = 20, $page = 1)
     {
         $keyword = $query;
         $stores = null;
@@ -54,22 +55,6 @@ class Searchengine
                 ->where('pc1.parent_id', 0)
                 ->distinct()
                 ->get();
-
-            $menuCategories = [];
-
-            foreach ($categories as $cat) {
-                $subMenus = DB::table('product_category')
-                    ->select('id', 'name')
-                    ->where('parent_id', $cat->id)
-                    ->where('active', 'Y')
-                    ->get();
-
-                $menuCategories[] = [
-                    'id' => $cat->id,
-                    'name' => $cat->name,
-                    'submenus' => $subMenus
-                ];
-            }
 
             $menuCategories = [];
 
@@ -105,6 +90,11 @@ class Searchengine
                 ->where('products.status_delete', 'N')
                 ->where('s.status', 'active');
 
+            if ($is_lpse == 1) {
+                $productsearch->where('s.is_lpse_verified', 1)
+                    ->where('products.status_lpse', 1);
+            }
+
             if ($where) {
                 foreach ($where as $key => $value) {
                     $productsearch->where($key, $value);
@@ -116,7 +106,6 @@ class Searchengine
             // Debugging
             Log::info('Type of $productsearch: ' . get_class($productsearch));
             Log::info('$productsearch contents: ' . json_encode($productsearch));
-
 
             $stores = DB::table('shop')
                 ->where('name', 'like', "%$query%")
@@ -147,14 +136,6 @@ class Searchengine
                             'name' => $selectedCategory->name,
                             'submenus' => $subMenus
                         ];
-
-
-                    // foreach ($subMenus as $subMenu) {
-                    //     $menuCategories[0]['submenus'][] = [
-                    //         'id' => $subMenu->id,
-                    //         'name' => $subMenu->name
-                    //     ];
-                    // }
                 } else {
                     $menuCategories = [];
                 }
@@ -168,17 +149,26 @@ class Searchengine
                         'p.province_name',
                         DB::raw('(SELECT image300 FROM product_image WHERE id_product = products.id AND is_default = "yes" LIMIT 1) AS image300')
                     )
-                    ->leftJoin('product_category as pc', 'products.id_category', '=', 'pc.id')
                     ->leftJoin('lpse_price as lp', 'products.id', '=', 'lp.id_product')
                     ->join('shop as s', 'products.id_shop', '=', 's.id')
                     ->leftJoin('member_address as ma', 's.id_address', '=', 'ma.member_address_id')
                     ->leftJoin('province as p', 'ma.province_id', '=', 'p.province_id')
+                    ->leftJoin('product_category as pc', 'products.id_category', '=', 'pc.id')
                     ->where('products.status_display', 'Y')
                     ->where('products.status_delete', 'N')
                     ->where('s.status', 'active');
 
-                $productsearch->where('products.id_category', $selectedCategory->id);
-                $productsearch->orWhere('pc.parent_id', $selectedCategory->id);
+                // Tambahkan kondisi untuk status_lpse
+                if ($is_lpse == 1) {
+                    $productsearch->where('s.is_lpse_verified', 1)
+                        ->where('products.status_lpse', 1); // Pastikan status_lpse adalah 1
+                }
+
+                // Gabungkan kondisi untuk kategori
+                $productsearch->where(function ($query) use ($selectedCategory) {
+                    $query->where('products.id_category', $selectedCategory->id)
+                        ->orWhere('pc.parent_id', $selectedCategory->id);
+                });
 
                 if ($where) {
                     foreach ($where as $key => $value) {
@@ -216,17 +206,14 @@ class Searchengine
             }
         }
 
-
-
         return compact('menuCategories', 'productsearch', 'stores', 'keyword');
     }
 
-    public function filterSearching($data)
+    public function filterSearching($data, $is_lpse)
     {
         $query = DB::table('products')
             ->select(
-                'products.id',
-                'products.name',
+                'products.*',
                 'shop.name as shop_name',
                 'p.province_name',
                 'lp.price_lpse as hargaTayang',
@@ -240,32 +227,20 @@ class Searchengine
             ->where('products.status_delete', 'N')
             ->where('shop.status', 'active');
 
-        if (!empty($data['keyword'])) {
-            $query->where('products.name', 'like', '%' . $data['keyword'] . '%');
+        // Perbaikan untuk kondisi is_lpse
+        if ($is_lpse == 1) {
+            $query->where('shop.is_lpse_verified', 1)
+                ->where('products.status_lpse', 1); // Hanya ambil produk dengan status_lpse = 1
+        } else {
+            $query->where('products.status_lpse', 0); // Jika tidak, ambil produk dengan status_lpse = 0
         }
 
-        if (!empty($data['category'])) {
-            $query->leftJoin('product_category as pc', 'products.id_category', '=', 'pc.id');
-            $query->where('products.id_category', $data['category']);
-            $query->orWhere('pc.parent_id', $data['category']);
-        }
-
-        if (!empty($data['min'])) {
-            $query->where('lp.price_lpse', '>=', $data['min']);
-        }
-
-        if (!empty($data['max'])) {
-            $query->where('lp.price_lpse', '<=', $data['max']);
-        }
-
-        if (!empty($data['condition'])) {
-            $query->where('products.status_new_product', $data['condition']);
-        }
-
+        // Filter berdasarkan id_shop jika ada
         if (!empty($data['idshop'])) {
             $query->where('products.id_shop', $data['idshop']);
         }
 
+        // Filter lainnya
         if (!empty($data['sort'])) {
             switch ($data['sort']) {
                 case 'terbaru':
@@ -283,8 +258,35 @@ class Searchengine
             }
         }
 
+        if (!empty($data['keyword'])) {
+            $query->where('products.name', 'like', '%' . $data['keyword'] . '%');
+        }
+
+        if (!empty($data['category'])) {
+            $query->leftJoin('product_category as pc', 'products.id_category', '=', 'pc.id');
+            $query->where(function ($q) use ($data) {
+                $q->where('products.id_category', $data['category'])
+                    ->orWhere('pc.parent_id', $data['category']);
+            });
+        }
+
+        if (!empty($data['min'])) {
+            $query->where('lp.price_lpse', '>=', $data['min']);
+        }
+
+        if (!empty($data['max'])) {
+            $query->where('lp.price_lpse', '<=', $data['max']);
+        }
+
+        if (!empty($data['condition'])) {
+            $query->where('products.status_new_product', $data['condition']);
+        }
+
+        // Mengambil hasil pencarian
         $productsearch = $query->get();
 
+        // print_r($productsearch);
+        // exit();
         return $productsearch;
     }
 

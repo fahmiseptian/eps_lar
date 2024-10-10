@@ -4,7 +4,7 @@
     <div class="navbar">
         <div class="navbar-left">
             <div class="logo">
-                <a href="{{ route('home') }}">
+                <a href="{{ route('home', ['token' => $token]) }}">
                     <img id="site-logo" src="{{ asset('/img/app/logo-eps.png') }}" alt="Logo" height="40px">
                 </a>
             </div>
@@ -23,12 +23,12 @@
             </div>
         </div>
         <div class="navbar-right">
-            <a href="{{ $id_user ? route('cart') : route('login') }}" class="icon-btn">
+            <a href="{{ $id_user ? route('cart',['token' => $token]) : route('login') }}" class="icon-btn">
                 <span class="material-icons">shopping_cart</span>
                 <span>Keranjang</span>
             </a>
             <div class="user-menu">
-                <a href="{{ $id_user ? route('profile') : route('login') }}" class="user-btn">
+                <a href="{{ $id_user ? route('profile',['token' => $token]) : route('login') }}" class="user-btn">
                     <span class="material-icons">account_circle</span>
                     <span>{{ $id_user != null ? $nama_user : 'Login' }}</span>
                 </a>
@@ -39,6 +39,7 @@
 
 <script>
     const appUrl = "{{ env('APP_URL') }}";
+    const token = "{{ $token }}";
     window.appUrl = appUrl;
     // var csrfToken = $('meta[name="csrf-token"]').attr("content");
 </script>

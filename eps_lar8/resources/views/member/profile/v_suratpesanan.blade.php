@@ -49,19 +49,19 @@
     function kembaliKeDetailTransaksi() {
         var id_cart = "{{ $id_cart }}";
 
-        var url = "{{ route('profile.transaksi.detail') }}?id=" + id_cart;
+        var url = "{{ route('profile.transaksi.detail') }}?id=" + id_cart + "&token=" + token;
         loadContent(url, $('#contentArea'));
     }
 
     function editsuratpesanan(id) {
-        var url = "{{ route('profile.edit-suratpesanan') }}?id=" + id;
+        var url = "{{ route('profile.edit-suratpesanan') }}?id=" + id + "&token=" + token;
         loadContent(url, $('#contentArea'));
     }   
 
     function buatSuratPesanan() {
         var id_cart_shop = "{{ $id_cart_shop }}";
         var id_shop = "{{ $id_shop }}";
-        var url = "{{ route('profile.create-suratpesanan') }}?id=" + id_cart_shop + "&id_shop=" + id_shop;
+        var url = "{{ route('profile.create-suratpesanan') }}?id=" + id_cart_shop + "&id_shop=" + id_shop + "&token=" + token;
         loadContent(url, $('#contentArea'));
     }
 

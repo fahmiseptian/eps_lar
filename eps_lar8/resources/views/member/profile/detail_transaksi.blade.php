@@ -240,7 +240,7 @@
             @if($member->id_member_type == 3)
             <div class="info-section">
                 <div class="action-buttons-detail-trx">
-                    @if($transaction['detailOrder']->no_resi != '')
+                    @if($transaction['detailOrder']->status != 'Menunggu_Konfirmasi_Penjual')
                     <button class="action-btn-detail-trx btn-primary lacakResi" data-resi="{{ $transaction['detailOrder']->no_resi }}" data-id_courier="{{ $transaction['detailOrder']->id_courier }}" data-id="{{ $transaction['detailOrder']->id_cart_shop }}">
                         <i class="material-icons">local_shipping</i>
                         <span>Lacak</span>
@@ -440,11 +440,11 @@
     console.log(bukti_transfer);
 
     function loadTransaksi() {
-        loadContent("{{ route('profile.transaksi') }}", $('#contentArea'));
+        loadContent("{{ route('profile.transaksi') }}?token=" + token, $('#contentArea'));
     }
 
     function loadTransaksiPemohon() {
-        loadContent("{{ route('profile.transaksi.pemohon') }}", $('#contentArea'));
+        loadContent("{{ route('profile.transaksi.pemohon') }}?token=" + token, $('#contentArea'));
     }
 
     function setujuinPPK(id_cart) {
@@ -459,7 +459,7 @@
             if (result.isConfirmed) {
                 // If user clicks "Ya, Setujui", send AJAX request to approve the transaction
                 $.ajax({
-                    url: appUrl + "/api/approveTransaction",
+                    url: appUrl + "/api/approveTransaction?token=" + token,
                     type: "POST",
                     data: {
                         id_cart: id_cart
@@ -487,7 +487,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: appUrl + "/api/rejectTransaction",
+                    url: appUrl + "/api/rejectTransaction?token=" + token,
                     type: "POST",
                     data: {
                         id_cart: id_cart
@@ -528,7 +528,6 @@
                 id_courier: id_courier,
                 resi: resi,
                 cart_shop: id_cart_shop,
-                _token: csrfToken,
             },
             xhrFields: {
                 withCredentials: true,
@@ -558,19 +557,15 @@
 
     $('.openKontrak').click(function() {
         var id_cart_shop = $(this).data('id');
-        var url = "{{ route('profile.kontrak') }}?id=" + id_cart_shop;
+        var url = "{{ route('profile.kontrak') }}?id=" + id_cart_shop + "&token=" + token;
         loadContent(url, $('#contentArea'));
     });
 
     $('.openSuratPesanan').click(function() {
         var id_cart_shop = $(this).data('id');
-        var url = "{{ route('profile.suratpesanan') }}?id=" + id_cart_shop;
+        var url = "{{ route('profile.suratpesanan') }}?id=" + id_cart_shop + "?token=" + token;
         loadContent(url, $('#contentArea'));
     });
-
-    function uploadPayment(id_cart) {
-        console.log(id_cart);
-    }
 
     function uploadPajak(id_cart_shop) {
         console.log(id_cart_shop);

@@ -140,6 +140,7 @@ class Nego extends Model
         $query = DB::table('nego as n')
             ->select(
                 'n.*',
+                'n.status_nego as nego_status',
                 's.name as nama_toko',
                 DB::raw('(SELECT base_price FROM product_nego WHERE id_nego = n.id ORDER BY id DESC LIMIT 1) AS harga_nego'),
                 DB::raw('(SELECT status FROM product_nego WHERE id_nego = n.id ORDER BY id DESC LIMIT 1) AS status_nego'),

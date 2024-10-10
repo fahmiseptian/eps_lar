@@ -39,6 +39,9 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
+// login lpse
+Route::post('/lpse/login',[LoginmemberController::class,'login_lpse']);
+
 Route::post('/bni/hit', [BniController::class, 'apiHiting']);
 Route::post('/bni/create-billing', [BniController::class, 'createBilling']);
 Route::post('/bni/inquiry-billing', [BniController::class, 'inquiryBilling']);
@@ -170,42 +173,43 @@ Route::post('/download-sp', [OrederController::class, 'downloadSp'])->name('down
 
 
 // Member
-Route::group(['middleware' => 'member'], function () {
-    Route::post('/update-quantity', [CartController::class, 'updateQuantity']);
-    Route::post('/cart/update-quantity', [CartController::class, 'updateProductCart']);
-    Route::post('/add-cart', [CartController::class, 'addCart']);
-    Route::get('/update-top/{top}', [CartController::class, 'updateTOP']);
-    Route::post('/update-payment', [CartController::class, 'updatePayment']);
-    Route::delete('/cart/{id_temporary}/{id_shop}', [CartController::class, 'deleteCart']);
-    Route::get('/member/getaddress', [CartController::class, 'getaddress']);
-    Route::get('/updateAddressCart/{member_address_id}', [CartController::class, 'updateAddressCart']);
-    Route::get('/shipping/{id_shipping}/{id_cs}', [CartController::class, 'getOngkir']);
-    Route::get('/insurance/{id_shop}/{id_courier}/{idcs}/{status}', [CartController::class, 'insurance']);
-    Route::get('/getorder/{id_cart}', [CheckoutController::class, 'getOrder']);
-    Route::post('/upload-payment', [CheckoutController::class, 'uploadPayment']);
-    Route::post('/storeKontrak', [ProfilememberController::class, 'storeKontrak']);
-    Route::post('/storeSuratPesanan', [ProfilememberController::class, 'storeSuratPesanan']);
-    Route::post('/finishCheckout', [CartController::class, 'finish_checkout']);
-    Route::post('/sumbitBast', [CheckoutController::class, 'sumbit_bast']);
-    Route::get('/lacak_pengiriman/{id_seller}/{id_cart_shop}', [CheckoutController::class, 'lacak_pengiriman']);
-    Route::get('/get_detail_transaksi/{id_shop}/{id_cart_shop}', [CheckoutController::class, 'get_detail_product']);
-    Route::post('/updateIsSelectProduct', [CartController::class, 'updateIsSelectProduct']);
-    Route::post('/update-product-selection/shop', [CartController::class, 'updateIsSelectShop']);
-    Route::post('/updateqtyCart', [CartController::class, 'updateqtyCart']);
-    Route::post('/member/storeAddress', [ProfilememberController::class, 'storeAddress']);
-    Route::post('/member/update-Address', [ProfilememberController::class, 'UpdateAddress']);
-    Route::post('/member/nego/accNego', [ProfilememberController::class, 'accNego']);
-    Route::post('/member/nego/tolak_nego', [ProfilememberController::class, 'tolak_nego']);
-    Route::post('/member/nego/reqNego', [ProfilememberController::class, 'addRequestNego']);
-    Route::post('/member/update-password', [ProfilememberController::class, 'store_password']);
-    Route::post('/member/add-user', [ProfilememberController::class, 'store_user']);
-    Route::post('/member/delete-user', [ProfilememberController::class, 'DeleteUser']);
-    Route::post('/cart/update-note', [CartController::class, 'UpdateNote']);
-    Route::post('/approveTransaction', [ProfilememberController::class, 'approveTransaction']);
-    Route::post('/rejectTransaction', [ProfilememberController::class, 'rejectTransaction']);
-    // Route::get('/bni/create-billing', [BniController::class, 'createBilling']);
+Route::post('/update-quantity', [CartController::class, 'updateQuantity']);
+Route::post('/cart/update-quantity', [CartController::class, 'updateProductCart']);
+Route::post('/add-cart', [CartController::class, 'addCart']);
+Route::get('/update-top/{top}', [CartController::class, 'updateTOP']);
+Route::post('/update-payment', [CartController::class, 'updatePayment']);
+Route::delete('/cart/{id_temporary}/{id_shop}', [CartController::class, 'deleteCart']);
+Route::get('/member/getaddress', [CartController::class, 'getaddress']);
+Route::get('/updateAddressCart/{member_address_id}', [CartController::class, 'updateAddressCart']);
+Route::get('/shipping/{id_shipping}/{id_cs}', [CartController::class, 'getOngkir']);
+Route::get('/insurance/{id_shop}/{id_courier}/{idcs}/{status}', [CartController::class, 'insurance']);
+Route::get('/getorder/{id_cart}', [CheckoutController::class, 'getOrder']);
+Route::post('/upload-payment', [CheckoutController::class, 'uploadPayment']);
+Route::post('/storeKontrak', [ProfilememberController::class, 'storeKontrak']);
+Route::post('/storeSuratPesanan', [ProfilememberController::class, 'storeSuratPesanan']);
+Route::post('/finishCheckout', [CartController::class, 'finish_checkout']);
+Route::post('/sumbitBast', [CheckoutController::class, 'sumbit_bast']);
+Route::get('/lacak_pengiriman/{id_seller}/{id_cart_shop}', [CheckoutController::class, 'lacak_pengiriman']);
+Route::get('/get_detail_transaksi/{id_shop}/{id_cart_shop}', [CheckoutController::class, 'get_detail_product']);
+Route::post('/updateIsSelectProduct', [CartController::class, 'updateIsSelectProduct']);
+Route::post('/update-product-selection/shop', [CartController::class, 'updateIsSelectShop']);
+Route::post('/updateqtyCart', [CartController::class, 'updateqtyCart']);
+Route::post('/member/storeAddress', [ProfilememberController::class, 'storeAddress']);
+Route::post('/member/update-Address', [ProfilememberController::class, 'UpdateAddress']);
+Route::post('/member/nego/accNego', [ProfilememberController::class, 'accNego']);
+Route::post('/member/nego/tolak_nego', [ProfilememberController::class, 'tolak_nego']);
+Route::post('/member/nego/reqNego', [ProfilememberController::class, 'addRequestNego']);
+Route::post('/member/update-password', [ProfilememberController::class, 'store_password']);
+Route::post('/member/add-user', [ProfilememberController::class, 'store_user']);
+Route::post('/member/delete-user', [ProfilememberController::class, 'DeleteUser']);
+Route::post('/cart/update-note', [CartController::class, 'UpdateNote']);
+Route::post('/approveTransaction', [ProfilememberController::class, 'approveTransaction']);
+Route::post('/rejectTransaction', [ProfilememberController::class, 'rejectTransaction']);
+// Route::group(['middleware' => 'member'], function () {
 
-});
+//     // Route::get('/bni/create-billing', [BniController::class, 'createBilling']);
+
+// });
 
 // kurir
 Route::post('/kurir/anter', [KurirController::class, 'anter']);
